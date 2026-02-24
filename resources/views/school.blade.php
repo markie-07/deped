@@ -408,6 +408,20 @@
                 <div class="school-avatar-modal" id="modalSchoolAvatar"></div>
                 <span id="modalSchoolName">School Name</span>
             </h2>
+            <div style="display: flex; align-items: center; gap: 16px; margin-left: auto; margin-right: 16px;">
+                <div class="input-wrapper" style="width: 280px; position: relative;">
+                    <div class="input-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="modalSearch" class="form-input" placeholder="Search records..." style="padding: 8px 12px 8px 38px; width: 100%; border: 1.5px solid #e8ecf4; border-radius: 12px; font-size: 0.84rem; outline: none;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="modalFilterDate" style="font-size: 0.8rem; font-weight: 600; color: #64748b; white-space: nowrap;">Date:</label>
+                    <input type="date" id="modalFilterDate" class="form-input" style="padding: 8px 12px; width: auto; border: 1.5px solid #e8ecf4; border-radius: 12px; font-size: 0.84rem; outline: none;" onchange="fetchSchoolRecords()">
+                </div>
+            </div>
             <button class="modal-close" onclick="closeSchoolModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -668,16 +682,66 @@ document.addEventListener('DOMContentLoaded', function() {
         renderSchools(this.value);
     });
 
+    function filterModalRecords() {
+        const q = document.getElementById('modalSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('#schoolTableBody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            if (row.cells.length < 2) return; // Skip "No records" or "Loading" rows
+            const text = row.textContent.toLowerCase();
+            const isMatch = text.includes(q);
+            row.style.display = isMatch ? '' : 'none';
+            if (isMatch) visibleCount++;
+        });
+
+        const tbody = document.getElementById('schoolTableBody');
+        const existingNoResults = document.getElementById('noResultsRow');
+        
+        if (visibleCount === 0 && rows.length > 0 && rows[0].cells.length >= 2) {
+            if (!existingNoResults) {
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'noResultsRow';
+                noResultsRow.innerHTML = `<td colspan="7" style="text-align:center; padding: 30px; color: #94a3b8;">No records matching "${q}"</td>`;
+                tbody.appendChild(noResultsRow);
+            } else {
+                existingNoResults.innerHTML = `<td colspan="7" style="text-align:center; padding: 30px; color: #94a3b8;">No records matching "${q}"</td>`;
+                existingNoResults.style.display = '';
+            }
+        } else if (existingNoResults) {
+            existingNoResults.style.display = 'none';
+        }
+    }
+
+    document.getElementById('modalSearch').addEventListener('input', filterModalRecords);
+
+    let currentSchoolForModal = '';
+
     window.openSchoolModal = function(schoolName) {
         modal.classList.add('open');
+        currentSchoolForModal = schoolName;
         document.getElementById('modalSchoolName').textContent = schoolName;
         document.getElementById('modalSchoolAvatar').textContent = getInitials(schoolName);
+        document.getElementById('modalSearch').value = ''; // Clear search when opening
         
+        // Default date is empty to show all records
+        document.getElementById('modalFilterDate').value = '';
+        
+        fetchSchoolRecords();
+    };
+
+    window.fetchSchoolRecords = function() {
+        const schoolName = currentSchoolForModal;
+        const date = document.getElementById('modalFilterDate').value;
+        const url = `/leave-records/by-school?school=${encodeURIComponent(schoolName)}&date=${encodeURIComponent(date)}`;
+        
+        const tbody = document.getElementById('schoolTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #94a3b8;">Loading records...</td></tr>';
+
         // Fetch employees for this school
-        fetch(`/leave-records/by-school?school=${encodeURIComponent(schoolName)}`)
+        fetch(url)
             .then(res => res.json())
             .then(data => {
-                const tbody = document.getElementById('schoolTableBody');
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
                     return;
@@ -704,9 +768,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tr>
                     `;
                 }).join('');
+
+                // Apply search filter if there's an active query
+                if (document.getElementById('modalSearch').value) {
+                    filterModalRecords();
+                }
             })
             .catch(() => {
-                document.getElementById('schoolTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
             });
     };
 

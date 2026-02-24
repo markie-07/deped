@@ -53,6 +53,7 @@
 
                     <form id="leaveForm" class="leave-form" autocomplete="off">
                         @csrf
+                        <input type="hidden" id="recordId">
 
                         <!-- Section: Employee Info -->
                         <div class="form-section">
@@ -63,7 +64,29 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group full-width">
+                                <div class="form-group">
+                                    <label class="form-label" for="deptInput">Department</label>
+                                    <div class="combobox-wrapper" id="deptComboWrapper">
+                                        <div class="input-wrapper">
+                                            <div class="input-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="deptInput" class="form-input has-icon" placeholder="Search or type department" autocomplete="off">
+                                            <span class="ghost-text" id="deptGhost"></span>
+                                            <input type="hidden" id="department" name="department">
+                                            <button type="button" class="combobox-toggle" data-target="deptDropdown" tabindex="-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="combobox-dropdown" id="deptDropdown"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
                                     <label class="form-label" for="nameInput">Name</label>
                                     <div class="combobox-wrapper" id="nameComboWrapper">
                                         <div class="input-wrapper">
@@ -144,13 +167,14 @@
                                 <div class="form-group">
                                     <label class="form-label" for="leaveInput">Type of Leave</label>
                                     <div class="combobox-wrapper" id="leaveComboWrapper">
+                                        <div id="leaveTags" class="selected-tags-container"></div>
                                         <div class="input-wrapper">
                                             <div class="input-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
                                                 </svg>
                                             </div>
-                                            <input type="text" id="leaveInput" class="form-input has-icon" placeholder="Search or type leave type" autocomplete="off" required>
+                                            <input type="text" id="leaveInput" class="form-input has-icon" placeholder="Search or type leave type" autocomplete="off" >
                                             <span class="ghost-text" id="leaveGhost"></span>
                                             <input type="hidden" id="typeOfLeave" name="type_of_leave">
                                             <button type="button" class="combobox-toggle" tabindex="-1">
@@ -211,7 +235,7 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group full-width">
+                                <div class="form-group">
                                     <label class="form-label" for="deductionRemarks">Deduction Remarks</label>
                                     <div class="input-wrapper">
                                         <div class="input-icon">
@@ -220,6 +244,17 @@
                                             </svg>
                                         </div>
                                         <input type="text" id="deductionRemarks" name="deduction_remarks" class="form-input has-icon" placeholder="Enter deduction remarks">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="incharge">Incharge</label>
+                                    <div class="input-wrapper">
+                                        <div class="input-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75c-2.213 0-4.204.957-5.592 2.486m11.582 0a7.488 7.488 0 0 1-5.99 2.764c-2.213 0-4.204-.957-5.593-2.487m11.583 0a7.488 7.488 0 0 0-2.235-4.521M4.508 18.725a7.488 7.488 0 0 1 2.235-4.521M12 12.75A3.75 3.75 0 1 0 12 5.25a3.75 3.75 0 0 0 0 7.5Z" />
+                                            </svg>
+                                        </div>
+                                        <input type="text" id="incharge" name="incharge" class="form-input has-icon" placeholder="Name of incharge">
                                     </div>
                                 </div>
                             </div>
@@ -700,6 +735,12 @@
         color: #1e293b;
     }
 
+    .combobox-option.selected {
+        background: #f1f5f9;
+        color: #6366f1;
+        font-weight: 600;
+    }
+
     .combobox-option.add-new {
         color: #6366f1;
         font-weight: 600;
@@ -733,6 +774,49 @@
         border-radius: 10px;
     }
 
+    /* ── Multi-select Tags ── */
+    .selected-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .combobox-tag {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #3b82f6;
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        border: 1px solid #dbeafe;
+        transition: all 0.2s ease;
+    }
+
+    .combobox-tag:hover {
+        background: #dbeafe;
+    }
+
+    .tag-remove {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        color: #94a3b8;
+        transition: color 0.2s;
+    }
+
+    .tag-remove:hover {
+        color: #ef4444;
+    }
+
+    .tag-remove svg {
+        width: 14px;
+        height: 14px;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 768px) {
         .form-row {
@@ -754,120 +838,553 @@
             flex-wrap: wrap;
         }
     }
-    /* ── Modal ── */
+    /* ══════════════════════════════════════════
+       MODAL — PROFESSIONAL MINIMAL DESIGN
+       ══════════════════════════════════════════ */
+
     .modal-overlay {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: rgba(15, 23, 42, 0.5);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 1000;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease;
-        backdrop-filter: blur(2px);
+        transition: opacity 0.25s ease;
+        backdrop-filter: blur(4px);
     }
     .modal-overlay.open {
         opacity: 1;
         pointer-events: auto;
     }
+
     .modal-container {
-        background: white;
-        width: 90%;
-        max-width: 2000px;
+        background: #fff;
+        width: 96%;
+        max-width: 1500px;
         border-radius: 16px;
-        padding: 24px;
+        padding: 0;
         transform: translateY(20px);
-        transition: transform 0.3s ease;
-        max-height: 85vh;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 92vh;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
     }
     .modal-overlay.open .modal-container {
         transform: translateY(0);
     }
+
+    /* ── Modal Header ── */
     .modal-header {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        background: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        gap: 0;
+    }
+    .modal-header-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f1f5f9;
+        width: 100%;
+        padding: 20px 28px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .modal-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .modal-icon-box {
+        width: 38px;
+        height: 38px;
+        background: #6366f1;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
     }
     .modal-title {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+    }
+    .modal-close {
+        background: transparent;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        color: #94a3b8;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+    }
+    .modal-close:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #ef4444;
+        transform: rotate(90deg);
+    }
+
+    /* ── Filter Bar ── */
+    .modal-header-bottom {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 28px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .modal-header-bottom .filter-divider {
+        width: 1px;
+        height: 22px;
+        background: #d1d5db;
+    }
+    .modal-header-bottom .filter-group {
         display: flex;
         align-items: center;
         gap: 8px;
     }
-    .modal-close {
-        background: none;
-        border: none;
+    .modal-header-bottom .filter-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+    .modal-filter-input {
+        padding: 7px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        background: #fff;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    .modal-filter-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+    }
+    .modal-filter-select {
+        padding: 7px 32px 7px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        background: #fff;
+        outline: none;
         cursor: pointer;
-        color: #94a3b8;
-        padding: 4px;
-        border-radius: 6px;
-        transition: all 0.2s;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 14px;
+        transition: border-color 0.2s ease;
     }
-    .modal-close:hover {
-        background: #f1f5f9;
-        color: #64748b;
+    .modal-filter-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
     }
+    .modal-search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 200px;
+        max-width: 280px;
+    }
+    .modal-search-box .search-icon {
+        position: absolute;
+        left: 10px;
+        width: 16px;
+        height: 16px;
+        color: #9ca3af;
+        pointer-events: none;
+    }
+    .modal-search-input {
+        width: 100%;
+        padding: 7px 12px 7px 34px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        background: #fff;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    .modal-search-input::placeholder {
+        color: #9ca3af;
+    }
+    .modal-search-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+    }
+
+    /* ── Modal Body ── */
     .modal-body {
         overflow-y: auto;
+        overflow-x: hidden;
         flex: 1;
+        padding: 0;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
+    .modal-body::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* ── Table ── */
     .record-table {
         width: 100%;
         border-collapse: collapse;
+        border-spacing: 0;
     }
     .record-table th {
         text-align: left;
-        padding: 12px 16px;
-        font-size: 0.76rem;
-        font-weight: 600;
+        padding: 12px 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
         text-transform: uppercase;
-        color: #64748b;
-        background: #f8fafc;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
         position: sticky;
         top: 0;
+        z-index: 40;
+        height: 44px;
+        box-sizing: border-box;
+        white-space: nowrap;
     }
     .record-table td {
-        padding: 14px 16px;
+        padding: 14px 20px;
         font-size: 0.84rem;
-        color: #334155;
-        border-bottom: 1px solid #f1f5f9;
+        color: #374151;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+        transition: all 0.2s ease;
     }
-    .record-table tr:last-child td {
+    .record-table tbody tr.record-row {
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    .record-table tbody tr.record-row:hover {
+        border-left: 3px solid #6366f1;
+    }
+    .record-table tbody tr.record-row:hover td {
+        background: #f5f3ff;
+    }
+    .record-table tbody tr:last-child td {
         border-bottom: none;
     }
-    .record-table tr:hover td {
-        background: #fcfcfc;
+
+    /* ── Department Header ── */
+    .dept-header {
+        background: #f3f4f6 !important;
+        font-weight: 700;
+        color: #374151;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 10px 20px !important;
+        border-top: 1px solid #e5e7eb !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        text-align: center !important;
+        position: sticky;
+        top: 44px;
+        z-index: 30;
     }
+    .dept-header-content {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 0 auto;
+    }
+    .dept-badge {
+        background: #fff;
+        color: #374151;
+        padding: 4px 14px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        margin: 0;
+        font-weight: 700;
+        font-size: 0.72rem;
+        transition: all 0.2s ease;
+    }
+    .dept-header-row:hover .dept-badge {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+        color: #4338ca;
+    }
+    .dept-badge svg {
+        color: #6b7280;
+        transition: color 0.2s ease;
+    }
+    .dept-header-row:hover .dept-badge svg {
+        color: #6366f1;
+    }
+
+    /* ── Badges ── */
     .badge-leave {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         padding: 4px 10px;
-        border-radius: 20px;
+        border-radius: 6px;
         font-weight: 600;
-        background: #eff6ff;
-        color: #3b82f6;
+        background: #f3f4f6;
+        color: #374151;
+        display: inline-block;
+        border: 1px solid #e5e7eb;
+        letter-spacing: 0.02em;
+        transition: all 0.2s ease;
     }
-    
+    .record-table tbody tr.record-row:hover .badge-leave {
+        background: #eef2ff;
+        color: #4338ca;
+        border-color: #c7d2fe;
+    }
     .badge {
         font-size: 0.7rem;
-        padding: 4px 10px;
-        border-radius: 20px;
+        padding: 3px 10px;
+        border-radius: 6px;
         font-weight: 600;
         display: inline-block;
+        transition: all 0.2s ease;
     }
-    .badge-green { background: #ecfdf5; color: #059669; }
-    .badge-red { background: #fef2f2; color: #dc2626; }
-    .badge-yellow { background: #fffbeb; color: #d97706; }
-    .badge-gray { background: #f1f5f9; color: #64748b; }
+    .badge-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .badge-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .badge-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .badge-gray { background: #f9fafb; color: #4b5563; border: 1px solid #e5e7eb; }
+
+    /* ── Action Buttons (Table) ── */
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: transparent;
+    }
+    .btn-action:hover {
+        transform: scale(1.1);
+    }
+    .btn-edit {
+        color: #059669;
+        border-color: #d1fae5;
+        background: #ecfdf5;
+    }
+    .btn-edit:hover {
+        background: #059669;
+        color: #fff;
+        border-color: #059669;
+    }
+    .btn-delete {
+        color: #dc2626;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+    .btn-delete:hover {
+        background: #dc2626;
+        color: #fff;
+        border-color: #dc2626;
+    }
+
+    /* ── Excel / Print Button ── */
+    .btn-print {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #6366f1;
+        color: #fff;
+        border: 1px solid #6366f1;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-print:hover {
+        background: #4f46e5;
+        border-color: #4f46e5;
+    }
+    .btn-print.active {
+        background: #6366f1;
+        color: #fff;
+        border-color: #6366f1;
+    }
+    .btn-print.btn-gray {
+        background: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #d1d5db;
+    }
+    .btn-print.btn-gray:hover {
+        background: #e5e7eb;
+        border-color: #9ca3af;
+    }
+
+    /* ── Selection Checkboxes ── */
+    .selection-col {
+        display: none;
+        width: 60px;
+        text-align: center !important;
+        padding: 0 16px !important;
+    }
+    .printing-mode .selection-col {
+        display: table-cell;
+    }
+    .custom-checkbox {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid #d1d5db;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        background: #fff;
+        margin: 0 auto;
+    }
+    .custom-checkbox.checked {
+        background: #6366f1;
+        border-color: #6366f1;
+    }
+    .custom-checkbox svg {
+        width: 10px;
+        height: 10px;
+        color: white;
+        display: none;
+    }
+    .custom-checkbox.checked svg {
+        display: block;
+    }
+    .custom-checkbox.dept-select-all {
+        display: none;
+    }
+    .printing-mode .custom-checkbox.dept-select-all {
+        display: flex;
+    }
+
+    /* ── Modal Footer ── */
+    .modal-footer {
+        display: flex;
+        background: #fff;
+        padding: 14px 28px;
+        border-top: 1px solid #e5e7eb;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-footer-info {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 0.82rem;
+    }
+    .printing-mode .modal-footer-info {
+        display: flex;
+    }
+    #selectedCount {
+        background: #6366f1;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: 'Inter', monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+    .export-actions {
+        display: none;
+        gap: 10px;
+    }
+    .printing-mode .export-actions {
+        display: flex;
+    }
+    .printing-mode #excelModeBtn {
+        display: none;
+    }
+
+    /* ── Print Styles ── */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #recordsModal, #recordsModal * {
+            visibility: visible;
+        }
+        #recordsModal {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: auto;
+            max-height: none;
+            overflow: visible;
+            box-shadow: none;
+            border: none;
+            background: white;
+        }
+        .modal-container {
+            width: 100%;
+            max-width: none;
+            height: auto;
+            max-height: none;
+            overflow: visible;
+            box-shadow: none;
+            border: none;
+            transform: none !important;
+        }
+        .modal-header, .print-controls, .btn-action, .selection-col, .modal-close {
+            display: none !important;
+        }
+        .modal-body {
+            overflow: visible !important;
+            padding: 0 !important;
+        }
+        .record-table tr:not(.print-selected):not(.dept-header-row) {
+            display: none !important;
+        }
+        .dept-header-row {
+            display: table-row !important;
+        }
+        .dept-header-row.no-selected {
+            display: none !important;
+        }
+        .record-table th, .record-table td {
+            border-bottom: 1px solid #e5e7eb !important;
+            padding: 10px 8px !important;
+        }
+    }
 
     .records-counter {
         cursor: pointer;
@@ -884,6 +1401,12 @@
 <script>
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    // Read URL params (from Leave Records page Add button)
+    const urlParams = new URLSearchParams(window.location.search);
+    const presetDept = urlParams.get('dept');
+    const presetBatch = urlParams.get('batch');
+    const presetSource = urlParams.get('source');
+
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         toast.textContent = message;
@@ -893,16 +1416,12 @@
 
     function resetForm() {
         document.getElementById('leaveForm').reset();
-        document.getElementById('employeeName').value = '';
-        document.getElementById('nameInput').value = '';
-        document.getElementById('position').value = '';
-        document.getElementById('positionInput').value = '';
-        document.getElementById('school').value = '';
-        document.getElementById('schoolInput').value = '';
-        document.getElementById('typeOfLeave').value = '';
-        document.getElementById('leaveInput').value = '';
-        document.getElementById('remarks').value = '';
-        document.getElementById('remarksInput').value = '';
+        document.getElementById('recordId').value = '';
+        if (nameCombo) nameCombo.clear();
+        if (posCombo) posCombo.clear();
+        if (schoolCombo) schoolCombo.clear();
+        if (leaveCombo) leaveCombo.clear();
+        if (remarksCombo) remarksCombo.clear();
         setTodayDate();
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = `
@@ -945,6 +1464,7 @@
 
         const record = {
             name: document.getElementById('employeeName').value,
+            department: document.getElementById('department').value,
             position: document.getElementById('position').value,
             school: document.getElementById('school').value,
             type_of_leave: document.getElementById('typeOfLeave').value,
@@ -952,10 +1472,21 @@
             remarks: document.getElementById('remarks').value,
             date_of_action: document.getElementById('dateOfAction').value,
             deduction_remarks: document.getElementById('deductionRemarks').value,
+            incharge: document.getElementById('incharge').value,
         };
 
-        fetch('/leave-records', {
-            method: 'POST',
+        // If adding from Leave Records page, include batch/source info
+        if (presetBatch && presetSource) {
+            record.target_batch = presetBatch;
+            record.source = presetSource;
+        }
+
+        const recordId = document.getElementById('recordId').value;
+        const method = recordId ? 'PUT' : 'POST';
+        const url = recordId ? `/leave-records/${recordId}` : '/leave-records';
+
+        fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
@@ -970,6 +1501,13 @@
                 updateRecordCount();
                 loadDropdownData();
                 resetForm();
+                
+                // If coming from Leave Records, redirect back after a brief delay
+                if (presetSource === 'leave-records') {
+                    setTimeout(() => {
+                        window.location.href = '/leave-records';
+                    }, 1000);
+                }
             } else {
                 showToast('Error saving record', 'error');
                 resetForm();
@@ -989,6 +1527,10 @@
         const wrapper = input.closest('.combobox-wrapper');
         const toggle = wrapper.querySelector('.combobox-toggle');
         const grouped = opts.grouped || false;
+        const isMulti = opts.multi || false;
+        const strict = opts.strict || false;
+        const tagsContainer = isMulti ? document.getElementById(opts.tagsId) : null;
+        let selectedValues = [];
         let allItems = [];
         let groupedItems = {};
 
@@ -1006,6 +1548,35 @@
             allItems = [...items];
         }
 
+        function updateTags() {
+            if (!tagsContainer) return;
+            if (selectedValues.length === 0) {
+                tagsContainer.innerHTML = '';
+                return;
+            }
+            tagsContainer.innerHTML = selectedValues.map((val, idx) => `
+                <div class="combobox-tag">
+                    <span>${val}</span>
+                    <span class="tag-remove" data-index="${idx}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </span>
+                </div>
+            `).join('');
+
+            tagsContainer.querySelectorAll('.tag-remove').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const idx = parseInt(this.getAttribute('data-index'));
+                    selectedValues.splice(idx, 1);
+                    updateTags();
+                    hidden.value = selectedValues.join(', ');
+                    if (opts.onSelect) opts.onSelect(selectedValues);
+                };
+            });
+        }
+
         function render(filter = '') {
             const q = filter.toLowerCase();
             let html = '';
@@ -1018,7 +1589,8 @@
                         hasResults = true;
                         html += `<div class="combobox-group-label">${group}</div>`;
                         filtered.forEach(s => {
-                            html += `<div class="combobox-option" data-value="${s}">${s}</div>`;
+                            const isSelected = isMulti && selectedValues.includes(s);
+                            html += `<div class="combobox-option ${isSelected ? 'selected' : ''}" data-value="${s}">${s}</div>`;
                         });
                     }
                 });
@@ -1027,7 +1599,8 @@
                 if (filtered.length > 0) {
                     hasResults = true;
                     filtered.forEach(s => {
-                        html += `<div class="combobox-option" data-value="${s}">${s}</div>`;
+                        const isSelected = isMulti && selectedValues.includes(s);
+                        html += `<div class="combobox-option ${isSelected ? 'selected' : ''}" data-value="${s}">${s}</div>`;
                     });
                 }
             }
@@ -1042,9 +1615,20 @@
                 opt.addEventListener('mousedown', function(e) {
                     e.preventDefault();
                     const val = this.getAttribute('data-value');
-                    input.value = val;
-                    hidden.value = val;
-                    if (opts.onSelect) opts.onSelect(val);
+                    
+                    if (isMulti) {
+                        if (!selectedValues.includes(val)) {
+                            selectedValues.push(val);
+                            updateTags();
+                        }
+                        input.value = '';
+                        hidden.value = selectedValues.join(', ');
+                        if (opts.onSelect) opts.onSelect(selectedValues);
+                    } else {
+                        input.value = val;
+                        hidden.value = val;
+                        if (opts.onSelect) opts.onSelect(val);
+                    }
                     close();
                 });
             });
@@ -1084,34 +1668,88 @@
 
         input.addEventListener('focus', open);
         input.addEventListener('input', function() {
-            // Auto Title Case: capitalize first letter of every word
+            // Auto Title Case
             const pos = this.selectionStart;
             this.value = this.value.replace(/\b\w/g, c => c.toUpperCase());
             this.setSelectionRange(pos, pos);
-            hidden.value = this.value;
+            if (!isMulti) hidden.value = this.value;
             if (opts.onInput) opts.onInput(this.value);
             updateGhost();
             open();
         });
 
-        // Accept ghost suggestion with Tab or Right Arrow
+        // Accept ghost suggestion
         input.addEventListener('keydown', function(e) {
             if ((e.key === 'Tab' || e.key === 'ArrowRight') && ghost && ghost.innerHTML) {
                 const suggestionEl = ghost.querySelector('.ghost-suggestion');
                 if (suggestionEl && suggestionEl.textContent) {
                     e.preventDefault();
                     const fullText = input.value + suggestionEl.textContent;
-                    input.value = fullText;
-                    hidden.value = fullText;
+                    if (isMulti) {
+                        if (!selectedValues.includes(fullText)) {
+                            selectedValues.push(fullText);
+                            updateTags();
+                        }
+                        input.value = '';
+                        hidden.value = selectedValues.join(', ');
+                    } else {
+                        input.value = fullText;
+                        hidden.value = fullText;
+                    }
                     if (opts.onInput) opts.onInput(fullText);
                     ghost.innerHTML = '';
                     close();
                 }
+            } else if (e.key === 'Enter' && input.value.trim() !== '') {
+                e.preventDefault();
+                const val = input.value.trim();
+                const match = allItems.find(s => s.toLowerCase() === val.toLowerCase());
+                
+                if (strict && !match) {
+                    // In strict mode, if no exact match, try to use ghost suggestion
+                    const ghostSuggestion = ghost && ghost.querySelector('.ghost-suggestion');
+                    if (ghostSuggestion) {
+                        const fullText = val + ghostSuggestion.textContent;
+                        applyValue(fullText);
+                    } else {
+                        input.value = ''; // Clear if invalid
+                    }
+                    return;
+                }
+
+                const finalVal = match || val;
+
+                function applyValue(v) {
+                    if (isMulti) {
+                        if (!selectedValues.includes(v)) {
+                            selectedValues.push(v);
+                            updateTags();
+                        }
+                        input.value = '';
+                        hidden.value = selectedValues.join(', ');
+                    } else {
+                        input.value = v;
+                        hidden.value = v;
+                    }
+                }
+
+                applyValue(finalVal);
+                close();
             }
         });
 
         input.addEventListener('blur', function() {
             if (ghost) ghost.innerHTML = '';
+            
+            if (strict && input.value.trim() !== '') {
+                const val = input.value.trim();
+                const match = allItems.find(s => s.toLowerCase() === val.toLowerCase());
+                if (!match) {
+                    input.value = ''; // Clear invalid partial input
+                } else {
+                    input.value = match; // Snap to correct case
+                }
+            }
         });
 
         toggle.addEventListener('click', function() {
@@ -1134,29 +1772,41 @@
             updateGroupedItems: function(newGroups) {
                 groupedItems = newGroups;
                 flattenItems();
+            },
+            clear: function() {
+                selectedValues = [];
+                if (isMulti) updateTags();
+                input.value = '';
+                hidden.value = '';
+            },
+            setValue: function(val) {
+                if (isMulti) {
+                    selectedValues = val ? val.split(', ').filter(v => v) : [];
+                    updateTags();
+                    hidden.value = selectedValues.join(', ');
+                } else {
+                    input.value = val || '';
+                    hidden.value = val || '';
+                }
             }
         };
     }
 
     // ── Initialize comboboxes ──
-    let nameCombo, posCombo, schoolCombo, leaveCombo, remarksCombo;
+    let nameCombo, deptCombo, posCombo, schoolCombo, leaveCombo, remarksCombo;
     let employeeDataMap = {};
+    let allEmployeeNames = [];
 
-    const leaveTypes = ['Vacation Leave', 'Sick Leave', 'Maternity Leave', 'Paternity Leave', 'Special Privilege Leave', 'Solo Parent Leave', 'Study Leave', 'Terminal Leave', 'Adoption Leave', 'Rehabilitation Leave', 'Special Leave Benefits for Women', 'Forced Leave', 'Special Emergency Leave'];
-    const remarksList = ['Approved', 'Disapproved', 'Pending', 'For Review', 'With Pay', 'Without Pay', 'Half Day', 'Cancelled'];
+    const leaveTypes = ['FL', 'SL', 'SPL', 'VL', 'SP', 'CTO', 'LC', 'CL', 'PL'];
+    const remarksList = ['With Pay', 'Without Pay'];
 
     function autoFillEmployee(name) {
         if (!name) return;
         const info = employeeDataMap[name];
         if (info) {
-            if (info.position) {
-                document.getElementById('positionInput').value = info.position;
-                document.getElementById('position').value = info.position;
-            }
-            if (info.school) {
-                document.getElementById('schoolInput').value = info.school;
-                document.getElementById('school').value = info.school;
-            }
+            if (info.department && deptCombo) deptCombo.setValue(info.department);
+            if (info.position && posCombo) posCombo.setValue(info.position);
+            if (info.school && schoolCombo) schoolCombo.setValue(info.school);
         }
     }
 
@@ -1165,37 +1815,74 @@
             onSelect: function(val) { autoFillEmployee(val); },
             onInput: function(val) { autoFillEmployee(val); }
         });
+        deptCombo = initCombobox('deptInput', 'department', 'deptDropdown', [], {
+            onSelect: function(val) { filterNamesByDept(val); },
+            onInput: function(val) { filterNamesByDept(val); }
+        });
         posCombo = initCombobox('positionInput', 'position', 'posDropdown', []);
         schoolCombo = initCombobox('schoolInput', 'school', 'schoolDropdown', {}, { grouped: true });
-        leaveCombo = initCombobox('leaveInput', 'typeOfLeave', 'leaveDropdown', leaveTypes);
+        leaveCombo = initCombobox('leaveInput', 'typeOfLeave', 'leaveDropdown', leaveTypes, { 
+            multi: true, 
+            strict: true,
+            tagsId: 'leaveTags' 
+        });
         remarksCombo = initCombobox('remarksInput', 'remarks', 'remarksDropdown', remarksList);
 
         // Load from database
         updateRecordCount();
-        loadDropdownData();
+        loadDropdownData().then(() => {
+            // Check for edit parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('edit');
+            if (editId) {
+                fetch(`/api/leave-records/${editId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data) editRecord(data);
+                    })
+                    .catch(() => {});
+            }
+            
+            // Pre-fill department if coming from Leave Records Add button
+            if (presetDept && deptCombo) {
+                deptCombo.setValue(presetDept);
+                filterNamesByDept(presetDept);
+            }
+        });
         setTodayDate();
     });
 
+    function filterNamesByDept(dept) {
+        if (!nameCombo) return;
+        if (!dept) {
+            nameCombo.updateItems(allEmployeeNames);
+            return;
+        }
+        const filtered = allEmployeeNames.filter(name => {
+            const info = employeeDataMap[name];
+            return info && info.department === dept;
+        });
+        nameCombo.updateItems(filtered);
+    }
+
     function loadDropdownData() {
-        fetch('/leave-records/dropdown-data')
+        return fetch('/leave-records/dropdown-data')
             .then(res => res.json())
             .then(data => {
-                if (nameCombo) nameCombo.updateItems(data.names || []);
+                allEmployeeNames = data.names || [];
+                if (nameCombo) nameCombo.updateItems(allEmployeeNames);
+                if (deptCombo) deptCombo.updateItems(data.departments || []);
                 if (posCombo) posCombo.updateItems(data.positions || []);
                 if (schoolCombo) schoolCombo.updateGroupedItems(data.schools || {});
                 
                 employeeDataMap = data.employee_map || {};
 
                 if (leaveCombo) {
-                    const dbLeaves = data.leave_types || [];
-                    const mergedLeaves = [...new Set([...leaveTypes, ...dbLeaves])];
-                    leaveCombo.updateItems(mergedLeaves);
+                    leaveCombo.updateItems(leaveTypes);
                 }
 
                 if (remarksCombo) {
-                    const dbRemarks = data.remarks || [];
-                    const mergedRemarks = [...new Set([...remarksList, ...dbRemarks])];
-                    remarksCombo.updateItems(mergedRemarks);
+                    remarksCombo.updateItems(remarksList);
                 }
             })
             .catch(() => {});
@@ -1206,50 +1893,94 @@
 <div class="modal-overlay" id="recordsModal">
     <div class="modal-container">
         <div class="modal-header">
-            <h2 class="modal-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="text-indigo-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                </svg>
-                Leave Records
-            </h2>
-            <div style="display: flex; align-items: center; gap: 16px; margin-left: auto; margin-right: 16px;">
-                <div class="input-wrapper" style="width: 280px;">
-                    <div class="input-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            <div class="modal-header-top">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:20px; height:20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                         </svg>
                     </div>
-                    <input type="text" id="modalSearch" class="form-input has-icon" placeholder="Search records..." style="padding: 8px 12px 8px 38px;">
+                    <h2 class="modal-title">Leave Records Registry</h2>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="filterDate" style="font-size: 0.8rem; font-weight: 600; color: #64748b; white-space: nowrap;">Date:</label>
-                    <input type="date" id="filterDate" class="form-input" style="padding: 8px 12px; width: auto;" onchange="fetchRecordsList()">
+                <button class="modal-close" onclick="closeRecordsModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-header-bottom">
+                <div class="modal-search-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <input type="text" id="modalSearch" class="modal-search-input" placeholder="Search records...">
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-group">
+                    <span class="filter-label">Department</span>
+                    <select id="filterDept" class="modal-filter-select" onchange="filterModalRecords()">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-group">
+                    <span class="filter-label">Status</span>
+                    <select id="filterPay" class="modal-filter-select" onchange="filterModalRecords()">
+                        <option value="all">All</option>
+                        <option value="with pay">With Pay</option>
+                        <option value="without pay">Without Pay</option>
+                    </select>
                 </div>
             </div>
-            <button class="modal-close" onclick="closeRecordsModal()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
         </div>
         <div class="modal-body">
             <table class="record-table">
                 <thead>
                     <tr>
-                        <th style="width: 15%">Name</th>
+                        <th class="selection-col"></th>
+                        <th style="width: 4%">#</th>
+                        <th style="width: 14%">Name</th>
                         <th style="width: 10%">Position</th>
-                        <th style="width: 15%">School</th>
-                        <th style="width: 12%">Type of Leave</th>
-                        <th style="width: 13%">Inclusive Dates</th>
-                        <th style="width: 10%">Remarks</th>
-                        <th style="width: 12%">Date of Action</th>
-                        <th style="width: 13%">Deduction Remarks</th>
+                        <th style="width: 12%">School</th>
+                        <th style="width: 8%">Leave Type</th>
+                        <th style="width: 11%">Inclusive Dates</th>
+                        <th style="width: 9%">Remarks</th>
+                        <th style="width: 10%">Date of Action</th>
+                        <th style="width: 10%">Deduction</th>
+                        <th style="width: 8%">Incharge</th>
+                        <th style="width: 8%; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="recordsTableBody">
-                    <tr><td colspan="8" style="text-align:center; padding: 30px; color: #94a3b8;">Loading records...</td></tr>
+                    <tr><td colspan="12" style="text-align:center; padding: 40px; color: #9ca3af; font-size: 0.85rem;">Loading records...</td></tr>
                 </tbody>
             </table>
+        </div>
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+            <div class="modal-footer-info">
+                <span id="selectedCount">0</span> records selected
+            </div>
+            <div style="flex: 1;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button id="excelModeBtn" class="btn-print" onclick="togglePrintMode()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px; height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span>Export</span>
+                </button>
+                <div class="export-actions">
+                    <button class="btn-print btn-gray" onclick="togglePrintMode()">Cancel</button>
+                    <button class="btn-print active" onclick="executeExport()">Download .xls</button>
+                </div>
+                <!-- Done Button -->
+                <button id="doneBtn" class="btn-print" onclick="completeRegistryAction()" style="background: #10b981; border-color: #10b981; color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:15px; height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <span>Done</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -1257,21 +1988,13 @@
 <script>
     const recordsModal = document.getElementById('recordsModal');
     const recordsCounter = document.querySelector('.records-counter');
-    const filterDateInput = document.getElementById('filterDate');
 
     recordsCounter.addEventListener('click', openRecordsModal);
 
     function openRecordsModal() {
         recordsModal.classList.add('open');
-        document.getElementById('modalSearch').value = ''; // Clear search when opening
-        // Set default date to today if not set
-        if (!filterDateInput.value) {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            filterDateInput.value = `${yyyy}-${mm}-${dd}`;
-        }
+        document.getElementById('modalSearch').value = '';
+        if (document.getElementById('filterPay')) document.getElementById('filterPay').value = 'all';
         fetchRecordsList();
     }
 
@@ -1287,15 +2010,30 @@
 
     function filterModalRecords() {
         const q = document.getElementById('modalSearch').value.toLowerCase();
+        const payStatus = document.getElementById('filterPay') ? document.getElementById('filterPay').value : 'all';
+        const deptFilter = document.getElementById('filterDept') ? document.getElementById('filterDept').value : 'all';
         const rows = document.querySelectorAll('#recordsTableBody tr');
         let visibleCount = 0;
 
         rows.forEach(row => {
-            if (row.cells.length < 2) return; // Skip "No records" or "Loading" rows
+            if (row.classList.contains('dept-header-row')) return;
+            if (row.id === 'noResultsRow') return;
+            
             const text = row.textContent.toLowerCase();
-            const isMatch = text.includes(q);
-            row.style.display = isMatch ? '' : 'none';
-            if (isMatch) visibleCount++;
+            const matchesSearch = text.includes(q);
+            const matchesDept = (deptFilter === 'all' || row.getAttribute('data-dept') === deptFilter);
+            
+            let matchesPay = true;
+            const rowRemarks = (row.getAttribute('data-remarks') || '').toLowerCase();
+            if (payStatus === 'with pay') {
+                matchesPay = rowRemarks.includes('with pay') || (rowRemarks.includes('approved') && !rowRemarks.includes('disapproved'));
+            } else if (payStatus === 'without pay') {
+                matchesPay = rowRemarks.includes('without pay') || rowRemarks.includes('disapproved');
+            }
+            
+            const isVisible = matchesSearch && matchesPay && matchesDept;
+            row.style.display = isVisible ? '' : 'none';
+            if (isVisible) visibleCount++;
         });
 
         // Handle case where all rows are filtered out
@@ -1303,66 +2041,502 @@
         const existingNoResults = document.getElementById('noResultsRow');
         
         if (visibleCount === 0 && rows.length > 0 && rows[0].cells.length >= 2) {
+            const noResultsMsg = (q || payStatus !== 'all') ? `No records matching current filters` : `No records found`;
             if (!existingNoResults) {
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.id = 'noResultsRow';
-                noResultsRow.innerHTML = `<td colspan="8" style="text-align:center; padding: 30px; color: #94a3b8;">No records matching "${q}"</td>`;
+                noResultsRow.innerHTML = `<td colspan="11" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
                 tbody.appendChild(noResultsRow);
             } else {
-                existingNoResults.innerHTML = `<td colspan="8" style="text-align:center; padding: 30px; color: #94a3b8;">No records matching "${q}"</td>`;
+                existingNoResults.innerHTML = `<td colspan="11" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
                 existingNoResults.style.display = '';
             }
         } else if (existingNoResults) {
             existingNoResults.style.display = 'none';
         }
+
+        // Logic to hide/show department headers based on visible records and selected filter
+        let currentHeader = null;
+        let hasVisibleRecordsInGroup = false;
+
+        rows.forEach(row => {
+            if (row.classList.contains('dept-header-row')) {
+                // Before starting next group, hide previous header if needed
+                if (currentHeader && !hasVisibleRecordsInGroup) {
+                    currentHeader.style.display = 'none';
+                }
+                
+                currentHeader = row;
+                hasVisibleRecordsInGroup = false;
+                
+                const headerDept = row.getAttribute('data-dept');
+                const matchesDeptFilter = (deptFilter === 'all' || headerDept === deptFilter);
+                
+                row.style.display = matchesDeptFilter ? '' : 'none';
+            } else if (row.id !== 'noResultsRow' && row.style.display !== 'none') {
+                hasVisibleRecordsInGroup = true;
+            }
+        });
+
+        if (currentHeader && !hasVisibleRecordsInGroup) {
+            currentHeader.style.display = 'none';
+        }
     }
 
+    let currentModalRecords = [];
     document.getElementById('modalSearch').addEventListener('input', filterModalRecords);
 
     function fetchRecordsList() {
-        const date = filterDateInput.value;
-        const url = date ? `/leave-records?date=${encodeURIComponent(date)}` : '/leave-records';
+        const url = '/leave-records?view=registry';
 
-        fetch(url)
+        fetch(url, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
             .then(res => res.json())
             .then(data => {
+                // Sort by department first
+                data.sort((a, b) => (a.department || '').localeCompare(b.department || ''));
+                
+                currentModalRecords = data;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = data.map(r => {
-                    // Styles for remarks badges
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '-';
+                    try {
+                        const date = new Date(dateStr);
+                        if (isNaN(date.getTime())) return dateStr;
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const dd = String(date.getDate()).padStart(2, '0');
+                        const yyyy = date.getFullYear();
+                        return `${mm}-${dd}-${yyyy}`;
+                    } catch (e) {
+                        return dateStr;
+                    }
+                };
+
+                // Populate Department Filter
+                const deptSelect = document.getElementById('filterDept');
+                const depts = [...new Set(data.map(r => r.department || 'No Department'))].sort();
+                const currentFilter = deptSelect.value;
+                deptSelect.innerHTML = '<option value="all">All Departments</option>';
+                depts.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    deptSelect.appendChild(opt);
+                });
+                deptSelect.value = depts.includes(currentFilter) ? currentFilter : 'all';
+
+                let html = '';
+                let lastDept = null;
+
+                data.forEach((r, index) => {
+                    const dept = r.department || 'No Department';
+                    if (dept !== lastDept) {
+                        html += `
+                            <tr class="dept-header-row" data-dept="${dept}">
+                                <td colspan="12" class="dept-header">
+                                    <div class="dept-header-content">
+                                        <div class="custom-checkbox dept-select-all" data-dept="${dept}" onclick="toggleDeptSelection('${dept}', this)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                        </div>
+                                        <div class="dept-badge">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                            </svg>
+                                            <span>${dept}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                        lastDept = dept;
+                    }
+
                     let remarkClass = 'badge-gray';
                     const rem = (r.remarks || '').toLowerCase();
-                    if (rem === 'approved' || rem === 'with pay') remarkClass = 'badge-green';
-                    else if (rem === 'disapproved' || rem === 'without pay' || rem === 'cancelled') remarkClass = 'badge-red';
-                    else if (rem === 'pending' || rem === 'for review') remarkClass = 'badge-yellow';
+                    if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'badge-green';
+                    else if (rem.includes('disapproved') || rem.includes('without pay') || rem.includes('cancelled')) remarkClass = 'badge-red';
+                    else if (rem.includes('pending') || rem.includes('review')) remarkClass = 'badge-yellow';
                     
                     const remarkBadge = r.remarks ? `<span class="badge ${remarkClass}">${r.remarks}</span>` : '<span style="color:#cbd5e1">-</span>';
 
-                    return `
-                    <tr>
-                        <td style="font-weight: 600; color:#1e293b;">${r.name}</td>
-                        <td style="color:#475569; font-size: 0.8rem;">${r.position || '-'}</td>
-                        <td style="color:#475569;">${r.school || '-'}</td>
-                        <td><span class="badge-leave">${r.type_of_leave}</span></td>
-                        <td style="font-family:monospace; font-size:0.75rem; color:#64748b;">${r.inclusive_dates || '-'}</td>
-                        <td>${remarkBadge}</td>
-                        <td style="font-family:monospace; font-size:0.75rem; color:#64748b;">${r.date_of_action || '-'}</td>
-                        <td style="color:#64748b; font-size: 0.8rem;">${r.deduction_remarks || '-'}</td>
-                    </tr>
-                `}).join('');
+                    html += `
+                        <tr data-dept="${dept}" data-id="${r.id}" data-remarks="${(r.remarks || '').toLowerCase()}" class="record-row">
+                            <td class="selection-col">
+                                <div class="custom-checkbox record-select" onclick="toggleRecordSelection(${r.id}, this)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                </div>
+                            </td>
+                            <td style="color:#94a3b8; font-weight: 600; font-family:monospace; font-size:0.8rem;">${index + 1}</td>
+                            <td style="font-weight: 700; color:#0f172a;">${r.name}</td>
+                            <td style="font-weight: 600; font-size: 0.82rem; color: #475569;">${r.position || '-'}</td>
+                            <td style="color:#64748b; font-size: 0.85rem;">${r.school || '-'}</td>
+                            <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                            <td style="font-family:monospace; font-size:0.78rem; color:#475569; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
+                            <td>${remarkBadge}</td>
+                            <td style="font-family:monospace; font-size:0.8rem; color:#0f172a; font-weight:700;">${formatDate(r.date_of_action)}</td>
+                            <td style="color:#64748b; font-size: 0.82rem;">${r.deduction_remarks || '-'}</td>
+                            <td style="color:#475569; font-size: 0.85rem; font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
 
-                // Apply search filter if there's an active query
-                if (document.getElementById('modalSearch').value) {
-                    filterModalRecords();
-                }
+                tbody.innerHTML = html;
+
+                // Apply filters to new data
+                filterModalRecords();
             })
             .catch(() => {
-                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
+                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
             });
+    }
+
+    function editModalRecord(id) {
+        const record = currentModalRecords.find(r => r.id == id);
+        if (record) {
+            editRecord(record);
+        }
+    }
+
+    function editRecord(r) {
+        // Close modal first
+        closeRecordsModal();
+        
+        // Populate form fields
+        document.getElementById('recordId').value = r.id;
+        
+        // For comboboxes, use setValue
+        if (nameCombo) nameCombo.setValue(r.name);
+        if (deptCombo) deptCombo.setValue(r.department);
+        if (posCombo) posCombo.setValue(r.position);
+        if (schoolCombo) schoolCombo.setValue(r.school);
+        if (leaveCombo) leaveCombo.setValue(r.type_of_leave);
+        if (remarksCombo) remarksCombo.setValue(r.remarks);
+        
+        document.getElementById('inclusiveDates').value = r.inclusive_dates || '';
+        document.getElementById('dateOfAction').value = r.date_of_action || '';
+        document.getElementById('deductionRemarks').value = r.deduction_remarks || '';
+        document.getElementById('remarks').value = r.remarks || '';
+        document.getElementById('remarksInput').value = r.remarks || '';
+        document.getElementById('incharge').value = r.incharge || '';
+
+        // Change submit button text
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+            </svg>
+            Update Record
+        `;
+        
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast('Form populated with record details. You can now edit and save.', 'info');
+    }
+
+    function deleteRecord(id) {
+        if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) return;
+
+        fetch(`/leave-records/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message);
+                updateRecordCount();
+                fetchRecordsList(); // Refresh the list in modal
+            } else {
+                showToast('Error deleting record', 'error');
+            }
+        })
+        .catch(() => {
+            showToast('Error deleting record. Please try again.', 'error');
+        });
+    }
+
+    // --- Printing Mode Logic ---
+    let isPrintingMode = false;
+
+    function togglePrintMode() {
+        isPrintingMode = !isPrintingMode;
+        const container = document.querySelector('.modal-container');
+        
+        if (isPrintingMode) {
+            container.classList.add('printing-mode');
+            
+            // AUTOMATIC SELECTION: Select all visible rows by default
+            const visibleRows = document.querySelectorAll('.record-row:not([style*="display: none"])');
+            visibleRows.forEach(row => {
+                row.classList.add('print-selected');
+                const cb = row.querySelector('.record-select');
+                if (cb) cb.classList.add('checked');
+            });
+            
+            // Update all department "select all" checkboxes to checked
+            document.querySelectorAll('.dept-select-all').forEach(cb => {
+                cb.classList.add('checked');
+            });
+            
+            updateSelectedCount();
+        } else {
+            container.classList.remove('printing-mode');
+            
+            // Clear selections
+            document.querySelectorAll('.custom-checkbox.checked').forEach(cb => cb.classList.remove('checked'));
+            document.querySelectorAll('.record-row.print-selected').forEach(row => row.classList.remove('print-selected'));
+            updateSelectedCount();
+        }
+    }
+
+    function toggleRecordSelection(id, el) {
+        el.classList.toggle('checked');
+        const row = el.closest('tr');
+        row.classList.toggle('print-selected');
+        
+        // Update department "select all" state
+        const dept = row.getAttribute('data-dept');
+        const deptHeader = document.querySelector(`.dept-header-row[data-dept="${dept}"]`);
+        if (deptHeader) {
+            const allInDept = document.querySelectorAll(`.record-row[data-dept="${dept}"]`);
+            const allChecked = document.querySelectorAll(`.record-row[data-dept="${dept}"].print-selected`);
+            const deptCheck = deptHeader.querySelector('.dept-select-all');
+            
+            if (allChecked.length === allInDept.length && allInDept.length > 0) {
+                deptCheck.classList.add('checked');
+            } else {
+                deptCheck.classList.remove('checked');
+            }
+        }
+        
+        updateSelectedCount();
+    }
+
+    function toggleDeptSelection(dept, el) {
+        const isChecked = el.classList.contains('checked');
+        const newState = !isChecked;
+        
+        el.classList.toggle('checked', newState);
+        
+        const rows = document.querySelectorAll(`.record-row[data-dept="${dept}"]`);
+        rows.forEach(row => {
+            const checkbox = row.querySelector('.record-select');
+            if (checkbox) {
+                if (newState) {
+                    row.classList.add('print-selected');
+                    checkbox.classList.add('checked');
+                } else {
+                    row.classList.remove('print-selected');
+                    checkbox.classList.remove('checked');
+                }
+            }
+        });
+        
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.record-row.print-selected').length;
+        document.getElementById('selectedCount').textContent = count;
+    }
+
+    function executeExport() {
+        const selectedRows = document.querySelectorAll('.record-row.print-selected');
+        if (selectedRows.length === 0) {
+            alert('Please select at least one record to export.');
+            return;
+        }
+
+        let html = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8">
+                <!--[if gte mso 9]>
+                <xml>
+                <${'x' + ':'}ExcelWorkbook>
+                    <${'x' + ':'}ExcelWorksheets>
+                        <${'x' + ':'}ExcelWorksheet>
+                            <${'x' + ':'}Name>Leave Records</${'x' + ':'}Name>
+                            <${'x' + ':'}WorksheetOptions>
+                                <${'x' + ':'}DisplayGridlines/>
+                            </${'x' + ':'}WorksheetOptions>
+                        </${'x' + ':'}ExcelWorksheet>
+                    </${'x' + ':'}ExcelWorksheets>
+                </${'x' + ':'}ExcelWorkbook>
+                </xml>
+                <![endif]-->
+                <style>
+                    table { border-collapse: collapse; width: 100%; }
+                    th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; }
+                    td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+                    .dept-header { background-color: #e2e8f0; font-weight: bold; text-align: center; }
+                </style>
+            </head>
+            <body>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>School</th>
+                            <th>Type of Leave</th>
+                            <th>Inclusive Dates</th>
+                            <th>Remarks</th>
+                            <th>Date of Action</th>
+                            <th>Deduction Remarks</th>
+                            <th>Incharge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        let lastDept = null;
+        let counter = 1;
+
+        // Iterate through rows in the DOM to preserve grouping and sorting
+        const rows = document.querySelectorAll('#recordsTableBody tr');
+        rows.forEach(row => {
+            if (row.classList.contains('dept-header-row')) {
+                const dept = row.getAttribute('data-dept');
+                // Check if any selected row exists under this specific dept header
+                // Stop at the next dept-header-row or batch-header-row
+                let hasSelected = false;
+                let next = row.nextElementSibling;
+                while (next && !next.classList.contains('dept-header-row') && !next.classList.contains('batch-header-row')) {
+                    if (next.classList.contains('print-selected')) {
+                        hasSelected = true;
+                        break;
+                    }
+                    next = next.nextElementSibling;
+                }
+                if (hasSelected) {
+                    html += `<tr><td colspan="10" class="dept-header">${dept}</td></tr>`;
+                }
+            } else if (row.classList.contains('print-selected')) {
+                const cells = row.cells;
+                // Note: Index 0 is selection-col, index 1 is #, index 2 is Name...
+                html += `
+                    <tr>
+                        <td>${counter++}</td>
+                        <td>${cells[2].textContent}</td>
+                        <td>${cells[3].textContent}</td>
+                        <td>${cells[4].textContent}</td>
+                        <td>${cells[5].textContent}</td>
+                        <td>${cells[6].textContent}</td>
+                        <td>${cells[7].textContent}</td>
+                        <td>${cells[8].textContent}</td>
+                        <td>${cells[9].textContent}</td>
+                        <td>${cells[10].textContent}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        const timestamp = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `Leave_Records_Registry_${timestamp}.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Excel file generated successfully.');
+        togglePrintMode(); // Exit excel mode
+    }
+
+    function completeRegistryAction() {
+        const tbody = document.getElementById('recordsTableBody');
+        const rows = tbody.querySelectorAll('.record-row');
+        
+        if (rows.length === 0) {
+            closeRecordsModal();
+            return;
+        }
+
+        // Get all visible record IDs in the registry
+        const ids = Array.from(rows).map(row => row.getAttribute('data-id')).filter(id => id);
+
+        if (ids.length === 0) {
+            closeRecordsModal();
+            return;
+        }
+
+        // Add a clearing animation
+        tbody.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        tbody.style.opacity = '0';
+        tbody.style.transform = 'translateY(10px)';
+
+        // Call API to mark as processed
+        fetch('/leave-records/bulk-process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                setTimeout(() => {
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem; background: #f8fafc;">All records processed and removed from registry.</td></tr>';
+                    tbody.style.opacity = '1';
+                    tbody.style.transform = 'translateY(0)';
+                    
+                    showToast('Registry cleared successfully.');
+                    updateRecordCount(); // Refresh the counter on the form
+                    
+                    setTimeout(closeRecordsModal, 800);
+                }, 400);
+            } else {
+                tbody.style.opacity = '1';
+                tbody.style.transform = 'translateY(0)';
+                showToast('Error clearing registry', 'error');
+            }
+        })
+        .catch(() => {
+            tbody.style.opacity = '1';
+            tbody.style.transform = 'translateY(0)';
+            showToast('Connection error', 'error');
+        });
     }
 </script>
 </body>

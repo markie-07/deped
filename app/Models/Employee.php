@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LeaveRecord extends Model
+class Employee extends Model
 {
     protected $fillable = [
         'name',
@@ -17,7 +17,5 @@ class LeaveRecord extends Model
         'date_of_action',
         'deduction_remarks',
         'incharge',
-        'is_processed',
-        'batch_id',
     ];
 }

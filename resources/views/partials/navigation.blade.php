@@ -17,6 +17,8 @@
                         'position' => 'Position',
                         'types-of-leave' => 'Types of Leave',
                         'remarks' => 'Remarks',
+                        'leave-records-registry' => 'Leave Records',
+                        'incharge' => 'Incharge Registry',
                     ];
                     $currentPath = request()->path();
                     $pageTitle = $titles[$currentPath] ?? ucfirst($currentPath);
@@ -32,6 +34,8 @@
                         'position' => 'Manage positions and designations',
                         'types-of-leave' => 'Manage leave types and categories',
                         'remarks' => 'Manage remarks and notes',
+                        'leave-records-registry' => 'Complete registry of all leave records',
+                        'incharge' => 'Manage and view incharges and their recorded activities',
                     ];
                     $pageSubtitle = $subtitles[$currentPath] ?? '';
                 @endphp

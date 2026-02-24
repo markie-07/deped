@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Controllers\LeaveRecordController;
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -21,14 +22,38 @@ Route::get('/form', function () {
     return view('form');
 });
 
+Route::get('/employee', [EmployeeController::class, 'index']);
+
 // Leave Record API routes
 Route::post('/leave-records', [LeaveRecordController::class, 'store']);
+Route::post('/leave-records/bulk', [LeaveRecordController::class, 'bulkStore']);
+Route::post('/leave-records/bulk-process', [LeaveRecordController::class, 'bulkProcess']);
 Route::get('/leave-records', [LeaveRecordController::class, 'index']);
+Route::get('/api/leave-records/{id}', [LeaveRecordController::class, 'show']);
+Route::put('/leave-records/{id}', [LeaveRecordController::class, 'update']);
+Route::delete('/leave-records/{id}', [LeaveRecordController::class, 'destroy']);
 Route::get('/leave-records/dropdown-data', [LeaveRecordController::class, 'dropdownData']);
 Route::get('/leave-records/count', [LeaveRecordController::class, 'count']);
 
 Route::get('/leave-records/schools', [LeaveRecordController::class, 'getSchools']);
 Route::get('/leave-records/by-school', [LeaveRecordController::class, 'getBySchool']);
+
+Route::get('/leave-records/positions', [LeaveRecordController::class, 'getPositions']);
+Route::get('/leave-records/by-position', [LeaveRecordController::class, 'getByPosition']);
+
+Route::get('/leave-records/types', [LeaveRecordController::class, 'getLeaveTypes']);
+Route::get('/leave-records/by-type', [LeaveRecordController::class, 'getByLeaveType']);
+
+Route::get('/leave-records/remarks-list', [LeaveRecordController::class, 'getRemarksList']);
+Route::get('/leave-records/by-remark', [LeaveRecordController::class, 'getByRemark']);
+
+Route::get('/leave-records/incharges', [LeaveRecordController::class, 'getIncharges']);
+Route::get('/leave-records/by-incharge', [LeaveRecordController::class, 'getByIncharge']);
+
+
+Route::get('/incharge', function () {
+    return view('incharge');
+});
 
 Route::get('/school', function () {
     return view('school');

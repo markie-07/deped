@@ -48,5 +48,8 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // Populate directory tables from existing leave records
+        $this->call(DirectorySeeder::class);
     }
 }

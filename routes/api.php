@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+use App\Http\Controllers\EmployeeController;
+
 // ─── Authentication ───
 Route::post('/login', function (Request $request) {
     // TODO: Implement login logic
@@ -43,30 +45,8 @@ Route::get('/dashboard/stats', function () {
 
 // ─── Employees ───
 Route::prefix('employees')->group(function () {
-    Route::get('/', function () {
-        // TODO: Return all employees
-        return response()->json(['message' => 'List employees'], 200);
-    });
-
-    Route::get('/{id}', function ($id) {
-        // TODO: Return specific employee
-        return response()->json(['message' => "Get employee {$id}"], 200);
-    });
-
-    Route::post('/', function (Request $request) {
-        // TODO: Create employee
-        return response()->json(['message' => 'Create employee'], 201);
-    });
-
-    Route::put('/{id}', function ($id, Request $request) {
-        // TODO: Update employee
-        return response()->json(['message' => "Update employee {$id}"], 200);
-    });
-
-    Route::delete('/{id}', function ($id) {
-        // TODO: Delete employee
-        return response()->json(['message' => "Delete employee {$id}"], 200);
-    });
+    Route::get('/', [EmployeeController::class, 'getEmployees']);
+    Route::get('/records', [EmployeeController::class, 'getRecordsByEmployee']);
 });
 
 // ─── Departments ───
