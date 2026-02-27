@@ -7,7 +7,7 @@ use App\Models\School;
 use App\Models\Position;
 use App\Models\LeaveType;
 use App\Models\Remark;
-use App\Models\Department;
+use App\Models\Forwarded;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,9 @@ class LeaveRecordController extends Controller
      */
     public function index(Request $request)
     {
-        $query = LeaveRecord::orderBy('batch_id', 'asc')->orderBy('created_at', 'asc');
+        $query = LeaveRecord::orderBy('batch_id', 'asc')
+            ->orderBy('forwarded', 'asc')
+            ->orderBy('created_at', 'asc');
 
         if ($request->has('view') && $request->view === 'registry') {
             $query->where('is_processed', false);
@@ -53,9 +55,15 @@ class LeaveRecordController extends Controller
         $nextBatch = $currentMaxBatch + 1;
         
         if ($ids === 'all') {
-            LeaveRecord::where('is_processed', false)->update(['is_processed' => true]);
+            LeaveRecord::where('is_processed', false)->update([
+                'is_processed' => true,
+                'date_of_action' => now()->format('Y-m-d')
+            ]);
         } elseif (is_array($ids)) {
-            LeaveRecord::whereIn('id', $ids)->update(['is_processed' => true]);
+            LeaveRecord::whereIn('id', $ids)->update([
+                'is_processed' => true,
+                'date_of_action' => now()->format('Y-m-d')
+            ]);
         }
 
         return response()->json([
@@ -80,7 +88,7 @@ class LeaveRecordController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'department' => 'nullable|string|max:255',
+            'forwarded' => 'nullable|string|max:255',
 
             'position' => 'required|string|max:255',
             'school' => 'required|string|max:255',
@@ -207,10 +215,10 @@ class LeaveRecordController extends Controller
             );
         }
 
-        // Sync Department
-        if ($record->department) {
-            Department::updateOrCreate(
-                ['name' => $record->department],
+        // Sync Forwarded
+        if ($record->forwarded) {
+            Forwarded::updateOrCreate(
+                ['name' => $record->forwarded],
                 [
                     'employee_name' => $record->name,
                     'position' => $record->position,
@@ -241,19 +249,21 @@ class LeaveRecordController extends Controller
 
         $leaveTypes = LeaveType::orderBy('name')->pluck('name');
         $remarks = Remark::orderBy('name')->pluck('name');
-        $departments = Department::orderBy('name')->pluck('name');
+        $forwardeds = Forwarded::orderBy('name')->pluck('name');
 
         // Get latest position and school for each employee to auto-fill form
         $employeeMap = LeaveRecord::orderBy('created_at', 'desc')
-            ->get(['name', 'department', 'position', 'school'])
+            ->get(['name', 'forwarded', 'position', 'school'])
             ->unique('name')
             ->mapWithKeys(function ($record) {
                 return [$record->name => [
-                    'department' => $record->department,
+                    'forwarded' => $record->forwarded,
                     'position' => $record->position,
                     'school' => $record->school
                 ]];
             });
+
+        $incharges = LeaveRecord::whereNotNull('incharge')->distinct()->pluck('incharge')->filter()->values();
 
         return response()->json([
             'names' => $names,
@@ -261,8 +271,9 @@ class LeaveRecordController extends Controller
             'schools' => $schoolGroups,
             'leave_types' => $leaveTypes,
             'remarks' => $remarks,
-            'departments' => $departments,
+            'forwardeds' => $forwardeds,
             'employee_map' => $employeeMap,
+            'incharges' => $incharges,
         ]);
     }
 
@@ -384,17 +395,35 @@ class LeaveRecordController extends Controller
      */
     public function getRemarksList()
     {
-        $remarks = Remark::withCount('leaveRecords as leave_count')
-            ->orderBy('name')
-            ->get()
-            ->map(function($r) {
-                return [
-                    'remarks' => $r->name,
-                    'leave_count' => $r->leave_count
-                ];
-            });
+        $remarks = Remark::all();
+        $resultsGrouped = [];
+        
+        foreach ($remarks as $r) {
+            $name = $r->name;
+            $key = $name;
             
-        return response()->json($remarks);
+            // Normalize W/O to Without Pay for grouping
+            if (strtolower($name) === 'w/o') {
+                $key = 'Without Pay';
+            }
+            
+            $count = LeaveRecord::where('remarks', $name)->count();
+            
+            if (isset($resultsGrouped[$key])) {
+                $resultsGrouped[$key]['leave_count'] += $count;
+            } else {
+                $resultsGrouped[$key] = [
+                    'remarks' => $key,
+                    'leave_count' => $count
+                ];
+            }
+        }
+        
+        // Return sorted by name
+        $final = array_values($resultsGrouped);
+        usort($final, function($a, $b) { return strcmp($a['remarks'], $b['remarks']); });
+        
+        return response()->json($final);
     }
 
     /**
@@ -403,7 +432,13 @@ class LeaveRecordController extends Controller
     public function getByRemark(Request $request)
     {
         $remark = $request->input('remark');
-        $query = LeaveRecord::where('remarks', $remark);
+        $query = LeaveRecord::query();
+
+        if (strtolower($remark) === 'without pay') {
+            $query->whereIn('remarks', ['Without Pay', 'W/O', 'w/o', 'WITHOUT PAY']);
+        } else {
+            $query->where('remarks', $remark);
+        }
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
@@ -422,7 +457,7 @@ class LeaveRecordController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'department' => 'nullable|string|max:255',
+            'forwarded' => 'nullable|string|max:255',
 
             'position' => 'required|string|max:255',
             'school' => 'required|string|max:255',
@@ -528,31 +563,31 @@ class LeaveRecordController extends Controller
             $currentBatch = (LeaveRecord::max('batch_id') ?? 0) + 1;
         }
         
-        // Track departments to detect when a department repeats (new group)
-        $lastDept = null;
-        $seenDepts = [];
+        // Track forwardeds to detect when a forwarded repeats (new group)
+        $lastForwarded = null;
+        $seenForwardeds = [];
         
         foreach ($recordsArr as $data) {
             // Basic validation
             if (empty($data['name']) || $data['name'] === '-') continue;
 
-            $dept = $data['department'] ?? null;
+            $forwardedValue = $data['forwarded'] ?? null;
             
-            // If this department was seen before but is not the same as the last one,
+            // If this "forwarded" was seen before but is not the same as the last one,
             // it means a new group started (e.g., SDO → SDS → SDO again)
-            if ($dept !== null && $dept !== $lastDept && in_array($dept, $seenDepts)) {
+            if ($forwardedValue !== null && $forwardedValue !== $lastForwarded && in_array($forwardedValue, $seenForwardeds)) {
                 $currentBatch++;
-                $seenDepts = []; // Reset for the new batch
+                $seenForwardeds = []; // Reset for the new batch
             }
             
-            if ($dept !== null && !in_array($dept, $seenDepts)) {
-                $seenDepts[] = $dept;
+            if ($forwardedValue !== null && !in_array($forwardedValue, $seenForwardeds)) {
+                $seenForwardeds[] = $forwardedValue;
             }
-            $lastDept = $dept;
+            $lastForwarded = $forwardedValue;
 
             $record = LeaveRecord::create([
                 'name' => $data['name'],
-                'department' => $dept,
+                'forwarded' => $forwardedValue,
                 'position' => $data['position'] ?? '-',
                 'school' => $data['school'] ?? '-',
                 'type_of_leave' => $data['type_of_leave'] ?? '-',
@@ -570,7 +605,7 @@ class LeaveRecordController extends Controller
             // Also save to employees table
             Employee::create([
                 'name' => $record->name,
-                'department' => $record->department,
+                'forwarded' => $record->forwarded,
                 'position' => $record->position,
                 'school' => $record->school,
                 'type_of_leave' => $record->type_of_leave,

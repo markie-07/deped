@@ -127,20 +127,20 @@ class DirectorySeeder extends Seeder
             );
         }
 
-        // Populate Departments with latest record info
-        $departments = \App\Models\LeaveRecord::select('department')
+        // Populate Forwardeds with latest record info
+        $forwardeds = \App\Models\LeaveRecord::select('forwarded')
             ->distinct()
-            ->whereNotNull('department')
-            ->where('department', '!=', '')
-            ->pluck('department');
+            ->whereNotNull('forwarded')
+            ->where('forwarded', '!=', '')
+            ->pluck('forwarded');
 
-        foreach ($departments as $dept) {
-            $latest = \App\Models\LeaveRecord::where('department', $dept)
+        foreach ($forwardeds as $fwd) {
+            $latest = \App\Models\LeaveRecord::where('forwarded', $fwd)
                 ->orderBy('created_at', 'desc')
                 ->first();
 
-            \App\Models\Department::updateOrCreate(
-                ['name' => $dept],
+            \App\Models\Forwarded::updateOrCreate(
+                ['name' => $fwd],
                 [
                     'employee_name' => $latest->name ?? null,
                     'position' => $latest->position ?? null,

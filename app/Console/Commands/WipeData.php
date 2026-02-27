@@ -41,7 +41,7 @@ class WipeData extends Command
             'positions',
             'leave_types',
             'remarks',
-            'departments'
+            'forwardeds'
         ];
 
         foreach ($tables as $table) {

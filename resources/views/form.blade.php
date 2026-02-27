@@ -65,24 +65,24 @@
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label" for="deptInput">Department</label>
-                                    <div class="combobox-wrapper" id="deptComboWrapper">
+                                    <label class="form-label" for="forwardedInput">Forwarded</label>
+                                    <div class="combobox-wrapper" id="forwardedComboWrapper">
                                         <div class="input-wrapper">
                                             <div class="input-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                                                 </svg>
                                             </div>
-                                            <input type="text" id="deptInput" class="form-input has-icon" placeholder="Search or type department" autocomplete="off">
-                                            <span class="ghost-text" id="deptGhost"></span>
-                                            <input type="hidden" id="department" name="department">
-                                            <button type="button" class="combobox-toggle" data-target="deptDropdown" tabindex="-1">
+                                            <input type="text" id="forwardedInput" class="form-input has-icon" placeholder="Search or type forwarded" autocomplete="off">
+                                            <span class="ghost-text" id="forwardedGhost"></span>
+                                            <input type="hidden" id="forwarded" name="forwarded">
+                                            <button type="button" class="combobox-toggle" data-target="forwardedDropdown" tabindex="-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                                 </svg>
                                             </button>
                                         </div>
-                                        <div class="combobox-dropdown" id="deptDropdown"></div>
+                                        <div class="combobox-dropdown" id="forwardedDropdown"></div>
                                     </div>
                                 </div>
 
@@ -247,14 +247,24 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" for="incharge">Incharge</label>
-                                    <div class="input-wrapper">
-                                        <div class="input-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75c-2.213 0-4.204.957-5.592 2.486m11.582 0a7.488 7.488 0 0 1-5.99 2.764c-2.213 0-4.204-.957-5.593-2.487m11.583 0a7.488 7.488 0 0 0-2.235-4.521M4.508 18.725a7.488 7.488 0 0 1 2.235-4.521M12 12.75A3.75 3.75 0 1 0 12 5.25a3.75 3.75 0 0 0 0 7.5Z" />
-                                            </svg>
+                                    <label class="form-label" for="inchargeInput">Incharge</label>
+                                    <div class="combobox-wrapper" id="inchargeComboWrapper">
+                                        <div class="input-wrapper">
+                                            <div class="input-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75c-2.213 0-4.204.957-5.592 2.486m11.582 0a7.488 7.488 0 0 1-5.99 2.764c-2.213 0-4.204-.957-5.593-2.487m11.583 0a7.488 7.488 0 0 0-2.235-4.521M4.508 18.725a7.488 7.488 0 0 1 2.235-4.521M12 12.75A3.75 3.75 0 1 0 12 5.25a3.75 3.75 0 0 0 0 7.5Z" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="inchargeInput" class="form-input has-icon" placeholder="Search or type incharge name" autocomplete="off">
+                                            <span class="ghost-text" id="inchargeGhost"></span>
+                                            <input type="hidden" id="incharge" name="incharge">
+                                            <button type="button" class="combobox-toggle" data-target="inchargeDropdown" tabindex="-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                </svg>
+                                            </button>
                                         </div>
-                                        <input type="text" id="incharge" name="incharge" class="form-input has-icon" placeholder="Name of incharge">
+                                        <div class="combobox-dropdown" id="inchargeDropdown"></div>
                                     </div>
                                 </div>
                             </div>
@@ -291,6 +301,7 @@
 
     .form-container {
         width: 100%;
+        padding-bottom: 250px;
     }
 
     /* ── Form Card ── */
@@ -302,7 +313,6 @@
             0 4px 12px rgba(0, 0, 0, 0.04),
             0 16px 40px rgba(99, 102, 241, 0.06),
             0 24px 60px rgba(0, 0, 0, 0.04);
-        overflow: hidden
     }
 
     .form-card-header {
@@ -1097,8 +1107,8 @@
         border-bottom: none;
     }
 
-    /* ── Department Header ── */
-    .dept-header {
+    /* ── Forwarded Header ── */
+    .forwarded-header {
         background: #f3f4f6 !important;
         font-weight: 700;
         color: #374151;
@@ -1113,14 +1123,14 @@
         top: 44px;
         z-index: 30;
     }
-    .dept-header-content {
+    .forwarded-header-content {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
         margin: 0 auto;
     }
-    .dept-badge {
+    .forwarded-badge {
         background: #fff;
         color: #374151;
         padding: 4px 14px;
@@ -1135,16 +1145,16 @@
         font-size: 0.72rem;
         transition: all 0.2s ease;
     }
-    .dept-header-row:hover .dept-badge {
+    .forwarded-header-row:hover .forwarded-badge {
         background: #eef2ff;
         border-color: #c7d2fe;
         color: #4338ca;
     }
-    .dept-badge svg {
+    .forwarded-badge svg {
         color: #6b7280;
         transition: color 0.2s ease;
     }
-    .dept-header-row:hover .dept-badge svg {
+    .forwarded-header-row:hover .forwarded-badge svg {
         color: #6366f1;
     }
 
@@ -1177,6 +1187,7 @@
     .badge-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
     .badge-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
     .badge-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .badge-violet { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
     .badge-gray { background: #f9fafb; color: #4b5563; border: 1px solid #e5e7eb; }
 
     /* ── Action Buttons (Table) ── */
@@ -1394,6 +1405,20 @@
     .records-counter:hover {
         background: #dbeafe;
     }
+
+    /* Hide selection column by default */
+    .selection-col {
+        display: none !important;
+    }
+    .printing-mode .selection-col {
+        display: table-cell !important;
+    }
+    .forwarded-select-all {
+        display: none !important;
+    }
+    .printing-mode .forwarded-select-all {
+        display: flex !important;
+    }
 </style>
 
 <div class="toast" id="toast"></div>
@@ -1403,7 +1428,7 @@
 
     // Read URL params (from Leave Records page Add button)
     const urlParams = new URLSearchParams(window.location.search);
-    const presetDept = urlParams.get('dept');
+    const presetForwarded = urlParams.get('forwarded');
     const presetBatch = urlParams.get('batch');
     const presetSource = urlParams.get('source');
 
@@ -1422,6 +1447,7 @@
         if (schoolCombo) schoolCombo.clear();
         if (leaveCombo) leaveCombo.clear();
         if (remarksCombo) remarksCombo.clear();
+        if (inchargeCombo) inchargeCombo.clear();
         setTodayDate();
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = `
@@ -1464,7 +1490,7 @@
 
         const record = {
             name: document.getElementById('employeeName').value,
-            department: document.getElementById('department').value,
+            forwarded: document.getElementById('forwarded').value,
             position: document.getElementById('position').value,
             school: document.getElementById('school').value,
             type_of_leave: document.getElementById('typeOfLeave').value,
@@ -1793,18 +1819,18 @@
     }
 
     // ── Initialize comboboxes ──
-    let nameCombo, deptCombo, posCombo, schoolCombo, leaveCombo, remarksCombo;
+    let nameCombo, forwardedCombo, posCombo, schoolCombo, leaveCombo, remarksCombo, inchargeCombo;
     let employeeDataMap = {};
     let allEmployeeNames = [];
 
-    const leaveTypes = ['FL', 'SL', 'SPL', 'VL', 'SP', 'CTO', 'LC', 'CL', 'PL'];
-    const remarksList = ['With Pay', 'Without Pay'];
+    const leaveTypes = ['FL', 'SL', 'SPL', 'VL', 'SP', 'CTO', 'LC', 'CL', 'PL', 'Wellness', 'SP/SPL', 'CTO/LC', 'SL/SPL', 'FL/SL', 'FL/SPL'];
+    const remarksList = ['With Pay', 'Without Pay', 'With Pay & Without Pay'];
 
     function autoFillEmployee(name) {
         if (!name) return;
         const info = employeeDataMap[name];
         if (info) {
-            if (info.department && deptCombo) deptCombo.setValue(info.department);
+            if (info.forwarded && forwardedCombo) forwardedCombo.setValue(info.forwarded);
             if (info.position && posCombo) posCombo.setValue(info.position);
             if (info.school && schoolCombo) schoolCombo.setValue(info.school);
         }
@@ -1815,9 +1841,9 @@
             onSelect: function(val) { autoFillEmployee(val); },
             onInput: function(val) { autoFillEmployee(val); }
         });
-        deptCombo = initCombobox('deptInput', 'department', 'deptDropdown', [], {
-            onSelect: function(val) { filterNamesByDept(val); },
-            onInput: function(val) { filterNamesByDept(val); }
+        forwardedCombo = initCombobox('forwardedInput', 'forwarded', 'forwardedDropdown', [], {
+            onSelect: function(val) { filterNamesByForwarded(val); },
+            onInput: function(val) { filterNamesByForwarded(val); }
         });
         posCombo = initCombobox('positionInput', 'position', 'posDropdown', []);
         schoolCombo = initCombobox('schoolInput', 'school', 'schoolDropdown', {}, { grouped: true });
@@ -1827,6 +1853,7 @@
             tagsId: 'leaveTags' 
         });
         remarksCombo = initCombobox('remarksInput', 'remarks', 'remarksDropdown', remarksList);
+        inchargeCombo = initCombobox('inchargeInput', 'incharge', 'inchargeDropdown', []);
 
         // Load from database
         updateRecordCount();
@@ -1843,24 +1870,24 @@
                     .catch(() => {});
             }
             
-            // Pre-fill department if coming from Leave Records Add button
-            if (presetDept && deptCombo) {
-                deptCombo.setValue(presetDept);
-                filterNamesByDept(presetDept);
+            // Pre-fill forwarded if coming from Leave Records Add button
+            if (presetForwarded && forwardedCombo) {
+                forwardedCombo.setValue(presetForwarded);
+                filterNamesByForwarded(presetForwarded);
             }
         });
         setTodayDate();
     });
 
-    function filterNamesByDept(dept) {
+    function filterNamesByForwarded(forwarded) {
         if (!nameCombo) return;
-        if (!dept) {
+        if (!forwarded) {
             nameCombo.updateItems(allEmployeeNames);
             return;
         }
         const filtered = allEmployeeNames.filter(name => {
             const info = employeeDataMap[name];
-            return info && info.department === dept;
+            return info && info.forwarded === forwarded;
         });
         nameCombo.updateItems(filtered);
     }
@@ -1871,7 +1898,7 @@
             .then(data => {
                 allEmployeeNames = data.names || [];
                 if (nameCombo) nameCombo.updateItems(allEmployeeNames);
-                if (deptCombo) deptCombo.updateItems(data.departments || []);
+                if (forwardedCombo) forwardedCombo.updateItems(data.forwardeds || []);
                 if (posCombo) posCombo.updateItems(data.positions || []);
                 if (schoolCombo) schoolCombo.updateGroupedItems(data.schools || {});
                 
@@ -1883,6 +1910,10 @@
 
                 if (remarksCombo) {
                     remarksCombo.updateItems(remarksList);
+                }
+
+                if (inchargeCombo) {
+                    inchargeCombo.updateItems((data.incharges || []).sort());
                 }
             })
             .catch(() => {});
@@ -1917,8 +1948,8 @@
                 </div>
                 <div class="filter-divider"></div>
                 <div class="filter-group">
-                    <span class="filter-label">Department</span>
-                    <select id="filterDept" class="modal-filter-select" onchange="filterModalRecords()">
+                    <span class="filter-label">Forwarded</span>
+                    <select id="filterForwarded" class="modal-filter-select" onchange="filterModalRecords()">
                         <option value="all">All</option>
                     </select>
                 </div>
@@ -2011,17 +2042,17 @@
     function filterModalRecords() {
         const q = document.getElementById('modalSearch').value.toLowerCase();
         const payStatus = document.getElementById('filterPay') ? document.getElementById('filterPay').value : 'all';
-        const deptFilter = document.getElementById('filterDept') ? document.getElementById('filterDept').value : 'all';
+        const forwardedFilter = document.getElementById('filterForwarded') ? document.getElementById('filterForwarded').value : 'all';
         const rows = document.querySelectorAll('#recordsTableBody tr');
         let visibleCount = 0;
 
         rows.forEach(row => {
-            if (row.classList.contains('dept-header-row')) return;
+            if (row.classList.contains('forwarded-header-row')) return;
             if (row.id === 'noResultsRow') return;
             
             const text = row.textContent.toLowerCase();
             const matchesSearch = text.includes(q);
-            const matchesDept = (deptFilter === 'all' || row.getAttribute('data-dept') === deptFilter);
+            const matchesForwarded = (forwardedFilter === 'all' || row.getAttribute('data-forwarded') === forwardedFilter);
             
             let matchesPay = true;
             const rowRemarks = (row.getAttribute('data-remarks') || '').toLowerCase();
@@ -2031,7 +2062,7 @@
                 matchesPay = rowRemarks.includes('without pay') || rowRemarks.includes('disapproved');
             }
             
-            const isVisible = matchesSearch && matchesPay && matchesDept;
+            const isVisible = matchesSearch && matchesPay && matchesForwarded;
             row.style.display = isVisible ? '' : 'none';
             if (isVisible) visibleCount++;
         });
@@ -2045,22 +2076,22 @@
             if (!existingNoResults) {
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.id = 'noResultsRow';
-                noResultsRow.innerHTML = `<td colspan="11" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
+                noResultsRow.innerHTML = `<td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
                 tbody.appendChild(noResultsRow);
             } else {
-                existingNoResults.innerHTML = `<td colspan="11" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
+                existingNoResults.innerHTML = `<td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
                 existingNoResults.style.display = '';
             }
         } else if (existingNoResults) {
             existingNoResults.style.display = 'none';
         }
 
-        // Logic to hide/show department headers based on visible records and selected filter
+        // Logic to hide/show forwarded headers based on visible records and selected filter
         let currentHeader = null;
         let hasVisibleRecordsInGroup = false;
 
         rows.forEach(row => {
-            if (row.classList.contains('dept-header-row')) {
+            if (row.classList.contains('forwarded-header-row')) {
                 // Before starting next group, hide previous header if needed
                 if (currentHeader && !hasVisibleRecordsInGroup) {
                     currentHeader.style.display = 'none';
@@ -2069,10 +2100,10 @@
                 currentHeader = row;
                 hasVisibleRecordsInGroup = false;
                 
-                const headerDept = row.getAttribute('data-dept');
-                const matchesDeptFilter = (deptFilter === 'all' || headerDept === deptFilter);
+                const headerForwarded = row.getAttribute('data-forwarded');
+                const matchesForwardedFilter = (forwardedFilter === 'all' || headerForwarded === forwardedFilter);
                 
-                row.style.display = matchesDeptFilter ? '' : 'none';
+                row.style.display = matchesForwardedFilter ? '' : 'none';
             } else if (row.id !== 'noResultsRow' && row.style.display !== 'none') {
                 hasVisibleRecordsInGroup = true;
             }
@@ -2096,13 +2127,13 @@
         })
             .then(res => res.json())
             .then(data => {
-                // Sort by department first
-                data.sort((a, b) => (a.department || '').localeCompare(b.department || ''));
+                // Sort by forwarded first
+                data.sort((a, b) => (a.forwarded || '').localeCompare(b.forwarded || ''));
                 
                 currentModalRecords = data;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
                     return;
                 }
 
@@ -2120,55 +2151,56 @@
                     }
                 };
 
-                // Populate Department Filter
-                const deptSelect = document.getElementById('filterDept');
-                const depts = [...new Set(data.map(r => r.department || 'No Department'))].sort();
-                const currentFilter = deptSelect.value;
-                deptSelect.innerHTML = '<option value="all">All Departments</option>';
-                depts.forEach(d => {
+                // Populate Forwarded Filter
+                const forwardedSelect = document.getElementById('filterForwarded');
+                const forwardeds = [...new Set(data.map(r => r.forwarded || 'No Forwarded'))].sort();
+                const currentFilter = forwardedSelect.value;
+                forwardedSelect.innerHTML = '<option value="all">All Forwarded</option>';
+                forwardeds.forEach(d => {
                     const opt = document.createElement('option');
                     opt.value = d;
                     opt.textContent = d;
-                    deptSelect.appendChild(opt);
+                    forwardedSelect.appendChild(opt);
                 });
-                deptSelect.value = depts.includes(currentFilter) ? currentFilter : 'all';
+                forwardedSelect.value = forwardeds.includes(currentFilter) ? currentFilter : 'all';
 
                 let html = '';
                 let lastDept = null;
 
                 data.forEach((r, index) => {
-                    const dept = r.department || 'No Department';
-                    if (dept !== lastDept) {
-                        html += `
-                            <tr class="dept-header-row" data-dept="${dept}">
-                                <td colspan="12" class="dept-header">
-                                    <div class="dept-header-content">
-                                        <div class="custom-checkbox dept-select-all" data-dept="${dept}" onclick="toggleDeptSelection('${dept}', this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
-                                        </div>
-                                        <div class="dept-badge">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                                            </svg>
-                                            <span>${dept}</span>
-                                        </div>
+                    const forwarded = r.forwarded || 'No Forwarded';
+                if (forwarded !== lastDept) {
+                    html += `
+                        <tr class="forwarded-header-row" data-forwarded="${forwarded}">
+                            <td colspan="12" class="forwarded-header">
+                                <div class="forwarded-header-content">
+                                    <div class="custom-checkbox forwarded-select-all" data-forwarded="${forwarded}" onclick="toggleForwardedSelection('${forwarded.replace(/'/g, "\\'")}', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
                                     </div>
-                                </td>
-                            </tr>
-                        `;
-                        lastDept = dept;
+                                    <div class="forwarded-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                        </svg>
+                                        <span>${forwarded}</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                        lastDept = forwarded;
                     }
 
                     let remarkClass = 'badge-gray';
                     const rem = (r.remarks || '').toLowerCase();
-                    if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'badge-green';
+                    if (rem.includes('with pay') && rem.includes('without pay')) remarkClass = 'badge-violet';
+                    else if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'badge-green';
                     else if (rem.includes('disapproved') || rem.includes('without pay') || rem.includes('cancelled')) remarkClass = 'badge-red';
                     else if (rem.includes('pending') || rem.includes('review')) remarkClass = 'badge-yellow';
                     
                     const remarkBadge = r.remarks ? `<span class="badge ${remarkClass}">${r.remarks}</span>` : '<span style="color:#cbd5e1">-</span>';
 
                     html += `
-                        <tr data-dept="${dept}" data-id="${r.id}" data-remarks="${(r.remarks || '').toLowerCase()}" class="record-row">
+                        <tr data-forwarded="${forwarded}" data-id="${r.id}" data-remarks="${(r.remarks || '').toLowerCase()}" class="record-row">
                             <td class="selection-col">
                                 <div class="custom-checkbox record-select" onclick="toggleRecordSelection(${r.id}, this)">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
@@ -2208,7 +2240,7 @@
                 filterModalRecords();
             })
             .catch(() => {
-                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
+                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
             });
     }
 
@@ -2228,18 +2260,12 @@
         
         // For comboboxes, use setValue
         if (nameCombo) nameCombo.setValue(r.name);
-        if (deptCombo) deptCombo.setValue(r.department);
+        if (forwardedCombo) forwardedCombo.setValue(r.forwarded);
         if (posCombo) posCombo.setValue(r.position);
         if (schoolCombo) schoolCombo.setValue(r.school);
         if (leaveCombo) leaveCombo.setValue(r.type_of_leave);
         if (remarksCombo) remarksCombo.setValue(r.remarks);
-        
-        document.getElementById('inclusiveDates').value = r.inclusive_dates || '';
-        document.getElementById('dateOfAction').value = r.date_of_action || '';
-        document.getElementById('deductionRemarks').value = r.deduction_remarks || '';
-        document.getElementById('remarks').value = r.remarks || '';
-        document.getElementById('remarksInput').value = r.remarks || '';
-        document.getElementById('incharge').value = r.incharge || '';
+        if (inchargeCombo) inchargeCombo.setValue(r.incharge);
 
         // Change submit button text
         const submitBtn = document.getElementById('submitBtn');
@@ -2298,8 +2324,8 @@
                 if (cb) cb.classList.add('checked');
             });
             
-            // Update all department "select all" checkboxes to checked
-            document.querySelectorAll('.dept-select-all').forEach(cb => {
+            // Update all forwarded "select all" checkboxes to checked
+            document.querySelectorAll('.forwarded-select-all').forEach(cb => {
                 cb.classList.add('checked');
             });
             
@@ -2319,31 +2345,31 @@
         const row = el.closest('tr');
         row.classList.toggle('print-selected');
         
-        // Update department "select all" state
-        const dept = row.getAttribute('data-dept');
-        const deptHeader = document.querySelector(`.dept-header-row[data-dept="${dept}"]`);
-        if (deptHeader) {
-            const allInDept = document.querySelectorAll(`.record-row[data-dept="${dept}"]`);
-            const allChecked = document.querySelectorAll(`.record-row[data-dept="${dept}"].print-selected`);
-            const deptCheck = deptHeader.querySelector('.dept-select-all');
+        // Update forwarded "select all" state
+        const forwarded = row.getAttribute('data-forwarded');
+        const forwardedHeader = document.querySelector(`.forwarded-header-row[data-forwarded="${forwarded}"]`);
+        if (forwardedHeader) {
+            const allInForwarded = document.querySelectorAll(`.record-row[data-forwarded="${forwarded}"]`);
+            const allChecked = document.querySelectorAll(`.record-row[data-forwarded="${forwarded}"].print-selected`);
+            const forwardedCheck = forwardedHeader.querySelector('.forwarded-select-all');
             
-            if (allChecked.length === allInDept.length && allInDept.length > 0) {
-                deptCheck.classList.add('checked');
+            if (allChecked.length === allInForwarded.length && allInForwarded.length > 0) {
+                forwardedCheck.classList.add('checked');
             } else {
-                deptCheck.classList.remove('checked');
+                forwardedCheck.classList.remove('checked');
             }
         }
         
         updateSelectedCount();
     }
 
-    function toggleDeptSelection(dept, el) {
+    function toggleForwardedSelection(forwarded, el) {
         const isChecked = el.classList.contains('checked');
         const newState = !isChecked;
         
         el.classList.toggle('checked', newState);
         
-        const rows = document.querySelectorAll(`.record-row[data-dept="${dept}"]`);
+        const rows = document.querySelectorAll(`.record-row[data-forwarded="${forwarded}"]`);
         rows.forEach(row => {
             const checkbox = row.querySelector('.record-select');
             if (checkbox) {
@@ -2394,7 +2420,7 @@
                     table { border-collapse: collapse; width: 100%; }
                     th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; }
                     td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
-                    .dept-header { background-color: #e2e8f0; font-weight: bold; text-align: center; }
+                    .forwarded-header { background-color: #e2e8f0; font-weight: bold; text-align: center; }
                 </style>
             </head>
             <body>
@@ -2422,13 +2448,13 @@
         // Iterate through rows in the DOM to preserve grouping and sorting
         const rows = document.querySelectorAll('#recordsTableBody tr');
         rows.forEach(row => {
-            if (row.classList.contains('dept-header-row')) {
-                const dept = row.getAttribute('data-dept');
-                // Check if any selected row exists under this specific dept header
-                // Stop at the next dept-header-row or batch-header-row
+            if (row.classList.contains('forwarded-header-row')) {
+                const forwardedName = row.getAttribute('data-forwarded');
+                // Check if any selected row exists under this specific forwarded header
+                // Stop at the next forwarded-header-row or batch-header-row
                 let hasSelected = false;
                 let next = row.nextElementSibling;
-                while (next && !next.classList.contains('dept-header-row') && !next.classList.contains('batch-header-row')) {
+                while (next && !next.classList.contains('forwarded-header-row') && !next.classList.contains('batch-header-row')) {
                     if (next.classList.contains('print-selected')) {
                         hasSelected = true;
                         break;
@@ -2436,7 +2462,9 @@
                     next = next.nextElementSibling;
                 }
                 if (hasSelected) {
-                    html += `<tr><td colspan="10" class="dept-header">${dept}</td></tr>`;
+                    const dateEl = row.querySelector('.header-date-badge');
+                    const groupDate = dateEl ? dateEl.textContent.trim() : '';
+                    html += `<tr><td colspan="10" class="forwarded-header">${forwardedName} ${groupDate ? '(' + groupDate + ')' : ''}</td></tr>`;
                 }
             } else if (row.classList.contains('print-selected')) {
                 const cells = row.cells;

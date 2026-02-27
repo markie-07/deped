@@ -84,6 +84,12 @@
                     <div class="modal-search">
                         <input type="text" id="modalSearch" placeholder="Search within records...">
                     </div>
+                    <div class="modal-date-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                        </svg>
+                        <input type="date" id="modalFilterDate" onchange="fetchInchargeRecords()" title="Filter by date">
+                    </div>
                     <button class="modal-close" onclick="closeInchargeModal()">&times;</button>
                 </div>
             </div>
@@ -149,30 +155,48 @@
     .search-box input:focus { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
 
     .incharge-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
     }
 
     .incharge-card {
-        background: #fff; padding: 24px; border-radius: 20px;
-        border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.3s ease;
-        display: flex; flex-direction: column; align-items: center; gap: 16px;
-        text-align: center;
+        background: #fff; padding: 14px 18px; border-radius: 14px;
+        border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.25s ease;
+        display: flex; align-items: center; gap: 16px;
+        position: relative; overflow: hidden;
     }
-    .incharge-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); border-color: #10b981; }
+    .incharge-card:hover { 
+        background: #fdfdfd;
+        border-color: #10b981; 
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+        transform: translateX(4px);
+    }
 
     .card-avatar {
-        width: 60px; height: 60px; border-radius: 50%;
-        background: #f1f5f9; color: #64748b; font-weight: 800;
+        width: 44px; height: 44px; border-radius: 12px;
+        background: #f1f5f9; color: #64748b; font-weight: 700;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.3rem; border: 2px solid #e2e8f0;
+        font-size: 1rem; flex-shrink: 0; transition: all 0.25s;
     }
-    .incharge-card:hover .card-avatar { background: #10b981; color: #fff; border-color: #10b981; }
+    .incharge-card:hover .card-avatar { 
+        background: #10b981; color: #fff;
+    }
 
-    .card-name { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
-    .card-count {
-        font-size: 0.75rem; font-weight: 600; color: #94a3b8;
-        padding: 4px 12px; background: #f8fafc; border-radius: 20px;
+    .card-info-wrap { flex: 1; min-width: 0; }
+    .card-name { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .card-meta { display: flex; align-items: center; gap: 6px; }
+    .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #94a3b8; font-weight: 600; }
+    .incharge-card:hover .meta-item { color: #10b981; }
+    .meta-icon { width: 12px; height: 12px; }
+
+    .card-action-indicator {
+        width: 28px; height: 28px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: #cbd5e1; transition: all 0.25s;
+    }
+    .incharge-card:hover .card-action-indicator { 
+        background: #ecfdf5; color: #10b981;
     }
 
     /* ── Modal Design ── */
@@ -213,6 +237,13 @@
         display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .modal-close:hover { background: #fee2e2; color: #ef4444; }
+
+    .modal-date-wrapper { position: relative; }
+    .modal-date-wrapper svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #94a3b8; pointer-events: none; }
+    .modal-date-wrapper input { padding: 9px 14px 9px 34px; border: 1.5px solid #f1f5f9; border-radius: 10px; font-size: 0.85rem; width: 150px; outline: none; transition: all 0.25s; color: #475569; background: #fff; cursor: pointer; }
+    .modal-date-wrapper input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+    .modal-date-wrapper input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+    .modal-date-wrapper input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08); }
 
     .modal-body { padding: 0; overflow-y: auto; flex: 1; }
     .table-responsive { width: 100%; border-collapse: collapse; }
@@ -277,8 +308,22 @@ document.addEventListener('DOMContentLoaded', function() {
         grid.innerHTML = filtered.map(i => `
             <div class="incharge-card" onclick="openInchargeModal('${i.incharge.replace(/'/g, "\\'")}')">
                 <div class="card-avatar">${getInitials(i.incharge)}</div>
-                <div class="card-name">${i.incharge}</div>
-                <div class="card-count">${i.leave_count} Record${i.leave_count !== 1 ? 's' : ''} processed</div>
+                <div class="card-info-wrap">
+                    <div class="card-name">${i.incharge}</div>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg class="meta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>${i.leave_count} Record${i.leave_count !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                </div>
             </div>
         `).join('');
     }
@@ -294,6 +339,8 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.classList.add('open');
         document.getElementById('modalInchargeName').textContent = name;
         document.getElementById('modalAvatar').textContent = getInitials(name);
+        document.getElementById('modalSearch').value = '';
+        document.getElementById('modalFilterDate').value = '';
         fetchInchargeRecords();
     };
 
@@ -305,7 +352,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('inchargeTableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 40px;">Loading records...</td></tr>';
 
-        fetch(`/leave-records/by-incharge?incharge=${encodeURIComponent(currentIncharge)}`)
+        const date = document.getElementById('modalFilterDate').value;
+        fetch(`/leave-records/by-incharge?incharge=${encodeURIComponent(currentIncharge)}&date=${encodeURIComponent(date)}`)
             .then(res => res.json())
             .then(data => {
                 document.getElementById('modalInchargeCount').textContent = `${data.length} record${data.length !== 1 ? 's' : ''} found`;

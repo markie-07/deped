@@ -12,9 +12,9 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f1f5f9; color: #1e293b; }
-        .batch-header-row { background: #f8fafc !important; border-top: 2px solid #e2e8f0; }
+        .batch-header-row { background: #f8fafc !important; height: 30px; border-bottom: 1px solid #e2e8f0; }
         .batch-header-row:hover { background: #f8fafc !important; }
-        .batch-header-row td { padding: 4px 8px !important; }
+        .batch-header-row td { padding: 0 !important; }
     </style>
 </head>
 <body>
@@ -66,6 +66,7 @@
                             <option value="all">All Remarks</option>
                             <option value="with pay">With Pay</option>
                             <option value="without pay">Without Pay</option>
+                            <option value="with pay & without pay">With Pay & Without Pay</option>
                         </select>
                     </div>
                     <div class="filter-input-wrap select-wrap">
@@ -325,13 +326,13 @@
     }
 
     /* ── Row Styles ── */
-    .master-table tbody tr:not(.dept-header-row) {
+    .master-table tbody tr:not(.forwarded-header-row) {
         transition: background 0.15s ease;
     }
-    .master-table tbody tr:not(.dept-header-row):hover td {
+    .master-table tbody tr:not(.forwarded-header-row):hover td {
         background: #f8f7ff;
     }
-    .master-table tbody tr:not(.dept-header-row):nth-child(even):not(:hover) td {
+    .master-table tbody tr:not(.forwarded-header-row):nth-child(even):not(:hover) td {
         background: #fafbfc;
     }
 
@@ -345,26 +346,26 @@
     }
 
     /* ═══════════════════════════════════════
-       DEPARTMENT HEADER ROW
+       FORWARDED HEADER ROW
        ═══════════════════════════════════════ */
-    .dept-header-row {
+    .forwarded-header-row {
         position: sticky;
         z-index: 10;
     }
-    .dept-header-row td {
+    .forwarded-header-row td {
         background: #f1f5f9 !important;
         padding: 10px 20px !important;
         border-bottom: 1px solid #e2e8f0;
         border-top: 1px solid #e2e8f0;
     }
-    .dept-header-content {
+    .forwarded-header-content {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
         position: relative;
     }
-    .dept-badge {
+    .forwarded-badge {
         background: #fff;
         color: #374151;
         padding: 5px 14px;
@@ -379,12 +380,12 @@
         transition: all 0.2s ease;
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
-    .dept-badge svg {
+    .forwarded-badge svg {
         color: #6366f1;
         width: 14px;
         height: 14px;
     }
-    .dept-count {
+    .forwarded-count {
         background: #eef2ff;
         color: #6366f1;
         padding: 2px 8px;
@@ -393,7 +394,7 @@
         font-weight: 700;
         margin-left: 4px;
     }
-    .btn-add-dept-record {
+    .btn-add-forwarded-record {
         background: #eef2ff;
         color: #6366f1;
         border: 1.5px solid #c7d2fe;
@@ -410,26 +411,26 @@
         position: absolute;
         right: 0;
     }
-    .btn-add-dept-record:hover {
+    .btn-add-forwarded-record:hover {
         background: #6366f1;
         color: white;
         border-color: #6366f1;
         transform: scale(1.03);
     }
-    .btn-add-dept-record svg {
+    .btn-add-forwarded-record svg {
         width: 13px;
         height: 13px;
     }
 
-    /* Batch/Dept header checkbox styling */
-    .batch-checkbox, .dept-checkbox {
+    /* Batch/Forwarded header checkbox styling */
+    .batch-checkbox, .forwarded-checkbox {
         width: 15px;
         height: 15px;
         cursor: pointer;
         accent-color: #6366f1;
     }
     .batch-header-row .col-checkbox,
-    .dept-header-row .col-checkbox {
+    .forwarded-header-row .col-checkbox {
         text-align: center;
         vertical-align: middle;
     }
@@ -680,7 +681,7 @@
     .import-modal.active { display: flex; }
     
     .import-modal-content {
-        background: #fff; width: 100%; max-width: 1200px; max-height: 90vh;
+        background: #fff; width: 100%; max-width: 1400px; max-height: 90vh;
         border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         display: flex; flex-direction: column; overflow: hidden;
         animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -697,11 +698,23 @@
     .modal-header h3 { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
     
     .modal-body { 
-        padding: 0; overflow-y: auto; flex: 1; background: #f8fafc;
+        padding: 0; 
+        overflow: auto; 
+        flex: 1; 
+        background: #f8fafc;
+        /* Hide scrollbars but keep functionality */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .modal-body::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
     }
 
     .preview-table {
-        width: 100%; border-collapse: collapse; font-size: 0.82rem;
+        width: 100%; 
+        min-width: 1200px; 
+        border-collapse: collapse; 
+        font-size: 0.82rem;
     }
     .preview-table th {
         background: #f1f5f9; position: sticky; top: 0; padding: 14px 16px;
@@ -741,10 +754,10 @@
     .btn-confirm.loading .import-loader { display: block; }
     .btn-confirm.loading span { opacity: 0.7; }
 
-    .preview-dept-row {
+    .preview-forwarded-row {
         background: #f8fafc !important;
     }
-    .preview-dept-row td {
+    .preview-forwarded-row td {
         background: #f8fafc !important;
         color: #6366f1 !important;
         font-weight: 700 !important;
@@ -804,7 +817,7 @@ function filterRecords() {
             if (currentBatchHeader && !hasVisibleInBatch) {
                 currentBatchHeader.style.display = 'none';
             }
-            // Hide previous dept header if no visible records
+            // Hide previous forwarded header if no visible records
             if (currentHeader && !hasVisibleInGroup) {
                 currentHeader.style.display = 'none';
             }
@@ -813,7 +826,7 @@ function filterRecords() {
             currentHeader = null;
             hasVisibleInGroup = false;
             row.style.display = '';
-        } else if (row.classList.contains('dept-header-row')) {
+        } else if (row.classList.contains('forwarded-header-row')) {
             if (currentHeader && !hasVisibleInGroup) {
                 currentHeader.style.display = 'none';
             }
@@ -825,9 +838,11 @@ function filterRecords() {
             let matchesRemark = true;
             const rowRemarks = (row.getAttribute('data-remarks') || '').toLowerCase();
             if (remarkFilter === 'with pay') {
-                matchesRemark = rowRemarks.includes('with pay') || (rowRemarks.includes('approved') && !rowRemarks.includes('disapproved'));
+                matchesRemark = (rowRemarks.includes('with pay') && !rowRemarks.includes('without pay')) || (rowRemarks.includes('approved') && !rowRemarks.includes('disapproved'));
             } else if (remarkFilter === 'without pay') {
-                matchesRemark = rowRemarks.includes('without pay') || rowRemarks.includes('disapproved');
+                matchesRemark = (rowRemarks.includes('without pay') && !rowRemarks.includes('with pay')) || rowRemarks.includes('disapproved');
+            } else if (remarkFilter === 'with pay & without pay') {
+                matchesRemark = rowRemarks.includes('with pay') && rowRemarks.includes('without pay');
             }
             const visible = matchesSearch && matchesRemark;
             row.style.display = visible ? '' : 'none';
@@ -871,26 +886,26 @@ function fetchMasterRecords() {
 
             document.getElementById('statTotal').textContent = data.length;
             
-            // Group records by department WITHIN each batch, preserving first-appearance order
+            // Group records by forwarded WITHIN each batch, preserving first-appearance order
             // This ensures all SDO records in batch 1 are together, all SDS records together, etc.
             const grouped = {};
             data.forEach(r => {
                 const batchId = r.batch_id || 1;
-                if (!grouped[batchId]) grouped[batchId] = { deptOrder: [], depts: {} };
-                const dept = r.department || 'No Department';
-                if (!grouped[batchId].depts[dept]) {
-                    grouped[batchId].depts[dept] = [];
-                    grouped[batchId].deptOrder.push(dept);
+                if (!grouped[batchId]) grouped[batchId] = { forwardedOrder: [], forwardeds: {} };
+                const forwarded = r.forwarded || '';
+                if (!grouped[batchId].forwardeds[forwarded]) {
+                    grouped[batchId].forwardeds[forwarded] = [];
+                    grouped[batchId].forwardedOrder.push(forwarded);
                 }
-                grouped[batchId].depts[dept].push(r);
+                grouped[batchId].forwardeds[forwarded].push(r);
             });
             // Flatten back to sorted array
             const sortedData = [];
             const batchIds = Object.keys(grouped).map(Number).sort((a, b) => a - b);
             batchIds.forEach(batchId => {
                 const batch = grouped[batchId];
-                batch.deptOrder.forEach(dept => {
-                    batch.depts[dept].forEach(r => sortedData.push(r));
+                batch.forwardedOrder.forEach(forwarded => {
+                    batch.forwardeds[forwarded].forEach(r => sortedData.push(r));
                 });
             });
             data = sortedData;
@@ -908,48 +923,60 @@ function fetchMasterRecords() {
 
             data.forEach((r, i) => {
                 const batchId = r.batch_id || 1;
-                const dept = r.department || 'No Department';
+                const forwarded = r.forwarded || '';
                 const isLatestBatch = batchId === latestBatch;
                 const shouldCheck = isExportMode && isLatestBatch;
 
                 // Add batch separator when batch changes
                 if (showBatchHeaders && batchId !== lastBatch) {
-                    lastDept = null; // Reset dept grouping for new batch
+                    const isFirstBatch = lastBatch === null;
+                    lastDept = null; // Reset forwarded grouping for new batch
                     html += `
                         <tr class="batch-header-row" data-batch="${batchId}">
                             <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                                 <input type="checkbox" class="batch-checkbox" data-batch="${batchId}" ${shouldCheck ? 'checked' : ''} onchange="toggleBatchCheckbox(${batchId}, this.checked)">
                             </td>
-                            <td colspan="11">
-                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px 4px;">
-                                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 8px; color: white; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em; box-shadow: 0 2px 8px rgba(99,102,241,0.3);">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:14px; height:14px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75 6.429 9.75m11.142 0l4.179 2.25-9.75 5.25-9.75-5.25 4.179-2.25" />
-                                        </svg>
-                                        Batch ${batchId}
+                            <td colspan="11" style="height: ${isFirstBatch ? '10px' : '60px'}; vertical-align: middle; padding: 0 40px !important;">
+                                ${!isFirstBatch ? `
+                                <div style="display: flex; align-items: center; gap: 20px;">
+                                    <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1); border-radius: 4px;"></div>
+                                    <div style="display: flex; gap: 6px;">
+                                        <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
+                                        <div style="width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc;"></div>
+                                        <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
                                     </div>
-                                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, #e2e8f0, transparent);"></div>
+                                    <div style="flex: 1; height: 2px; background: linear-gradient(90deg, #6366f1, transparent); border-radius: 4px;"></div>
                                 </div>
+                                ` : ''}
                             </td>
                         </tr>
                     `;
                     lastBatch = batchId;
                 }
 
-                if (dept !== lastDept) {
+                const isProcessed = r.is_processed == 1 || r.is_processed === true;
+
+                if (forwarded && forwarded !== 'No Forwarded' && forwarded !== lastDept) {
+                    const groupDate = r.date_of_action ? formatDate(r.date_of_action) : '-';
                     html += `
-                        <tr class="dept-header-row" data-dept="${dept}" data-batch="${batchId}">
+                        <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}">
                             <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};"></td>
                             <td colspan="11">
-                                <div class="dept-header-content">
-                                    <input type="checkbox" class="dept-checkbox" data-dept="${dept}" data-batch="${batchId}" ${shouldCheck ? 'checked' : ''} onchange="toggleDeptCheckbox('${dept.replace(/'/g, "\\'")}', ${batchId}, this.checked)" style="display: ${isExportMode ? '' : 'none'};">
-                                    <div class="dept-badge">
+                                <div class="forwarded-header-content">
+                                    <input type="checkbox" class="forwarded-checkbox" data-forwarded="${forwarded}" data-batch="${batchId}" ${shouldCheck ? 'checked' : ''} onchange="toggleForwardedCheckbox('${forwarded.replace(/'/g, "\\'")}', ${batchId}, this.checked)" style="display: ${isExportMode ? '' : 'none'};">
+                                    <div class="forwarded-badge">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                                         </svg>
-                                        <span>${dept}</span>
+                                        <span>${forwarded}</span>
                                     </div>
-                                    <a href="/form?dept=${encodeURIComponent(dept)}&batch=${batchId}&source=leave-records" class="btn-add-dept-record">
+                                    <div class="header-date-badge" style="margin-left: 10px; display: ${isProcessed ? 'flex' : 'none'}; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; color: #6366f1;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-18 3.75h18" />
+                                        </svg>
+                                        ${groupDate}
+                                    </div>
+                                    <a href="/form?forwarded=${encodeURIComponent(forwarded)}&batch=${batchId}&source=leave-records" class="btn-add-forwarded-record">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
@@ -959,7 +986,7 @@ function fetchMasterRecords() {
                             </td>
                         </tr>
                     `;
-                    lastDept = dept;
+                    lastDept = forwarded;
                 }
 
                 rowIndex++;
@@ -970,9 +997,9 @@ function fetchMasterRecords() {
                 else if (rem.includes('pending')) remarkClass = 'yellow';
 
                 html += `
-                    <tr data-dept="${dept}" data-batch="${batchId}" data-remarks="${rem}" class="animate-in" style="animation-delay: ${Math.min(i * 15, 300)}ms">
+                    <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" class="animate-in" style="animation-delay: ${Math.min(i * 15, 300)}ms">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
-                            <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${dept.replace(/'/g, "\\'")}', ${batchId})">
+                            <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${forwarded.replace(/'/g, "\\'")}', ${batchId})">
                         </td>
                         <td class="cell-index">${rowIndex}</td>
                         <td class="cell-name">${r.name}</td>
@@ -981,7 +1008,7 @@ function fetchMasterRecords() {
                         <td><span class="badge-leave">${r.type_of_leave || '-'}</span></td>
                         <td class="cell-dates">${r.inclusive_dates || '-'}</td>
                         <td><span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span></td>
-                        <td class="cell-action-date">${formatDate(r.date_of_action)}</td>
+                        <td class="cell-action-date">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
                         <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
                         <td class="cell-incharge">${r.incharge || '-'}</td>
                         <td>
@@ -1004,6 +1031,8 @@ function fetchMasterRecords() {
 
             tbody.innerHTML = html;
             updateStickyPositions();
+            // Important: Re-apply client-side filters (Search & Remark) after table rebuild
+            filterRecords();
             // Update export selection count after table rebuild
             updateSelectionCount();
         });
@@ -1054,9 +1083,9 @@ function updateStickyPositions() {
     const navbarH = navbar.offsetHeight;
     const headerH = headerCard.offsetHeight;
 
-    const deptTop = navbarH + headerH;
-    document.querySelectorAll('.dept-header-row').forEach(row => {
-        row.style.top = deptTop + 'px';
+    const forwardedTop = navbarH + headerH;
+    document.querySelectorAll('.forwarded-header-row').forEach(row => {
+        row.style.top = forwardedTop + 'px';
     });
 }
 
@@ -1134,18 +1163,23 @@ function processImportedData(data) {
         return '';
     };
 
-    let currentDept = 'Imported Records';
+    let currentForwarded = ''; 
     pendingImportData = [];
 
     data.forEach(r => {
         const rawName = getVal(r, ['name', 'full name', 'employee name']);
         const name = formatExcelValue(rawName);
         const dates = formatExcelValue(getVal(r, ['dates', 'inclusive dates', 'duration']));
+        const inlineForwarded = formatExcelValue(getVal(r, ['forwarded', 'dept', 'department', 'division']));
         
         if (!name || name === '-' || name === '0' || name === '') {
             const values = Object.values(r).filter(v => v && String(v).trim().length > 0 && String(v).trim() !== '-');
-            if (values.length === 1) {
-                currentDept = formatExcelValue(values[0]);
+            
+            // Check if it's likely a header row (exactly one value and no data fields found)
+            const hasDataFields = !!(inlineForwarded || getVal(r, ['position', 'designation']) || getVal(r, ['school', 'office', 'station']));
+            
+            if (values.length === 1 && !hasDataFields) {
+                currentForwarded = formatExcelValue(values[0]);
                 return;
             }
             if (!name && !dates) return;
@@ -1155,13 +1189,13 @@ function processImportedData(data) {
             name: name || '-',
             position: formatExcelValue(getVal(r, ['position', 'designation'])) || '-',
             school: formatExcelValue(getVal(r, ['school', 'office', 'station'])) || '-',
-            department: currentDept,
+            forwarded: inlineForwarded || currentForwarded || '',
             type_of_leave: formatExcelValue(getVal(r, ['type', 'type of leave', 'leave type'])) || '-',
             inclusive_dates: dates || '-',
             remarks: formatExcelValue(getVal(r, ['remarks', 'remark', 'status'])) || '-',
             date_of_action: formatExcelValue(getVal(r, ['date of action', 'date', 'action date'])) || '-',
             deduction_remarks: formatExcelValue(getVal(r, ['deduction', 'deduction remarks'])) || '-',
-            incharge: formatExcelValue(getVal(r, ['incharge', 'recorded by'])) || '-'
+            incharge: formatExcelValue(getVal(r, ['incharge', 'recorded by', 'person incharge', 'person inchage', 'person in-charge', 'person in charge', 'prepared by'])) || '-'
         });
     });
 
@@ -1174,8 +1208,8 @@ function renderPreview() {
     countSpan.textContent = pendingImportData.length;
     
     let html = '';
-    let lastDept = null;
-    let seenDepts = [];
+    let lastForwarded = null;
+    let seenForwardeds = [];
     let batchNum = 1;
     let rowIndex = 0;
 
@@ -1183,70 +1217,72 @@ function renderPreview() {
     let tempSeenDepts = [];
     let tempLastDept = null;
     let totalBatches = 1;
+
     pendingImportData.forEach(r => {
-        const dept = r.department;
-        if (dept !== tempLastDept && tempSeenDepts.includes(dept)) {
+        const forwarded = r.forwarded;
+        if (forwarded !== tempLastDept && tempSeenDepts.includes(forwarded)) {
             totalBatches++;
             tempSeenDepts = [];
         }
-        if (!tempSeenDepts.includes(dept)) tempSeenDepts.push(dept);
-        tempLastDept = dept;
+        if (!tempSeenDepts.includes(forwarded)) tempSeenDepts.push(forwarded);
+        tempLastDept = forwarded;
     });
+
     const showBatchHeaders = totalBatches > 1;
 
     let lastBatchNum = 0; // Track last emitted batch header
 
     pendingImportData.forEach((r, i) => {
-        const dept = r.department;
+        const forwarded = r.forwarded;
 
-        // Detect batch change: department repeats after other departments
-        if (dept !== lastDept && seenDepts.includes(dept)) {
+        // Detect batch change: forwarded repeats after other forwardeds
+        if (forwarded !== lastForwarded && seenForwardeds.includes(forwarded)) {
             batchNum++;
-            seenDepts = [];
+            seenForwardeds = [];
         }
-        if (!seenDepts.includes(dept)) seenDepts.push(dept);
+        if (!seenForwardeds.includes(forwarded)) seenForwardeds.push(forwarded);
 
         // Show batch header when batch number changes
         if (showBatchHeaders && batchNum !== lastBatchNum) {
+            const isFirstBatch = lastBatchNum === 0;
             lastBatchNum = batchNum;
             html += `
-                <tr class="preview-batch-row">
-                    <td colspan="10">
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 4px 12px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 6px; color: white; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.03em;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:12px; height:12px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75 6.429 9.75m11.142 0l4.179 2.25-9.75 5.25-9.75-5.25 4.179-2.25" />
-                                </svg>
-                                Batch ${batchNum}
-                            </div>
-                            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, #e2e8f0, transparent);"></div>
+                <tr class="preview-batch-row" style="height: ${isFirstBatch ? '10px' : '50px'}; background: #f8fafc;">
+                    <td colspan="10" style="vertical-align: middle; padding: 0 32px;">
+                        ${!isFirstBatch ? `
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1);"></div>
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1;"></div>
+                            <div style="flex: 1; height: 2px; background: linear-gradient(90deg, #6366f1, transparent);"></div>
                         </div>
+                        ` : ''}
                     </td>
                 </tr>
             `;
         }
 
-        if (dept !== lastDept) {
+        if (forwarded && forwarded !== 'No Forwarded' && forwarded !== lastForwarded) {
             html += `
-                <tr class="preview-dept-row">
+                <tr class="preview-forwarded-row">
                     <td colspan="10">
                         <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 14px; height: 14px; color: #6366f1;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                             </svg>
-                            <span>${dept}</span>
+                            <span>${forwarded}</span>
                         </div>
                     </td>
                 </tr>
             `;
-            lastDept = dept;
+            lastForwarded = forwarded;
         }
 
         rowIndex++;
         
         let remarkClass = '';
         const rem = (r.remarks || '').toLowerCase();
-        if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'color: #16a34a; background: #f0fdf4;';
+        if (rem.includes('with pay') && rem.includes('without pay')) remarkClass = 'color: #7c3aed; background: #f5f3ff;';
+        else if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'color: #16a34a; background: #f0fdf4;';
         else if (rem.includes('disapproved') || rem.includes('without pay')) remarkClass = 'color: #dc2626; background: #fef2f2;';
         else if (rem.includes('pending')) remarkClass = 'color: #ca8a04; background: #fefce8;';
         
@@ -1315,8 +1351,8 @@ function formatDate(dateStr) {
     try {
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
-        const mm = date.getMonth() + 1;
-        const dd = date.getDate();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
         const yyyy = date.getFullYear();
         return `${mm}-${dd}-${yyyy}`;
     } catch (e) {
@@ -1330,8 +1366,8 @@ function toggleSelectionMode(force = null) {
     const isVisible = force !== null ? force : (checksums[0].style.display === 'none');
     
     checksums.forEach(c => c.style.display = isVisible ? '' : 'none');
-    // Also show/hide inline dept checkboxes (inside dept-header-content)
-    document.querySelectorAll('.dept-checkbox').forEach(cb => cb.style.display = isVisible ? '' : 'none');
+    // Also show/hide inline forwarded checkboxes (inside forwarded-header-content)
+    document.querySelectorAll('.forwarded-checkbox').forEach(cb => cb.style.display = isVisible ? '' : 'none');
     
     const exportBar = document.getElementById('exportBar');
     if (!isVisible) {
@@ -1365,7 +1401,7 @@ function toggleAllCheckboxes(checked) {
     document.querySelectorAll('.row-checkbox').forEach(cb => {
         cb.checked = checked;
     });
-    document.querySelectorAll('.dept-checkbox').forEach(cb => {
+    document.querySelectorAll('.forwarded-checkbox').forEach(cb => {
         cb.checked = checked;
     });
     document.querySelectorAll('.batch-checkbox').forEach(cb => {
@@ -1375,19 +1411,19 @@ function toggleAllCheckboxes(checked) {
 }
 
 function toggleBatchCheckbox(batchId, checked) {
-    // Toggle all dept checkboxes and row checkboxes in this batch
-    document.querySelectorAll(`.dept-checkbox[data-batch="${batchId}"]`).forEach(cb => {
+    // Toggle all forwarded checkboxes and row checkboxes in this batch
+    document.querySelectorAll(`.forwarded-checkbox[data-batch="${batchId}"]`).forEach(cb => {
         cb.checked = checked;
     });
-    document.querySelectorAll(`tr[data-batch="${batchId}"]:not(.batch-header-row):not(.dept-header-row) .row-checkbox`).forEach(cb => {
+    document.querySelectorAll(`tr[data-batch="${batchId}"]:not(.batch-header-row):not(.forwarded-header-row) .row-checkbox`).forEach(cb => {
         cb.checked = checked;
     });
     updateSelectionCount();
 }
 
-function toggleDeptCheckbox(dept, batchId, checked) {
-    // Toggle all row checkboxes matching this dept AND batch
-    document.querySelectorAll(`tr[data-dept="${dept}"][data-batch="${batchId}"]:not(.dept-header-row) .row-checkbox`).forEach(cb => {
+function toggleForwardedCheckbox(forwarded, batchId, checked) {
+    // Toggle all row checkboxes matching this forwarded AND batch
+    document.querySelectorAll(`tr[data-forwarded="${forwarded}"][data-batch="${batchId}"]:not(.forwarded-header-row) .row-checkbox`).forEach(cb => {
         cb.checked = checked;
     });
     // Sync batch checkbox
@@ -1395,24 +1431,24 @@ function toggleDeptCheckbox(dept, batchId, checked) {
     updateSelectionCount();
 }
 
-function onRowCheckboxChange(dept, batchId) {
-    // Sync dept checkbox state
-    syncDeptCheckbox(dept, batchId);
+function onRowCheckboxChange(forwarded, batchId) {
+    // Sync forwarded checkbox state
+    syncForwardedCheckbox(forwarded, batchId);
     // Sync batch checkbox state
     syncBatchCheckbox(batchId);
     updateSelectionCount();
 }
 
-function syncDeptCheckbox(dept, batchId) {
-    const rows = document.querySelectorAll(`tr[data-dept="${dept}"][data-batch="${batchId}"]:not(.dept-header-row) .row-checkbox`);
+function syncForwardedCheckbox(forwarded, batchId) {
+    const rows = document.querySelectorAll(`tr[data-forwarded="${forwarded}"][data-batch="${batchId}"]:not(.forwarded-header-row) .row-checkbox`);
     const allChecked = Array.from(rows).every(cb => cb.checked);
-    const deptCb = document.querySelector(`.dept-checkbox[data-dept="${dept}"][data-batch="${batchId}"]`);
-    if (deptCb) deptCb.checked = allChecked;
+    const forwardedCb = document.querySelector(`.forwarded-checkbox[data-forwarded="${forwarded}"][data-batch="${batchId}"]`);
+    if (forwardedCb) forwardedCb.checked = allChecked;
 }
 
 function syncBatchCheckbox(batchId) {
-    const deptCbs = document.querySelectorAll(`.dept-checkbox[data-batch="${batchId}"]`);
-    const allChecked = Array.from(deptCbs).every(cb => cb.checked);
+    const forwardedCbs = document.querySelectorAll(`.forwarded-checkbox[data-batch="${batchId}"]`);
+    const allChecked = Array.from(forwardedCbs).every(cb => cb.checked);
     const batchCb = document.querySelector(`.batch-checkbox[data-batch="${batchId}"]`);
     if (batchCb) batchCb.checked = allChecked;
 }
@@ -1440,10 +1476,17 @@ function downloadSelectedExcel() {
             </xml>
             <![endif]-->
             <style>
-                table { border-collapse: collapse; width: 100%; }
-                th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; }
-                td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
-                .dept-header { background-color: #e2e8f0; font-weight: bold; text-align: center; }
+                body { font-family: Arial, sans-serif; font-size: 10pt; }
+                table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 10pt; }
+                th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; font-family: Arial, sans-serif; font-size: 10pt; }
+                td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-family: Arial, sans-serif; font-size: 10pt; }
+                .forwarded-header { background-color: #f8fafc; font-weight: bold; text-align: center; border: 1px solid #e2e8f0; }
+                .batch-spacer { height: 20px; background-color: transparent; border: none; }
+                
+                /* Remark Colors */
+                .remark-with-pay { color: #16a34a; font-weight: 600; }
+                .remark-without-pay { color: #dc2626; font-weight: 600; }
+                .remark-both { color: #7c3aed; font-weight: 600; }
             </style>
         </head>
         <body>
@@ -1467,9 +1510,35 @@ function downloadSelectedExcel() {
 
     const rows = document.querySelectorAll('#masterTableBody tr');
     let counter = 1;
+    let lastExportedBatch = null;
+    
+    // Color mapping for consistent forwarded headers
+    const forwardedColorMap = {};
+    const pastelColors = [
+        '#e0f2fe', // light blue
+        '#fef2f2', // light red
+        '#f0fdf4', // light green
+        '#f5f3ff', // light purple
+        '#fff7ed', // light yellow
+        '#ecfeff', // light cyan
+        '#fdf2f8', // light pink
+        '#ffedd5', // light orange
+    ];
+    let nextColorIdx = 0;
+
+    function getForwardedColor(name) {
+        const cleanName = (name || '').trim().toLowerCase();
+        if (!forwardedColorMap[cleanName]) {
+            forwardedColorMap[cleanName] = pastelColors[nextColorIdx % pastelColors.length];
+            nextColorIdx++;
+        }
+        return forwardedColorMap[cleanName];
+    }
 
     // Walk through rows in order - emit headers exactly as they appear on screen
     rows.forEach(row => {
+        const batchId = row.getAttribute('data-batch');
+
         if (row.classList.contains('batch-header-row')) {
             // Check if any selected rows exist in this batch
             let hasSelected = false;
@@ -1482,15 +1551,18 @@ function downloadSelectedExcel() {
                 }
                 next = next.nextElementSibling;
             }
-            // We don't output the batch header itself to Excel,
-            // the department headers within each batch handle the separation
-        } else if (row.classList.contains('dept-header-row')) {
-            const dept = row.getAttribute('data-dept');
-            // Check if any selected row exists under this specific dept header
-            // Stop at the next dept-header-row OR batch-header-row
+            
+            // If it's not the first batch we are exporting and it has selected items, add a spacer row
+            if (hasSelected && lastExportedBatch !== null) {
+                html += `<tr class="batch-spacer"><td colspan="10" style="border:none; height:20px;"></td></tr>`;
+            }
+            if (hasSelected) lastExportedBatch = batchId;
+
+        } else if (row.classList.contains('forwarded-header-row')) {
+            const forwardedName = row.getAttribute('data-forwarded');
             let hasSelected = false;
             let next = row.nextElementSibling;
-            while (next && !next.classList.contains('dept-header-row') && !next.classList.contains('batch-header-row')) {
+            while (next && !next.classList.contains('forwarded-header-row') && !next.classList.contains('batch-header-row')) {
                 const cb = next.querySelector('.row-checkbox');
                 if (cb && cb.checked) {
                     hasSelected = true;
@@ -1500,13 +1572,29 @@ function downloadSelectedExcel() {
             }
             
             if (hasSelected) {
-                html += `<tr><td colspan="10" class="dept-header">${dept}</td></tr>`;
+                const dateEl = row.querySelector('.header-date-badge');
+                const groupDate = (dateEl && dateEl.style.display !== 'none') ? dateEl.textContent.trim() : '';
+                const headerText = groupDate ? `${forwardedName}    -    ${groupDate}` : forwardedName;
+                const bgColor = getForwardedColor(forwardedName);
+                
+                html += `<tr><td colspan="10" class="forwarded-header" style="background-color: ${bgColor}; border: 1px solid #cbd5e1;">${headerText}</td></tr>`;
             }
         } else if (row.classList.contains('animate-in')) {
             const cb = row.querySelector('.row-checkbox');
             if (cb && cb.checked) {
                 const cells = row.cells;
-                // Index 0: checkbox, Index 1: #, Index 2: Name
+                const remarksText = cells[7].textContent.trim();
+                const lowerRemarks = remarksText.toLowerCase();
+                
+                let remarkStyleClass = '';
+                if (lowerRemarks.includes('with pay') && lowerRemarks.includes('without pay')) {
+                    remarkStyleClass = 'remark-both';
+                } else if (lowerRemarks.includes('with pay') || lowerRemarks.includes('approved')) {
+                    remarkStyleClass = 'remark-with-pay';
+                } else if (lowerRemarks.includes('without pay') || lowerRemarks.includes('disapproved')) {
+                    remarkStyleClass = 'remark-without-pay';
+                }
+
                 html += `
                     <tr>
                         <td>${counter++}</td>
@@ -1515,7 +1603,7 @@ function downloadSelectedExcel() {
                         <td>${cells[4].textContent.trim()}</td>
                         <td>${cells[5].textContent.trim()}</td>
                         <td>${cells[6].textContent.trim()}</td>
-                        <td>${cells[7].textContent.trim()}</td>
+                        <td class="${remarkStyleClass}">${remarksText}</td>
                         <td>${cells[8].textContent.trim()}</td>
                         <td>${cells[9].textContent.trim()}</td>
                         <td>${cells[10].textContent.trim()}</td>

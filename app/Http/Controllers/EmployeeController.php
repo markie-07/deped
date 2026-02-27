@@ -30,9 +30,13 @@ class EmployeeController extends Controller
     public function getRecordsByEmployee(Request $request)
     {
         $name = $request->input('name');
-        $records = Employee::where('name', $name)
-            ->orderBy('date_of_action', 'asc')
-            ->get();
+        $query = Employee::where('name', $name);
+
+        if ($request->has('date') && $request->date) {
+            $query->whereDate('date_of_action', $request->date);
+        }
+
+        $records = $query->orderBy('date_of_action', 'asc')->get();
             
         return response()->json($records);
     }

@@ -8,7 +8,7 @@ class LeaveRecord extends Model
 {
     protected $fillable = [
         'name',
-        'department',
+        'forwarded',
         'position',
         'school',
         'type_of_leave',

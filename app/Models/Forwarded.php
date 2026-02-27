@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Forwarded extends Model
 {
+    protected $table = 'forwardeds';
+
     protected $fillable = [
         'name',
         'employee_name',
@@ -19,6 +21,6 @@ class Department extends Model
 
     public function leaveRecords()
     {
-        return $this->hasMany(LeaveRecord::class, 'department', 'name');
+        return $this->hasMany(LeaveRecord::class, 'forwarded', 'name');
     }
 }
