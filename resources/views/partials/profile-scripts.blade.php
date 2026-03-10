@@ -179,7 +179,14 @@
     function showToast(title, msg, type = 'success') {
         const c = document.getElementById('toastContainer'), t = document.createElement('div');
         t.className = `toast ${type}`;
-        const icon = type === 'success' ? '<svg class="toast-icon" fill="none" stroke="#10b981" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' : '<svg class="toast-icon" fill="none" stroke="#ef4444" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+        let icon = '';
+        if (type === 'success') {
+            icon = '<svg class="toast-icon" fill="none" stroke="#10b981" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+        } else if (type === 'error') {
+            icon = '<svg class="toast-icon" fill="none" stroke="#ef4444" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+        } else {
+            icon = '<svg class="toast-icon" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+        }
         t.innerHTML = `${icon}<div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
         c.appendChild(t); setTimeout(() => t.classList.add('show'), 10);
         setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
@@ -398,9 +405,6 @@
                     const coverWrap = document.getElementById('coverPhotoWrap');
                     if (coverWrap) coverWrap.style.backgroundImage = `url('{{ url('/storage') }}/${data.user.cover_image}')`;
                 }
-                // Reset security state
-                cancelPasswordChange();
-                
                 // Update initial state for next dirty check
                 captureInitialData();
             } else {

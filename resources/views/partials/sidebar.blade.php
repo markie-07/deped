@@ -614,7 +614,7 @@
 
     /* ── Main Content Adjustment ── */
     .main-content {
-        margin-left: 80px; /* More breathing room */
+        margin-left: 70px; /* Matched to sidebar collapsed width */
         min-height: 100vh;
         background: #fff;
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -622,7 +622,7 @@
     }
 
     .sidebar.active ~ .main-content {
-        margin-left: 260px;
+        margin-left: 260px; /* Matched to sidebar active width */
     }
 
     .content-body {
@@ -669,10 +669,24 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const subPanel = document.getElementById('leaveHistoryPanel');
+        const container = document.querySelector('.nav-panels-container');
+        
         if (subPanel && subPanel.querySelector('.nav-list-item.active')) {
             showLeaveHistoryPanel();
         } else {
+            // Keep current panel but ensure active styling
             updateActivePanel();
+        }
+
+        // Fix for sidebar state persistence in CSS transitions
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            const saved = localStorage.getItem('sidebar-open');
+            if (saved === 'false') {
+                sidebar.classList.remove('active');
+            } else if (saved === 'true') {
+                sidebar.classList.add('active');
+            }
         }
     });
 </script>

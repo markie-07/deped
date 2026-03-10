@@ -512,9 +512,21 @@
         -ms-overflow-style: none;
     }
     .modal-table-wrap::-webkit-scrollbar { display: none; }
-    .modal-table { width:100%; min-width: 1400px; border-collapse:collapse; text-align:left; }
+    .modal-table { width:100%; border-collapse:collapse; text-align:left; table-layout: fixed; }
     .modal-table thead th { background:#f8fafc; padding:12px 18px; font-size:0.68rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; position:sticky; top:0; z-index:5; border-bottom:2px solid #e2e8f0; white-space:nowrap; }
-    .modal-table tbody td { padding:13px 18px; font-size:0.81rem; color:#475569; border-bottom:1px solid #f8fafc; }
+    .modal-table tbody td { padding:13px 18px; font-size:0.81rem; color:#475569; border-bottom:1px solid #f8fafc; word-wrap: break-word; vertical-align: top; line-height: 1.4; }
+
+    /* Column widths for Admin Employee Modal */
+    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 12%; } /* Position */
+    .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 12%; } /* School */
+    .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 8%; }  /* Type */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 12%; } /* Dates */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 10%; } /* Remarks */
+    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 10%; } /* Action Date */
+    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 17%; } /* Deduction Remarks */
+    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 10%; } /* Incharge */
+    .modal-table th:nth-child(9), .modal-table td:nth-child(9) { width: 9%; }  /* Actions */
+
     .modal-table tbody tr:hover td { background:#f8fafc; }
     .modal-table tbody tr:last-child td { border-bottom:none; }
     .badge-leave { font-size:0.7rem; font-weight:600; padding:4px 10px; border-radius:8px; background:#eef2ff; color:#4f46e5; display:inline-block; }
@@ -1146,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="cell-subtext">${r.deduction_remarks || '-'}</td>
                     <td class="cell-incharge" style="font-weight:500;">${r.incharge || '-'}</td>
                     <td>
-                        <div style="display: flex; gap: 8px; justify-content: center;">
+                        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                             <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg></button>
                             <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
                         </div>

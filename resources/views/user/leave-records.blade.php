@@ -24,73 +24,86 @@
         @include('partials.navigation')
         <div class="content-body">
 
-            <!-- Page Header -->
-            <div class="page-header-card" id="pageHeaderCard">
-                <div class="header-left">
-                    <div class="header-icon-box">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+            <!-- Hero Banner -->
+            <div class="hero-banner">
+                <div class="hero-dots"></div>
+                <div class="hero-left">
+                    <div class="hero-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
+                        Leave Management
                     </div>
-                    <div>
-                        <h2 class="header-title">Leave Records Registry</h2>
-                        <p class="header-subtitle">Review and manage all historical leave records</p>
-                    </div>
-                    <div class="header-stats" id="headerStats">
-                        <div class="stat-chip">
-                            <span class="stat-dot green"></span>
-                            <span class="stat-label">Total</span>
-                            <span class="stat-value" id="statTotal">0</span>
+                    <h1 class="hero-title">Leave Records Registry</h1>
+                    <p class="hero-desc">Review and manage all historical leave records — optimized with batch tracking and smart filtering.</p>
+                    <div class="hero-meta">
+                        <div class="hero-meta-item">
+                            <div class="hmi-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="hmi-num" id="statTotal">0</span>
+                                <span class="hmi-label">Total Records</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="header-filters">
-                    <div class="filter-input-wrap search-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-                        <input type="text" id="masterSearch" placeholder="Search records...">
+                <div class="hero-right">
+                    <div class="hero-search-card">
+                        <p class="hsc-label">Quick Search & Records Filter</p>
+                        <div class="hero-search">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                            <input type="text" id="masterSearch" placeholder="Search by name, position, school...">
+                        </div>
+                        
+                        <div class="hero-filters-grid">
+                            <div class="filter-item">
+                                <label>Date of Action</label>
+                                <div class="filter-input-wrap">
+                                    <input type="date" id="dateFilter" onchange="fetchMasterRecords()">
+                                </div>
+                            </div>
+                            <div class="filter-item">
+                                <label>Pay Status</label>
+                                <div class="filter-select-wrap">
+                                    <select id="remarkFilter" onchange="filterRecords()">
+                                        <option value="all">All Remarks</option>
+                                        <option value="with pay">With Pay</option>
+                                        <option value="without pay">Without Pay</option>
+                                        <option value="with pay & without pay">With Pay & Without Pay</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-item">
+                                <label>Records Incharge</label>
+                                <div class="filter-select-wrap">
+                                    <select id="inchargeFilter" onchange="fetchMasterRecords()">
+                                        <option value="">All Incharge</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hsc-actions">
+                            <button class="btn-hsc btn-import" onclick="document.getElementById('excelInput').click()">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span>Import</span>
+                            </button>
+                            <button class="btn-hsc btn-export" onclick="toggleSelectionMode()" id="btnMainExport">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 12 12 16.5m0 0L16.5 12M12 16.5V3" />
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <input type="file" id="excelInput" hidden accept=".xlsx, .xls" onchange="handleExcelImport(event)">
                     </div>
-                    <div class="filter-input-wrap date-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                        </svg>
-                        <input type="date" id="dateFilter" onchange="fetchMasterRecords()">
-                    </div>
-                    <div class="filter-input-wrap select-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-                        </svg>
-                        <select id="remarkFilter" onchange="filterRecords()">
-                            <option value="all">All Remarks</option>
-                            <option value="with pay">With Pay</option>
-                            <option value="without pay">Without Pay</option>
-                            <option value="with pay & without pay">With Pay & Without Pay</option>
-                        </select>
-                    </div>
-                    <div class="filter-input-wrap select-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                        <select id="inchargeFilter" onchange="fetchMasterRecords()">
-                            <option value="">All Incharge</option>
-                        </select>
-                    </div>
-                    
-                    <button class="btn-import-excel" onclick="document.getElementById('excelInput').click()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <span>Import Excel</span>
-                    </button>
-                    <button class="btn-export-excel" onclick="toggleSelectionMode()" id="btnMainExport">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 12 12 16.5m0 0L16.5 12M12 16.5V3" />
-                        </svg>
-                        <span>Export Excel</span>
-                    </button>
-                    <input type="file" id="excelInput" hidden accept=".xlsx, .xls" onchange="handleExcelImport(event)">
                 </div>
             </div>
 
@@ -100,17 +113,17 @@
                     <thead>
                         <tr>
                             <th class="col-checkbox" style="display: none;"></th>
-                            <th class="col-index">#</th>
-                            <th class="col-name">Name</th>
+                            <th>#</th>
+                            <th>Name</th>
                             <th>Position</th>
                             <th>School</th>
-                            <th>Type of Leave</th>
+                            <th>Leave Type</th>
                             <th>Inclusive Dates</th>
                             <th>Remarks</th>
                             <th>Date of Action</th>
-                            <th>Deduction Remarks</th>
+                            <th>Deduction Remark</th>
                             <th>Incharge</th>
-                            <th class="col-actions">Actions</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="masterTableBody">
@@ -194,63 +207,50 @@
     /* ═══════════════════════════════════════
        PAGE HEADER CARD
        ═══════════════════════════════════════ */
-    .page-header-card {
-        background: #fff;
-        padding: 20px 28px;
-        border-radius: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        border: 1px solid #e2e8f0;
-        position: sticky;
-        top: 68px;
-        z-index: 30;
-        transition: all 0.25s ease;
-        gap: 20px;
-    }
-    .page-header-card.is-stuck {
-        box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-        border-radius: 0 0 16px 16px;
-        border-top-color: transparent;
-    }
+    /* ═══════════════════════════════════════
+       POSITIONS PAGE — NEW BANNER REDESIGN
+       ═══════════════════════════════════════ */
 
-    .header-left { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    /* ── Hero Banner ── */
+    .hero-banner { position: relative; background: #fff; border-radius: 22px; border: 1.5px solid #e8edf5; display: flex; align-items: stretch; overflow: hidden; margin-bottom: 28px; box-shadow: 0 4px 24px rgba(99,102,241,0.07); }
+    .hero-dots { position: absolute; inset: 0; background-image: radial-gradient(circle, #c7d2fe 1px, transparent 1px); background-size: 22px 22px; opacity: 0.45; pointer-events: none; border-radius: 22px; }
+    .hero-left { flex: 1; padding: 32px 36px; position: relative; z-index: 1; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: #eef2ff; color: #6366f1; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+    .hero-tag svg { width: 13px; height: 13px; }
+    .hero-title { font-size: 1.65rem; font-weight: 900; color: #1e1b4b; letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 10px; }
+    .hero-desc { font-size: 0.82rem; color: #64748b; line-height: 1.6; max-width: 420px; margin-bottom: 24px; }
+    .hero-meta { display: flex; align-items: center; gap: 20px; }
+    .hero-meta-item { display: flex; align-items: center; gap: 10px; }
+    .hmi-icon { width: 36px; height: 36px; border-radius: 10px; background: #eef2ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hmi-icon svg { width: 16px; height: 16px; color: #6366f1; }
+    .hmi-num { display: block; font-size: 1.2rem; font-weight: 900; color: #1e1b4b; line-height: 1; }
+    .hmi-label { display: block; font-size: 0.63rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
 
-    .header-icon-box {
-        width: 46px; height: 46px;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        border-radius: 12px;
-        display: flex; align-items: center; justify-content: center;
-        color: #fff;
-        box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.5);
-        flex-shrink: 0;
-    }
-    .header-icon-box svg { width: 24px; height: 24px; }
+    /* Hero Right - Multi-Filter Card */
+    .hero-right { width: 420px; flex-shrink: 0; background: linear-gradient(145deg, #f5f3ff 0%, #ede9fe 100%); border-left: 1.5px solid #e0e7ff; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; z-index: 1; }
+    .hero-search-card { width: 100%; }
+    .hsc-label { font-size: 0.72rem; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    
+    .hero-search { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(99,102,241,0.08); display: flex; align-items: center; padding: 0 14px; gap: 8px; border: 1.5px solid #ddd6fe; margin-bottom: 12px; }
+    .hero-search svg { width: 16px; height: 16px; color: #a5b4fc; }
+    .hero-search input { flex: 1; border: none; outline: none; padding: 10px 0; font-size: 0.8rem; font-family: inherit; color: #1e293b; background: transparent; }
 
-    .header-title {
-        font-size: 1.15rem; font-weight: 700; color: #0f172a;
-        letter-spacing: -0.02em; line-height: 1.3;
-    }
-    .header-subtitle { font-size: 0.78rem; color: #94a3b8; margin-top: 1px; }
+    .hero-filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .filter-item { display: flex; flex-direction: column; gap: 4px; }
+    .filter-item label { font-size: 0.62rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.03em; margin-left: 4px; }
+    
+    .filter-input-wrap, .filter-select-wrap { background: #fff; border-radius: 10px; border: 1.5px solid #e0e7ff; padding: 2px 8px; display: flex; align-items: center; }
+    .filter-input-wrap input, .filter-select-wrap select { width: 100%; border: none; outline: none; padding: 6px 0; font-size: 0.75rem; color: #475569; font-weight: 600; background: transparent; }
+    
+    .hsc-actions { display: flex; gap: 8px; }
+    .btn-hsc { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-import { background: #10b981; color: #fff; box-shadow: 0 4px 10px rgba(16,185,129,0.2); }
+    .btn-import:hover { background: #059669; transform: translateY(-1px); }
+    .btn-export { background: #fff; color: #6366f1; border: 1.5px solid #e0e7ff; }
+    .btn-export:hover { border-color: #6366f1; background: #f8faff; }
 
-    /* Stats chip */
-    .header-stats { display: flex; gap: 8px; margin-left: 8px; }
-    .stat-chip {
-        display: flex; align-items: center; gap: 6px;
-        padding: 6px 14px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        font-size: 0.75rem;
-    }
-    .stat-dot {
-        width: 7px; height: 7px; border-radius: 50%;
-    }
-    .stat-dot.green { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.4); }
-    .stat-label { color: #94a3b8; font-weight: 500; }
-    .stat-value { color: #1e293b; font-weight: 700; }
+    /* Full-width incharge filter */
+    .hero-filters-grid .filter-item:last-child { grid-column: span 2; }
 
     /* ═══════════════════════════════════════
        FILTER BAR
@@ -267,8 +267,8 @@
     }
     .filter-input-wrap input,
     .filter-input-wrap select {
-        padding: 9px 14px 9px 36px;
-        border: 1.5px solid #e2e8f0;
+        padding: 8px 12px;
+        border: none;
         border-radius: 10px;
         font-size: 0.82rem;
         font-family: inherit;
@@ -301,7 +301,7 @@
     .table-card::-webkit-scrollbar { display: none; }
 
     .master-table {
-        width: 100%; min-width: 1400px; border-collapse: collapse; text-align: left;
+        width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed;
     }
 
     /* ── Table Header ── */
@@ -309,24 +309,40 @@
         background: #f8fafc;
         padding: 12px 14px;
         font-size: 0.65rem;
-        font-weight: 600;
+        font-weight: 800;
         color: #64748b;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 2px solid #f1f5f9;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 20;
     }
-    .master-table th.col-index { width: 50px; text-align: center; }
-    .master-table th.col-name { min-width: 160px; }
-    .master-table th.col-actions { width: 100px; text-align: center; }
+    .master-table th.col-index { width: 3%; text-align: center; }
+    .master-table th.col-checkbox { width: 3%; text-align: center; }
+    
+    /* Column widths for Main Table */
+    .master-table th:nth-child(3), .master-table td:nth-child(3) { width: 11%; } /* Name */
+    .master-table th:nth-child(4), .master-table td:nth-child(4) { width: 9%; }  /* Position */
+    .master-table th:nth-child(5), .master-table td:nth-child(5) { width: 9%; }  /* School */
+    .master-table th:nth-child(6), .master-table td:nth-child(6) { width: 6%; }  /* Leave Type */
+    .master-table th:nth-child(7), .master-table td:nth-child(7) { width: 10%; } /* Inclusive Dates */
+    .master-table th:nth-child(8), .master-table td:nth-child(8) { width: 8%; }  /* Remarks */
+    .master-table th:nth-child(9), .master-table td:nth-child(9) { width: 8%; }  /* Action Date */
+    .master-table th:nth-child(10), .master-table td:nth-child(10) { width: 13%; } /* Deduction Remark */
+    .master-table th:nth-child(11), .master-table td:nth-child(11) { width: 10%; } /* Incharge */
+    .master-table th:nth-child(12), .master-table td:nth-child(12) { width: 10%; } /* Actions */
 
     /* ── Table Cells ── */
     .master-table td {
         padding: 12px 14px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         color: #334155;
         border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
+        vertical-align: top;
+        word-wrap: break-word;
+        line-height: 1.4;
     }
 
     /* ── Row Styles ── */
@@ -804,52 +820,59 @@
        DARK MODE — LEAVE RECORDS
        ══════════════════════════════════════════ */
 
-    /* Page Header Card */
-    body.dark-mode .page-header-card {
-        background: #0f172a;
-        border-color: #1e293b;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    /* Hero Banner */
+    body.dark-mode .hero-banner { 
+        background: #0f172a; border-color: #1e293b; 
+        box-shadow: 0 4px 24px rgba(0,0,0,0.3); 
     }
-    body.dark-mode .page-header-card.is-stuck {
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        border-top-color: transparent;
+    body.dark-mode .hero-dots { 
+        background-image: radial-gradient(circle, #334155 1px, transparent 1px); 
     }
-    body.dark-mode .header-title { color: #fff; }
-    body.dark-mode .header-subtitle { color: #64748b; }
-
-    /* Stat Chips */
-    body.dark-mode .stat-chip { background: #111827; border-color: #1e293b; }
-    body.dark-mode .stat-label { color: #64748b; }
-    body.dark-mode .stat-value { color: #f1f5f9; }
-
-    /* Filters */
-    body.dark-mode .filter-input-wrap input,
-    body.dark-mode .filter-input-wrap select {
-        background: #111827;
-        border-color: #64748b;
-        color: #f1f5f9;
+    body.dark-mode .hero-left { border-bottom: 1.5px solid #1e293b; }
+    @media (min-width: 1201px) {
+        body.dark-mode .hero-left { border-bottom: none; }
     }
-    body.dark-mode .filter-input-wrap input::placeholder { color: #94a3b8; }
-    body.dark-mode .filter-input-wrap input:focus,
-    body.dark-mode .filter-input-wrap select:focus { border-color: #818cf8; }
-    body.dark-mode .filter-input-wrap svg { color: #fff !important; }
-    body.dark-mode .filter-input-wrap select option { background: #0f172a; color: #f1f5f9; }
+    body.dark-mode .hero-title { color: #fff; }
+    body.dark-mode .hero-desc { color: #94a3b8; }
+    body.dark-mode .hero-tag { background: rgba(99, 102, 241, 0.12); color: #818cf8; }
+    body.dark-mode .hmi-icon { background: #1e293b; }
+    body.dark-mode .hmi-num { color: #fff; }
+    body.dark-mode .hmi-label { color: #475569; }
 
-    /* Date picker specific dark mode adjustments */
+    /* Hero Right - Filter Card */
+    body.dark-mode .hero-right { 
+        background: linear-gradient(145deg, #111827 0%, #0f172a 100%); 
+        border-left-color: #1e293b; 
+    }
+    body.dark-mode .hsc-label { color: #818cf8; }
+    
+    body.dark-mode .hero-search { 
+        background: #1e293b; border-color: #334155; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+    }
+    body.dark-mode .hero-search input { color: #f1f5f9; }
+    body.dark-mode .hero-search svg { color: #6366f1; }
+
+    body.dark-mode .filter-item label { color: #64748b; }
+    body.dark-mode .filter-input-wrap, 
+    body.dark-mode .filter-select-wrap { 
+        background: #1e293b !important; border-color: #334155 !important; 
+    }
+    body.dark-mode .filter-input-wrap input, 
+    body.dark-mode .filter-select-wrap select { 
+        color: #f1f5f9 !important; 
+        background: transparent !important;
+    }
+    body.dark-mode select option { background: #0f172a; color: #f1f5f9; }
+
+    /* Date picker icon brilliance */
     body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: brightness(0) invert(1) !important;
-        -webkit-filter: brightness(0) invert(1) !important;
+        filter: invert(1) brightness(0.8);
         cursor: pointer;
-        opacity: 1 !important;
     }
-    body.dark-mode .filter-input-wrap input[type="date"] {
-        color-scheme: dark;
-    }
-    body.dark-mode .date-wrap svg { color: #fff !important; opacity: 1 !important; }
 
-    /* Import/Export Buttons */
-    body.dark-mode .btn-export-excel { background: #111827; color: #818cf8; border-color: #334155; }
-    body.dark-mode .btn-export-excel:hover { background: #1e293b; border-color: #818cf8; color: #a5b4fc; }
+    body.dark-mode .btn-export { background: #1e293b; color: #818cf8; border-color: #334155; }
+    body.dark-mode .btn-export:hover { background: #0f172a; border-color: #6366f1; }
 
     /* Table Card */
     body.dark-mode .table-card {
@@ -1221,37 +1244,38 @@ function fetchMasterRecords(exportModeOverride = null) {
                 else if (rem.includes('disapproved') || rem.includes('without pay')) remarkClass = 'red';
                 else if (rem.includes('pending')) remarkClass = 'yellow';
 
+                const remarkBadge = `<span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span>`;
+                const index = i; // Use the loop index for the cell-idx
+
                 html += `
                     <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                             <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${forwarded.replace(/'/g, "\\'")}', ${batchId})">
                         </td>
-                        <td class="cell-index">${rowIndex}</td>
-                        <td class="cell-name">${r.name}</td>
-                        <td class="cell-position">${r.position || '-'}</td>
-                        <td class="cell-school">${r.school || '-'}</td>
-                        <td><span class="badge-leave">${r.type_of_leave || '-'}</span></td>
-                        <td class="cell-dates">${r.inclusive_dates || '-'}</td>
-                        <td><span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span></td>
-                        <td class="cell-action-date">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
-                        <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                        <td class="cell-incharge">${r.incharge || '-'}</td>
-                        <td class="col-actions">
-                            ${isMyRecord ? `
-                            <div class="btn-action-group">
-                                <button onclick="editRecord(${r.id})" class="btn-action btn-edit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
-                                    </svg>
-                                </button>
-                                <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.244 2.244 0 0 1-2.244 2.077H8.084a2.244 2.244 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>
-                                </button>
-                            </div>
-                            ` : '-'}
-                        </td>
+                            <td class="cell-idx" style="font-weight: 600; font-family:monospace;">${index + 1}</td>
+                            <td class="cell-name" style="font-weight: 700;">${r.name}</td>
+                            <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
+                            <td class="cell-school">${r.school || '-'}</td>
+                            <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                            <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
+                            <td>${remarkBadge}</td>
+                            <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
+                            <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
+                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                            <td>
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
+                                    <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
                     </tr>
                 `;
             });

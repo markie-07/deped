@@ -115,6 +115,10 @@
                 <div class="table-tabs">
                     <button class="table-tab active" data-role="user" onclick="setRoleFilter('user')">Standard Users</button>
                     <button class="table-tab" data-role="admin" onclick="setRoleFilter('admin')">Administrators</button>
+                    <button class="table-tab" data-role="pending" onclick="setRoleFilter('pending')" style="position:relative;">
+                        Pending Approval
+                        <span id="pendingDot" style="display:none; position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:#ef4444; border-radius:50%; border:2px solid var(--card-bg, #fff);"></span>
+                    </button>
                 </div>
                 <div class="table-wrap">
                     <table class="accounts-table">
@@ -135,17 +139,17 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            <!-- Empty State -->
-            <div id="emptyState" style="display:none;" class="empty-wrap">
-                <div class="empty-art">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                    </svg>
+                <!-- Empty State -->
+                <div id="emptyState" style="display:none;" class="empty-wrap">
+                    <div class="empty-art">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                        </svg>
+                    </div>
+                    <h3>No Accounts Found</h3>
+                    <p>Try a different search or filter</p>
                 </div>
-                <h3>No Accounts Found</h3>
-                <p>Try a different search or filter</p>
             </div>
 
         </div>
@@ -193,6 +197,7 @@
                             <div class="form-field"><label class="form-label">System Role <span class="req">*</span></label><div class="form-input-wrap"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg><select id="inputRole" style="flex:1;border:none;outline:none;background:transparent;padding:11px 0;font-size:0.82rem;font-family:inherit;color:#1e293b;"><option value="user">User</option><option value="admin">Administrator</option></select></div></div>
                             <div class="form-field" id="statusFieldArea"><label class="form-label">Account Status <span class="req">*</span></label><div class="form-input-wrap"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><select id="inputStatus" style="flex:1;border:none;outline:none;background:transparent;padding:11px 0;font-size:0.82rem;font-family:inherit;color:#1e293b;"><option value="1">Active</option><option value="0">Inactive</option></select></div></div>
                         </div>
+                        <div class="form-field" id="approvalFieldArea"><label class="form-label">Approval Status <span class="req">*</span></label><div class="form-input-wrap"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><select id="inputApproved" style="flex:1;border:none;outline:none;background:transparent;padding:11px 0;font-size:0.82rem;font-family:inherit;color:#1e293b;"><option value="1">Approved</option><option value="0">Pending</option></select></div></div>
                         <div class="form-field"><label class="form-label">Email Address <span class="req">*</span></label><div class="form-input-wrap"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg><input type="email" id="inputEmail" placeholder="e.g. juan@deped.gov.ph"></div></div>
                         <div class="form-row">
                             <div class="form-field">
@@ -616,12 +621,95 @@
 .pw-toggle-btn svg { width: 16px; height: 16px; }
 
 /* ── Responsive ── */
+/* Dynamic Classes */
+.cell-idx { color: #cbd5e1; font-size: 0.75rem; font-family: monospace; }
+.cell-username, .cell-email { color: #64748b; font-size: 0.8rem; }
+.cell-created { font-family: monospace; font-size: 0.75rem; color: #94a3b8; }
+.cell-pos { display: block; font-size: 0.7rem; color: #94a3b8; }
+
 @media (max-width: 768px) {
     .hero-banner { flex-direction: column; }
     .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; }
     .table-header { flex-direction: column; align-items: stretch; }
     .table-search-wrap input { width: 100%; }
 }
+
+/* ── Dark Mode Overrides ── */
+body.dark-mode { background: #0f172a; color: #cbd5e1; }
+
+body.dark-mode .hero-banner { background: #1e293b; border-color: #334155; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+body.dark-mode .hero-dots { opacity: 0.1; }
+body.dark-mode .hero-title { color: #f8fafc; }
+body.dark-mode .hero-meta-divider { background: #334155; }
+body.dark-mode .hmi-num { color: #f8fafc; }
+body.dark-mode .hero-right { background: #1a1f35; border-left-color: #334155; }
+body.dark-mode .hsc-label { color: #818cf8; }
+body.dark-mode .hsc-hint { color: #64748b; }
+body.dark-mode .filter-select-wrap { background: #0f172a; border-color: #334155; }
+body.dark-mode .filter-select-wrap select { color: #f1f5f9; }
+body.dark-mode .filter-select-wrap select option { background: #1e293b; color: #f1f5f9; }
+
+body.dark-mode .accounts-table-card { 
+    background: transparent; 
+    border: 1.5px solid #334155; 
+    box-shadow: none; 
+}
+body.dark-mode .table-header { border-bottom-color: #334155; }
+body.dark-mode .table-title { color: #f1f5f9; }
+body.dark-mode .table-count { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+body.dark-mode .table-search-wrap { background: #0f172a; }
+body.dark-mode .table-search-wrap input { color: #f1f5f9; }
+body.dark-mode .table-tabs { background: transparent; border-bottom-color: #334155; }
+body.dark-mode .table-tab { color: #94a3b8; }
+body.dark-mode .table-tab.active { color: #818cf8; }
+body.dark-mode .table-tab.active::after { background: #818cf8; }
+
+body.dark-mode .accounts-table thead th { background: #0f172a; border-bottom-color: #334155; color: #f8fafc; }
+body.dark-mode .accounts-table tbody td { border-bottom-color: #334155; color: #cbd5e1; }
+body.dark-mode .accounts-table tbody tr:hover td { background: #1a1f35; }
+body.dark-mode .user-name { color: #f1f5f9; }
+body.dark-mode .cell-idx { color: #475569; }
+body.dark-mode .cell-username, body.dark-mode .cell-email { color: #94a3b8; }
+body.dark-mode .cell-created, body.dark-mode .cell-pos { color: #64748b; }
+
+body.dark-mode .modal-card { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); }
+body.dark-mode .modal-right { background: #0f172a; }
+body.dark-mode .form-label { color: #8892a4; }
+body.dark-mode .form-input-wrap { background: #0a0f1e; border: 1.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+body.dark-mode .form-input-wrap:focus-within { border-color: #6366f1; background: #050812; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+body.dark-mode .form-input-wrap input { color: #f1f5f9; }
+body.dark-mode .form-input-wrap input::placeholder { color: #334155; }
+body.dark-mode .form-input-wrap select { color: #f1f5f9 !important; }
+body.dark-mode .form-input-wrap select option { background: #0a0f1e; color: #f1f5f9; }
+
+body.dark-mode .modal-left { background: linear-gradient(160deg, #1e1b4b 0%, #0f172a 100%); border-right: 1px solid rgba(255,255,255,0.05); }
+body.dark-mode .modal-left-hint { color: #64748b; }
+body.dark-mode .modal-card-desc { color: #64748b; }
+body.dark-mode .modal-card-title { color: #f8fafc; }
+body.dark-mode .profile-upload { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); }
+body.dark-mode .profile-upload:hover { border-color: #6366f1; background: rgba(99,102,241,0.05); }
+
+body.dark-mode .btn-cancel { background: transparent; border-color: #1e293b; color: #64748b; }
+body.dark-mode .btn-cancel:hover { background: #1e293b; color: #f1f5f9; }
+body.dark-mode .modal-card-footer { border-top: 1px solid #1e293b; padding-top: 20px; }
+body.dark-mode .modal-error { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+body.dark-mode .pw-toggle-btn { color: #334155; }
+body.dark-mode .pw-toggle-btn:hover { color: #818cf8; }
+body.dark-mode .form-hint { color: #475569; }
+body.dark-mode .empty-wrap h3 { color: #f1f5f9; }
+body.dark-mode .empty-art { background: rgba(99, 102, 241, 0.1); }
+
+body.dark-mode .status-badge.role-admin { background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.2); }
+body.dark-mode .status-badge.role-user { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border-color: #334155; }
+body.dark-mode .status-badge.active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+body.dark-mode .status-badge.inactive { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+body.dark-mode .btn-edit { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+body.dark-mode .btn-edit:hover { background: #6366f1; color: #fff; }
+body.dark-mode .btn-delete { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+body.dark-mode .btn-delete:hover { background: #ef4444; color: #fff; }
+body.dark-mode .btn-toggle-active { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+body.dark-mode .btn-toggle-inactive { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 </style>
 
 <script>
@@ -654,7 +742,12 @@ document.addEventListener('DOMContentLoaded', function() {
     window.setRoleFilter = function(role) {
         currentRoleTab = role;
         document.querySelectorAll('.table-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.role === role));
-        document.querySelector('.table-title').textContent = role === 'admin' ? 'Administrator Accounts' : 'Standard User Accounts';
+        
+        let title = 'Standard User Accounts';
+        if (role === 'admin') title = 'Administrator Accounts';
+        if (role === 'pending') title = 'Pending Registration Requests';
+        
+        document.querySelector('.table-title').textContent = title;
         renderAccounts();
     };
 
@@ -679,15 +772,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateStats() {
         const active = allAccounts.filter(a => a.is_active).length;
+        const pending = allAccounts.filter(a => !a.is_approved).length;
         document.getElementById('totalAccounts').textContent = allAccounts.length;
         document.getElementById('activeAccounts').textContent = active;
         document.getElementById('inactiveAccounts').textContent = allAccounts.length - active;
+        
+        const dot = document.getElementById('pendingDot');
+        if (dot) dot.style.display = pending > 0 ? 'block' : 'none';
     }
 
     window.renderAccounts = function() {
         const filter = document.getElementById('statusFilter').value;
         const search = (document.getElementById('tableSearch').value || '').toLowerCase();
-        let list = allAccounts.filter(a => (a.role || 'user') === currentRoleTab);
+        let list = allAccounts.filter(a => {
+            if (currentRoleTab === 'pending') return !a.is_approved;
+            return a.is_approved && (a.role || 'user') === currentRoleTab;
+        });
         if (filter === 'active') list = list.filter(a => a.is_active);
         else if (filter === 'inactive') list = list.filter(a => !a.is_active);
         if (search) list = list.filter(a => (a.name||'').toLowerCase().includes(search) || (a.email||'').toLowerCase().includes(search) || (a.username||'').toLowerCase().includes(search));
@@ -695,29 +795,59 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tableCount').textContent = list.length + ' account' + (list.length !== 1 ? 's' : '');
         const tbody = document.getElementById('accountsTableBody');
         const emptyEl = document.getElementById('emptyState');
-        const tableCard = document.querySelector('.accounts-table-card');
-        if (!list.length) { tableCard.style.display = 'none'; emptyEl.style.display = 'block'; return; }
-        tableCard.style.display = 'block'; emptyEl.style.display = 'none';
+        const tableWrap = document.querySelector('.table-wrap');
+        
+        if (!list.length) { 
+            tableWrap.style.display = 'none'; 
+            emptyEl.style.display = 'block'; 
+            return; 
+        }
+        
+        tableWrap.style.display = 'block'; 
+        emptyEl.style.display = 'none';
 
         tbody.innerHTML = list.map((acc, idx) => {
             const [c1, c2] = getGrad(acc.name);
-            const isActive = acc.is_active;
+            const isApproved = acc.is_approved;
             const created = acc.created_at ? new Date(acc.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : '—';
             const avatarHtml = acc.profile_image
                 ? `<img src="/storage/${acc.profile_image}" class="user-avatar-img" style="width:40px;height:40px;border-radius:12px;object-fit:cover;">`
                 : `<div class="user-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(acc.name)}</div>`;
-            const posLabel = acc.position ? `<span style="display:block;font-size:0.7rem;color:#94a3b8;">${acc.position}</span>` : '';
-            return `<tr>
-                <td style="color:#cbd5e1;font-size:0.75rem;font-family:monospace;">${idx+1}</td>
-                <td><div class="user-cell">${avatarHtml}<div><span class="user-name">${acc.name}</span>${posLabel}</div></div></td>
-                <td style="color:#64748b;font-size:0.8rem;">${acc.username || '—'}</td>
-                <td style="color:#64748b;font-size:0.8rem;">${acc.email}</td>
-                <td><span class="status-badge ${isActive?'active':'inactive'}"><span class="dot"></span>${isActive?'Active':'Inactive'}</span></td>
-                <td><span class="status-badge ${acc.role==='admin'?'role-admin':'role-user'}">${acc.role==='admin'?'Admin':'User'}</span></td>
-                <td style="font-family:monospace;font-size:0.75rem;color:#94a3b8;">${created}</td>
-                <td><div class="action-group">
+            const posLabel = acc.position ? `<span class="cell-pos">${acc.position}</span>` : '';
+            
+            const isActive = acc.is_active;
+            let statusBadge = isActive ? `<span class="status-badge active"><span class="dot"></span>Active</span>` : `<span class="status-badge inactive"><span class="dot"></span>Inactive</span>`;
+            if (!isApproved) {
+                statusBadge = `<span class="status-badge inactive" style="background:rgba(245,158,11,0.1);color:#d97706;border-color:rgba(245,158,11,0.2);"><span class="dot" style="background:#d97706;"></span>Pending Approval</span>`;
+            }
+
+            let actionGroup = '';
+            if (currentRoleTab === 'pending') {
+                actionGroup = `
+                    <button class="btn-action" title="Approve" style="background:rgba(16,185,129,0.1);color:#10b981;border-color:rgba(16,185,129,0.2);" onclick="approveAccount(${acc.id})">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    </button>
+                    <button class="btn-action" title="Reject" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="rejectAccount(${acc.id})">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                `;
+            } else {
+                actionGroup = `
                     <button class="btn-action btn-edit" title="Edit" onclick="editAccountById(${acc.id})"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg></button>
                     <button class="btn-action ${isActive?'btn-toggle-active':'btn-toggle-inactive'}" title="${isActive?'Deactivate':'Activate'}" onclick="toggleAccount(${acc.id})">${isActive?'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>':'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>'}</button>
+                `;
+            }
+
+            return `<tr>
+                <td class="cell-idx">${idx+1}</td>
+                <td><div class="user-cell">${avatarHtml}<div><span class="user-name">${acc.name}</span>${posLabel}</div></div></td>
+                <td class="cell-username">${acc.username || '—'}</td>
+                <td class="cell-email">${acc.email}</td>
+                <td>${statusBadge}</td>
+                <td><span class="status-badge ${acc.role==='admin'?'role-admin':'role-user'}">${acc.role==='admin'?'Admin':'User'}</span></td>
+                <td class="cell-created">${created}</td>
+                <td><div class="action-group">
+                    ${actionGroup}
                 </div></td></tr>`;
         }).join('');
     };
@@ -726,6 +856,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ['editId','inputUsername','inputLastName','inputFirstName','inputMiddleName','inputSuffix','inputPosition','inputEmail','inputPassword','inputConfirmPassword'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('inputRole').value = 'user';
         document.getElementById('inputStatus').value = '1';
+        document.getElementById('inputApproved').value = '1';
         document.getElementById('inputProfileImage').value = '';
         document.getElementById('profilePreview').style.display = 'none';
         document.getElementById('profilePlaceholder').style.display = 'flex';
@@ -741,7 +872,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('confirmLabel').innerHTML = 'Confirm Password <span class="req">*</span>';
         document.getElementById('passwordHint').textContent = 'Must be at least 8 characters long.';
         document.getElementById('statusFieldArea').style.display = 'none';
+        document.getElementById('approvalFieldArea').style.display = 'none';
         document.getElementById('inputStatus').value = '1';
+        document.getElementById('inputApproved').value = '1';
         document.getElementById('accountModal').classList.add('open');
     };
 
@@ -774,6 +907,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('inputEmail').value = acc.email || '';
         document.getElementById('inputRole').value = acc.role || 'user';
         document.getElementById('inputStatus').value = acc.is_active ? '1' : '0';
+        document.getElementById('inputApproved').value = acc.is_approved ? '1' : '0';
         if (acc.profile_image) {
             document.getElementById('profilePreview').src = '/storage/' + acc.profile_image;
             document.getElementById('profilePreview').style.display = 'block';
@@ -786,6 +920,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('confirmLabel').textContent = 'Confirm New Password';
         document.getElementById('passwordHint').textContent = 'Leave blank to keep current password.';
         document.getElementById('statusFieldArea').style.display = 'block';
+        document.getElementById('approvalFieldArea').style.display = 'block';
         document.getElementById('accountModal').classList.add('open');
     };
 
@@ -816,6 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('position', document.getElementById('inputPosition').value.trim());
         formData.append('role', document.getElementById('inputRole').value);
         formData.append('is_active', document.getElementById('inputStatus').value);
+        formData.append('is_approved', document.getElementById('inputApproved').value);
         formData.append('email', email);
         if (password) formData.append('password', password);
         const fileInput = document.getElementById('inputProfileImage');
@@ -850,11 +986,75 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchAccounts();
     };
 
+    window.approveAccount = async function(id) {
+        if (!confirm('Approve this account?')) return;
+        try {
+            const res = await fetch(`/api/user-accounts/${id}/approve`, {
+                method: 'PUT',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Approved!',
+                    text: 'Account has been activated and moved to Standard Users.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+                // Optimistic Update: Update local state immediately
+                const userIndex = allAccounts.findIndex(a => a.id == id);
+                if (userIndex !== -1) {
+                    allAccounts[userIndex].is_approved = true;
+                    allAccounts[userIndex].is_active = true;
+                }
+                
+                updateStats();
+                setRoleFilter('user'); // This will call renderAccounts()
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    window.rejectAccount = async function(id) {
+        if (!confirm('Are you sure you want to REJECT and DELETE this registration request? This action cannot be undone.')) return;
+        try {
+            const res = await fetch(`/api/user-accounts/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Rejected',
+                    text: 'The registration request has been deleted.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+                // Optimistic Update: Remove from local state immediately
+                allAccounts = allAccounts.filter(a => a.id != id);
+                
+                updateStats();
+                renderAccounts();
+            } else {
+                Swal.fire('Error', data.message || 'Failed to reject account', 'error');
+            }
+        } catch (err) { 
+            console.error(err);
+            Swal.fire('Error', 'Server error occurred', 'error');
+        }
+    };
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('accountModal').classList.contains('open')) closeModal(); });
+    
+    // Initial fetch
     fetchAccounts();
+    
+    // Real-time polling: Refresh the list every 10 seconds to detect new registrations automatically
+    setInterval(fetchAccounts, 10000);
 });
 </script>
 
 </body>
-</html>

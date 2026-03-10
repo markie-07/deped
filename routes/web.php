@@ -159,7 +159,7 @@ Route::get('/profile', function () {
 Route::get('/api/user-accounts', function () {
     return response()->json(User::orderBy('created_at', 'desc')->get([
         'id', 'name', 'username', 'last_name', 'first_name', 'middle_name',
-        'suffix', 'position', 'profile_image', 'email', 'is_active', 'role', 'created_at'
+        'suffix', 'position', 'profile_image', 'email', 'is_active', 'is_approved', 'role', 'created_at'
     ]));
 });
 
@@ -191,6 +191,46 @@ Route::post('/api/user-accounts', function (Request $request) {
         'password' => Hash::make($request->password),
         'role' => $request->role ?? 'user',
         'is_active' => $request->has('is_active') ? ($request->is_active == '1') : true,
+        'is_approved' => $request->has('is_approved') ? ($request->is_approved == '1') : true,
+    ];
+
+    if ($request->hasFile('profile_image')) {
+        $path = $request->file('profile_image')->store('profile-images', 'public');
+        $data['profile_image'] = $path;
+    }
+    
+    $user = User::create($data);
+    AuditLog::logAction('Created user account', $user);
+    return response()->json(['success' => true, 'message' => 'Account created successfully.', 'user' => $user]);
+});
+
+// Self-Registration API
+Route::post('/api/register', function (Request $request) {
+    $request->validate([
+        'username' => 'required|string|max:255|unique:users,username',
+        'last_name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+        'role' => 'required|string',
+        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+    ]);
+
+    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
+
+    $data = [
+        'name' => $fullName,
+        'username' => $request->username,
+        'last_name' => $request->last_name,
+        'first_name' => $request->first_name,
+        'middle_name' => $request->middle_name,
+        'suffix' => $request->suffix,
+        'position' => $request->position,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role,
+        'is_active' => true,
+        'is_approved' => false, // Requires admin approval
     ];
 
     if ($request->hasFile('profile_image')) {
@@ -199,8 +239,8 @@ Route::post('/api/user-accounts', function (Request $request) {
     }
 
     $user = User::create($data);
-    AuditLog::logAction('Created user account', $user);
-    return response()->json(['success' => true, 'message' => 'Account created successfully.', 'user' => $user]);
+    AuditLog::logAction('Self-registered account (Pending Approval)', $user);
+    return response()->json(['success' => true, 'message' => 'Registration submitted. Please wait for admin approval.']);
 });
 
 Route::put('/api/user-accounts/{id}/toggle', function ($id) {
@@ -212,6 +252,33 @@ Route::put('/api/user-accounts/{id}/toggle', function ($id) {
     $user->save();
     AuditLog::logAction($user->is_active ? 'Activated user account' : 'Deactivated user account', $user);
     return response()->json(['success' => true, 'message' => $user->is_active ? 'Account activated.' : 'Account deactivated.', 'user' => $user]);
+});
+
+Route::put('/api/user-accounts/{id}/approve', function ($id) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    $user = User::findOrFail($id);
+    $user->is_approved = true;
+    $user->save();
+    AuditLog::logAction('Approved user account', $user);
+    return response()->json(['success' => true, 'message' => 'Account approved.', 'user' => $user]);
+});
+
+Route::delete('/api/user-accounts/{id}', function ($id) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    $user = User::findOrFail($id);
+    
+    // Optional: Delete profile image if exists
+    if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
+        \Storage::disk('public')->delete($user->profile_image);
+    }
+    
+    AuditLog::logAction('Deleted user account (Rejected request)', $user);
+    $user->delete();
+    return response()->json(['success' => true, 'message' => 'Account deleted.']);
 });
 
 Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
@@ -239,6 +306,7 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
     $user->email = $request->email;
     $user->role = $request->role ?? 'user';
     $user->is_active = $request->has('is_active') ? ($request->is_active == '1') : $user->is_active;
+    $user->is_approved = $request->has('is_approved') ? ($request->is_approved == '1') : $user->is_approved;
 
     if ($request->filled('password')) {
         $user->password = Hash::make($request->password);
@@ -386,6 +454,9 @@ Route::post('/login', function (Request $request) {
         if (!$user->is_active) {
             return response()->json(['success' => false, 'message' => 'Your account has been deactivated. Please contact an administrator.'], 403);
         }
+        if (!$user->is_approved) {
+            return response()->json(['success' => false, 'message' => 'Your account is pending approval. Please contact an administrator.'], 403);
+        }
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         session([
             'otp_code' => $otp,
@@ -418,6 +489,9 @@ Route::post('/verify-otp', function (Request $request) {
     if (!$user || !$user->is_active) {
         return response()->json(['success' => false, 'message' => 'Your account has been deactivated. Please contact an administrator.'], 403);
     }
+    if (!$user->is_approved) {
+        return response()->json(['success' => false, 'message' => 'Your account is pending approval. Please contact an administrator.'], 403);
+    }
     Auth::login($user);
     session(['authenticated' => true, 'user_id' => $user->id]);
     session()->forget(['otp_code', 'otp_expires', 'otp_user_id']);
@@ -433,6 +507,15 @@ Route::post('/resend-otp', function (Request $request) {
     if (!$email) return response()->json(['success' => false], 400);
     $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     session(['otp_code' => $otp, 'otp_expires' => now()->addMinutes(5)]);
+    
+    try {
+        Mail::html('Verification code: ' . $otp, function ($message) use ($email) {
+            $message->to($email)->subject('Login OTP (Resend)');
+        });
+    } catch (\Exception $e) {
+        Log::warning('Resend OTP email failed: ' . $e->getMessage());
+    }
+
     return response()->json(['success' => true, 'otp_code' => $otp]);
 });
 
@@ -440,8 +523,24 @@ Route::post('/forgot-password', function (Request $request) {
     $email = $request->input('email');
     $user = User::where('email', $email)->first();
     if (!$user) return response()->json(['success' => true, 'message' => 'Email sent if exists.']);
+    
     $token = Str::random(64);
-    \DB::table('password_reset_tokens')->updateOrInsert(['email' => $email], ['token' => Hash::make($token), 'created_at' => now()]);
+    \DB::table('password_reset_tokens')->updateOrInsert(
+        ['email' => $email],
+        ['token' => Hash::make($token), 'created_at' => now()]
+    );
+
+    $resetUrl = url('/reset-password/' . $token . '?email=' . urlencode($email));
+
+    try {
+        Mail::html("Hello, <br><br> You requested a password reset. Click the link below to reset your password: <br><br> <a href='{$resetUrl}'>{$resetUrl}</a> <br><br> This link will expire shortly.", function ($message) use ($email) {
+            $message->to($email)->subject('Password Reset Link');
+        });
+    } catch (\Exception $e) {
+        Log::error('Forgot password email failed: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Failed to send email. Please check configuration.']);
+    }
+
     return response()->json(['success' => true, 'message' => 'Reset link sent.']);
 });
 

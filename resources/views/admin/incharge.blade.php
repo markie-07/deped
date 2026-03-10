@@ -78,7 +78,7 @@
                             </button>
                         </div>
                         
-                        <!-- Name Filter Dropdown -->
+                        <!-- Alphabet Filter -->
                         <div class="hero-filter">
                             <div class="filter-select-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -89,8 +89,15 @@
                                 </select>
                             </div>
                         </div>
-                        
-                        <p class="hsc-hint">Click any card below to view leave records</p>
+
+                        <div class="hsc-toggles">
+                            <button class="view-btn active" id="viewGrid" onclick="setView('grid')" title="Grid View">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                            </button>
+                            <button class="view-btn" id="viewList" onclick="setView('list')" title="List View">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -181,7 +188,9 @@
                                 <th>Inclusive Dates</th>
                                 <th>Remarks</th>
                                 <th>Date of Action</th>
-                                <th></th>
+                                <th>Deduction Remark</th>
+                                <th>Incharge</th>
+                                <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="inchargeTableBody">
@@ -376,6 +385,11 @@
 .hero-search button:hover { background: #fee2e2; }
 .hero-search button:hover svg { color: #ef4444; }
 
+.hsc-toggles { display: flex; gap: 4px; margin-top: 10px; background: #ede9fe; border-radius: 10px; padding: 3px; }
+.view-btn { background: transparent; border: none; flex: 1; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7c3aed; transition: all 0.2s; }
+.view-btn svg { width: 16px; height: 16px; pointer-events: none; }
+.view-btn.active { background: #fff; color: #6366f1; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
 .hsc-hint {
     font-size: 0.68rem;
     color: #a5b4fc;
@@ -426,27 +440,28 @@
     cursor: pointer;
 }
 
-/* ── Personnel Grid ── */
-.personnel-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    padding-bottom: 40px;
-}
+    /* ── Personnel Grid ── */
+    .personnel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+        padding-bottom: 40px;
+    }
+    .personnel-grid.list-view { grid-template-columns: 1fr; gap: 12px; }
 
-/* ── Skeleton ── */
-@keyframes shimmer { 0%{background-position:-400px 0;} 100%{background-position:400px 0;} }
-.skeleton-card { background:#fff; border-radius:24px; overflow:hidden; border:1px solid #f1f5f9; display:flex; flex-direction:column; }
-.sk-banner { width:100%; height:80px; background:linear-gradient(90deg,#f1f5f9 25%,#f8fafc 50%,#f1f5f9 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; }
-.sk-content { padding: 20px; }
-.sk-avatar { width:72px; height:72px; border-radius:20px; margin-top:-56px; background:linear-gradient(90deg,#e8ecf3 25%,#f1f5f9 50%,#e8ecf3 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; border:4px solid #fff; margin-bottom: 12px; }
-.sk-line { height:12px; border-radius:6px; margin-bottom:12px; background:linear-gradient(90deg,#e8ecf3 25%,#f1f5f9 50%,#e8ecf3 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; }
-.sk-l1 { width:70%; } .sk-l2 { width:45%; }
+    /* ── Skeleton ── */
+    @keyframes shimmer { 0%{background-position:-400px 0;} 100%{background-position:400px 0;} }
+    .skeleton-card { background:#fff; border-radius:24px; overflow:hidden; border:1px solid #f1f5f9; display:flex; flex-direction:column; }
+    .sk-banner { width:100%; height:80px; background:linear-gradient(90deg,#f1f5f9 25%,#f8fafc 50%,#f1f5f9 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; }
+    .sk-content { padding: 20px; }
+    .sk-avatar { width:72px; height:72px; border-radius:20px; margin-top:-56px; background:linear-gradient(90deg,#e8ecf3 25%,#f1f5f9 50%,#e8ecf3 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; border:4px solid #fff; margin-bottom: 12px; }
+    .sk-line { height:12px; border-radius:6px; margin-bottom:12px; background:linear-gradient(90deg,#e8ecf3 25%,#f1f5f9 50%,#e8ecf3 75%); background-size:400px 100%; animation:shimmer 1.6s ease-in-out infinite; }
+    .sk-l1 { width:70%; } .sk-l2 { width:45%; }
 
-    /* ── Personnel Card — Premium Redesign ── */
+    /* Incharge Card — Premium Redesign */
     @keyframes cardReady { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     
-    .person-card {
+    .incharge-card {
         background: #fff;
         border-radius: 24px;
         border: 1.5px solid #f1f5f9;
@@ -461,7 +476,7 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
     }
 
-    .person-card:hover {
+    .incharge-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.15);
         border-color: rgba(99, 102, 241, 0.2);
@@ -507,7 +522,7 @@
         transition: transform 0.3s ease;
     }
 
-    .person-card:hover .card-avatar {
+    .incharge-card:hover .card-avatar {
         transform: scale(1.05) rotate(-2deg);
     }
 
@@ -529,13 +544,14 @@
         flex-grow: 1;
         display: flex;
         flex-direction: column;
+        position: relative;
     }
 
-    .card-person-name {
+    .card-name {
         font-size: 1.05rem;
         font-weight: 800;
         color: #1e293b;
-        margin-bottom: 8px; /* Slightly reduced */
+        margin-bottom: 12px;
         letter-spacing: -0.02em;
         line-height: 1.2;
         display: -webkit-box;
@@ -545,14 +561,33 @@
         min-height: 2.4em;
     }
 
-    /* Added sub-label for consistence */
-    .card-sub-label {
-        font-size: 0.72rem;
-        font-weight: 600;
+    .card-details {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #64748b;
+        font-size: 0.78rem;
+        font-weight: 500;
+    }
+
+    .detail-row svg {
+        width: 14px;
+        height: 14px;
         color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
+
+    .detail-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .card-action-bar {
@@ -587,11 +622,43 @@
         transition: all 0.3s ease;
     }
 
-    .person-card:hover .action-icon {
+    .incharge-card:hover .action-icon {
         background: #6366f1;
         color: #fff;
         transform: translateX(4px);
     }
+
+    /* ── List View Layout ── */
+    .personnel-grid.list-view .incharge-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 20px;
+        height: auto;
+        min-height: 80px;
+    }
+
+    .personnel-grid.list-view .card-banner { display: none; }
+    .personnel-grid.list-view .card-avatar-container { margin-top: 0; padding: 0; margin-right: 20px; }
+    .personnel-grid.list-view .card-avatar { width: 52px; height: 52px; border-radius: 14px; font-size: 1rem; border: none; box-shadow: none; }
+    .personnel-grid.list-view .card-badge { display: none; }
+    .personnel-grid.list-view .card-main { padding: 0; flex-direction: row; align-items: center; flex: 1; gap: 24px; }
+    .personnel-grid.list-view .card-name { margin-bottom: 0; min-height: auto; -webkit-line-clamp: 1; width: 300px; flex-shrink: 0; }
+    .personnel-grid.list-view .card-details { margin-bottom: 0; flex-direction: row; flex: 1; gap: 32px; }
+    .personnel-grid.list-view .detail-row { width: auto; min-width: 150px; }
+    .personnel-grid.list-view .card-action-bar { margin-top: 0; padding-top: 0; border-top: none; width: auto; }
+    .personnel-grid.list-view .action-label { display: none; }
+
+    /* List View Skeleton */
+    .personnel-grid.list-view .skeleton-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 20px;
+        height: 80px;
+        border-radius: 14px;
+    }
+    .personnel-grid.list-view .sk-banner { display: none; }
+    .personnel-grid.list-view .sk-avatar { margin-top: 0; width: 52px; height: 52px; margin-right: 20px; border-radius: 14px; }
+    .personnel-grid.list-view .sk-content { padding: 0; flex: 1; }
 
 /* ── Empty State ── */
 .empty-wrap {
@@ -631,16 +698,17 @@
 }
 .modal-backdrop.open { opacity: 1; pointer-events: auto; }
 
-.modal-sheet {
-    width: 94%; max-width: 1160px;
-    max-height: 90vh;
-    display: flex;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 32px 80px -12px rgba(0,0,0,0.25);
-    transform: scale(0.95) translateY(24px);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+    .modal-sheet {
+        width: 98% !important;
+        max-width: none !important;
+        max-height: 90vh;
+        display: flex;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 32px 80px -12px rgba(0,0,0,0.25);
+        transform: scale(0.95) translateY(24px);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 .modal-backdrop.open .modal-sheet { transform: scale(1) translateY(0); }
     body.dark-mode .pf-date-wrap { background: rgba(0,0,0,0.2); border-color: rgba(99,102,241,0.3); }
     body.dark-mode .pf-date-wrap svg { color: #fff !important; }
@@ -805,59 +873,132 @@
 }
 .mm-search input::placeholder { color: #b0bac9; }
 
-.modal-table-wrap { flex: 1; overflow-y: auto; }
 
-.modal-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .modal-table-wrap { 
+        flex: 1; 
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+    }
+    .modal-table-wrap::-webkit-scrollbar { display: none; }
+    .modal-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+    .modal-table thead th { background: #f8fafc; padding: 12px 18px; font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; position: sticky; top: 0; z-index: 5; border-bottom: 2px solid #eef2ff; white-space: nowrap; }
+    .modal-table tbody td { padding: 13px 18px; font-size: 0.81rem; color: #475569; border-bottom: 1px solid #f8fafc; word-wrap: break-word; vertical-align: top; line-height: 1.4; }
 
-.modal-table thead th {
-    background: #f8fafc;
-    padding: 12px 18px;
-    font-size: 0.68rem; font-weight: 700; color: #94a3b8;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    position: sticky; top: 0; z-index: 5;
-    border-bottom: 2px solid #eef2ff;
-    white-space: nowrap;
-}
+    /* Action Buttons */
+    .btn-action { width:32px; height:32px; border-radius:10px; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
+    .btn-edit { background:#f0fdf4; color:#16a34a; } 
+    .btn-edit:hover { background:#16a34a; color:#fff; transform: translateY(-2px) scale(1.1); box-shadow: 0 4px 12px rgba(22,163,74,0.2); }
+    .btn-delete { background:#fef2f2; color:#dc2626; } 
+    .btn-delete:hover { background:#dc2626; color:#fff; transform: translateY(-2px) scale(1.1); box-shadow: 0 4px 12px rgba(220,38,38,0.2); }
 
-.modal-table tbody td {
-    padding: 13px 18px;
-    font-size: 0.81rem; color: #475569;
-    border-bottom: 1px solid #f8fafc;
-}
-.modal-table tbody tr:hover td { background: #fafaff; }
-.modal-table tbody tr:last-child td { border-bottom: none; }
+    /* Column widths for Incharge Modal */
+    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 4%; }  /* # */
+    .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 12%; } /* Name */
+    .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 10%; } /* Position */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 10%; } /* School */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 8%; }  /* Leave Type */
+    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 12%; } /* Dates */
+    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 10%; } /* Remarks */
+    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 8%; }  /* Date of Action */
+    .modal-table th:nth-child(9), .modal-table td:nth-child(9) { width: 10%; } /* Deduction Remark */
+    .modal-table th:nth-child(10), .modal-table td:nth-child(10) { width: 9%; } /* Incharge */
+    .modal-table th:nth-child(11), .modal-table td:nth-child(11) { width: 7%; } /* Actions */
 
-.table-loading {
-    text-align: center; padding: 60px !important;
-    color: #94a3b8; font-size: 0.85rem;
-}
+    .modal-table tbody tr:hover td { background: #f5f7ff; color: #1e293b; }
+    .badge { font-size:0.7rem; padding:4px 10px; border-radius:20px; font-weight:700; display:inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .badge-green { background:#ecfdf5; color:#059669; border: 1px solid rgba(5,150,105,0.1); } 
+    .badge-red { background:#fef2f2; color:#dc2626; border: 1px solid rgba(220,38,38,0.1); }
+    .badge-violet { background:#f5f3ff; color:#7c3aed; border: 1px solid rgba(124,58,237,0.1); } 
+    .badge-yellow { background:#fffbeb; color:#d97706; border: 1px solid rgba(217,119,6,0.1); }
+    .badge-gray { background:#f1f5f9; color:#64748b; border: 1px solid rgba(100,116,139,0.1); } 
+    .badge-leave { font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:8px; background:#eef2ff; color:#6366f1; display:inline-block; }
 
-/* ── Badges ── */
-.badge-type {
-    display: inline-block;
-    font-size: 0.68rem; font-weight: 600; padding: 3px 9px;
-    border-radius: 20px; background: #eef2ff; color: #6366f1;
-}
+/* ── Dark Mode Overrides ── */
+body.dark-mode { background: #0f172a; color: #cbd5e1; }
 
-.remark-pill {
-    display: inline-block;
-    font-size: 0.68rem; font-weight: 700; padding: 3px 10px;
-    border-radius: 20px;
-}
-.remark-pill.green  { background: #ecfdf5; color: #059669; }
-.remark-pill.red    { background: #fef2f2; color: #dc2626; }
-.remark-pill.yellow { background: #fffbeb; color: #d97706; }
-.remark-pill.gray   { background: #f8fafc; color: #94a3b8; }
+body.dark-mode .hero-banner { background: #1e293b; border-color: #334155; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+body.dark-mode .hero-dots { opacity: 0.1; }
+body.dark-mode .hero-title { color: #f8fafc; }
+body.dark-mode .hero-meta-divider { background: #334155; }
+body.dark-mode .hmi-num { color: #f8fafc; }
+body.dark-mode .hero-right { background: #1a1f35; border-left-color: #334155; }
+body.dark-mode .hero-search { background: #0f172a; border-color: #334155; }
+body.dark-mode .hero-search input { color: #f1f5f9; }
+body.dark-mode .hsc-toggles { background: rgba(0,0,0,0.3); }
+body.dark-mode .view-btn { color: #94a3b8; }
+body.dark-mode .view-btn.active { background: #334155; color: #818cf8; }
+body.dark-mode .filter-select-wrap { background: #0f172a; border-color: #334155; }
+body.dark-mode .filter-select-wrap select { color: #f1f5f9; }
+body.dark-mode .filter-select-wrap select option { background: #1e293b; color: #f1f5f9; }
 
-/* ── Edit button ── */
-.btn-edit {
-    width: 30px; height: 30px; border-radius: 9px;
-    border: none; background: #f0fdf4; color: #16a34a;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s;
-}
-.btn-edit:hover { background: #16a34a; color: #fff; transform: scale(1.08); }
-.btn-edit svg { width: 13px; height: 13px; }
+/* Cards in Dark Mode */
+body.dark-mode .incharge-card { background: transparent; border: 1.5px solid var(--card-color, #334155); box-shadow: none; }
+body.dark-mode .card-name { color: #f1f5f9; }
+body.dark-mode .detail-row { color: #94a3b8; }
+body.dark-mode .detail-row svg { color: var(--card-color, #818cf8); }
+body.dark-mode .action-label { color: var(--card-color, #818cf8); }
+body.dark-mode .action-icon { background: rgba(255,255,255,0.05); color: var(--card-color, #818cf8); }
+body.dark-mode .incharge-card:hover { background: rgba(30, 41, 59, 0.3); transform: translateY(-8px); box-shadow: 0 0 20px rgba(var(--card-color-rgb, 99,102,241), 0.15); }
+body.dark-mode .incharge-card:hover .action-icon { background: var(--card-color, #6366f1); color: #fff; }
+body.dark-mode .card-action-bar { border-top-color: rgba(255,255,255,0.06); }
+body.dark-mode .card-badge { background: rgba(15, 23, 42, 0.7); color: var(--card-color, #818cf8); border-color: var(--card-color, #334155); }
+body.dark-mode .card-avatar { border: 4px solid #0f172a !important; }
+
+/* Modal in Dark Mode */
+body.dark-mode .modal-sheet { background: #0f172a; border: 1px solid #1e293b; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+body.dark-mode .modal-panel { background: linear-gradient(160deg, #1e1b4b 0%, #111827 100%); border-right-color: #1e293b; }
+body.dark-mode .panel-avatar { border-color: #1e293b !important; }
+body.dark-mode .panel-name { color: #f1f5f9; }
+body.dark-mode .panel-role { color: #818cf8; }
+body.dark-mode .panel-stat-wrap { background: rgba(255,255,255,0.05); border-color: rgba(99, 102, 241, 0.2); }
+body.dark-mode .ps-num { color: #f1f5f9; }
+body.dark-mode .ps-label { color: #818cf8; }
+body.dark-mode .pf-date-wrap { background: rgba(0,0,0,0.2); border-color: rgba(99, 102, 241, 0.3); }
+body.dark-mode .pf-date-wrap input { color: #f1f5f9; color-scheme: dark; }
+body.dark-mode .pf-date-wrap input::-webkit-calendar-picker-indicator { filter: brightness(0) invert(1) !important; }
+body.dark-mode .pf-date-wrap svg { color: #fff !important; }
+body.dark-mode .pf-clear, body.dark-mode .panel-close-btn { background: rgba(255,255,255,0.05); border-color: rgba(99, 102, 241, 0.2); color: #f1f5f9; }
+body.dark-mode .panel-divider { background: rgba(99, 102, 241, 0.2); }
+
+body.dark-mode .modal-main { background: #0f172a; }
+body.dark-mode .modal-main-header { background: #111827; border-bottom-color: #1e293b; }
+body.dark-mode .mm-title { color: #f1f5f9; }
+body.dark-mode .mm-search { background: #0a0f1e; }
+body.dark-mode .mm-search input { color: #f1f5f9; }
+body.dark-mode .modal-table thead th { background: #111827; border-bottom-color: #1e293b; color: #cbd5e1; }
+body.dark-mode .modal-table tbody td { border-bottom-color: #1e293b; color: #cbd5e1; }
+body.dark-mode .modal-table tbody tr:hover td { background: #1a1f35; }
+
+/* Dynamic Classes */
+.cell-name { font-weight: 700; color: #1e293b; }
+.cell-position { color: #475569; }
+.cell-meta { font-family: monospace; font-size: 0.725rem; color: #94a3b8; }
+.cell-subtext { font-size: 0.8rem; color: #64748b; }
+
+body.dark-mode .cell-name { color: #f1f5f9 !important; }
+body.dark-mode .cell-position { color: #cbd5e1 !important; }
+body.dark-mode .cell-meta { color: #94a3b8 !important; }
+body.dark-mode .cell-subtext { color: #94a3b8 !important; }
+
+/* Status Badges in Dark Mode */
+body.dark-mode .badge-type { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+body.dark-mode .remark-pill.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+body.dark-mode .remark-pill.red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+body.dark-mode .remark-pill.yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+body.dark-mode .remark-pill.gray { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+
+body.dark-mode .btn-edit { background: rgba(22, 163, 74, 0.2); color: #4ade80; }
+body.dark-mode .btn-edit:hover { background: #16a34a; color: #fff; }
+body.dark-mode .btn-delete { background: rgba(220, 38, 38, 0.2); color: #f87171 !important; }
+body.dark-mode .btn-delete:hover { background: #dc2626; color: #fff; }
+
+/* ── Skeleton Dark Mode ── */
+body.dark-mode .skeleton-card { background: #1e293b; border-color: #334155; }
+body.dark-mode .sk-banner { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 400px 100%; animation: shimmer 1.6s ease-in-out infinite; }
+body.dark-mode .sk-avatar { background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%); background-size: 400px 100%; animation: shimmer 1.6s ease-in-out infinite; border-color: #1e293b !important; }
+body.dark-mode .sk-line { background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%); background-size: 400px 100%; animation: shimmer 1.6s ease-in-out infinite; }
 </style>
 
 <script>
@@ -865,16 +1006,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── Colour palette for cards (cycles) ──
     const PALETTE = [
-        { strip: 'linear-gradient(135deg,#6366f1,#8b5cf6)', avatar: 'linear-gradient(135deg,#6366f1,#818cf8)' },
-        { strip: 'linear-gradient(135deg,#10b981,#06b6d4)', avatar: 'linear-gradient(135deg,#10b981,#34d399)' },
-        { strip: 'linear-gradient(135deg,#f59e0b,#ef4444)', avatar: 'linear-gradient(135deg,#f59e0b,#fbbf24)' },
-        { strip: 'linear-gradient(135deg,#ec4899,#8b5cf6)', avatar: 'linear-gradient(135deg,#ec4899,#f472b6)' },
-        { strip: 'linear-gradient(135deg,#0ea5e9,#6366f1)', avatar: 'linear-gradient(135deg,#0ea5e9,#38bdf8)' },
-        { strip: 'linear-gradient(135deg,#14b8a6,#10b981)', avatar: 'linear-gradient(135deg,#14b8a6,#2dd4bf)' },
+        { strip: 'linear-gradient(135deg, #6366f1, #4f46e5)', avatar: 'linear-gradient(135deg, #6366f1, #818cf8)', color: '#6366f1' },
+        { strip: 'linear-gradient(135deg, #10b981, #059669)', avatar: 'linear-gradient(135deg, #10b981, #34d399)', color: '#10b981' },
+        { strip: 'linear-gradient(135deg, #f59e0b, #d97706)', avatar: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: '#f59e0b' },
+        { strip: 'linear-gradient(135deg, #ec4899, #db2777)', avatar: 'linear-gradient(135deg, #ec4899, #f472b6)', color: '#ec4899' },
+        { strip: 'linear-gradient(135deg, #0ea5e9, #0284c7)', avatar: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#0ea5e9' },
+        { strip: 'linear-gradient(135deg, #14b8a6, #0d9488)', avatar: 'linear-gradient(135deg, #14b8a6, #2dd4bf)', color: '#14b8a6' },
     ];
 
     let allIncharges = [];
     let currentLetter = 'ALL';
+    let currentView = localStorage.getItem('inchargeView') || 'grid';
 
     const grid      = document.getElementById('personnelGrid');
     const skeleton  = document.getElementById('skeletonGrid');
@@ -883,6 +1025,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const alphaSelect = document.getElementById('alphaSelect');
     const searchInput  = document.getElementById('inchargeSearch');
     const searchClearBtn = document.getElementById('searchClearBtn');
+
+    // Apply saved view on load
+    if (currentView === 'list') {
+        grid.classList.add('list-view');
+        skeleton.classList.add('list-view');
+        document.getElementById('viewGrid').classList.remove('active');
+        document.getElementById('viewList').classList.add('active');
+    }
 
     function formatDate(dateStr) {
         if (!dateStr || dateStr === '—' || dateStr === '-') return '-';
@@ -895,10 +1045,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getInitials(name) {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        if (!name) return '??';
+        return name.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
     }
 
     function getColorIdx(name) {
+        if (!name) return 0;
         let h = 0;
         for (let c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
         return h % PALETTE.length;
@@ -935,6 +1087,15 @@ document.addEventListener('DOMContentLoaded', function () {
         renderGrid(searchInput.value);
     };
 
+    window.setView = function(view) {
+        currentView = view;
+        localStorage.setItem('inchargeView', view);
+        document.getElementById('viewGrid').classList.toggle('active', view === 'grid');
+        document.getElementById('viewList').classList.toggle('active', view === 'list');
+        grid.classList.toggle('list-view', view === 'list');
+        skeleton.classList.toggle('list-view', view === 'list');
+    };
+
     function renderGrid(filter = '') {
         let list = allIncharges;
 
@@ -968,16 +1129,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 : initials;
             const avatarBg = i.profile_image ? 'background:transparent;overflow:hidden;' : `background:${col.avatar}`;
             const position = i.position || '—';
+            const roleLabel = i.role ? (i.role.charAt(0).toUpperCase() + i.role.slice(1)) : 'User';
+            
             return `
-            <div class="person-card" onclick="openInchargeModal('${safeName}')" style="animation-delay:${Math.min(idx*0.04,0.5)}s">
+            <div class="incharge-card" onclick="openInchargeModal('${safeName}')" style="animation-delay:${Math.min(idx*0.04,0.5)}s; --card-color: ${col.color}">
                 <div class="card-banner" style="${coverBg}"></div>
                 <div class="card-avatar-container">
                     <div class="card-avatar" style="${avatarBg}">${avatarContent}</div>
                     <div class="card-badge">${i.leave_count} Record${i.leave_count !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="card-main">
-                    <h3 class="card-person-name" title="${i.incharge}">${i.incharge}</h3>
-                    <div class="card-sub-label">${position}</div>
+                    <h3 class="card-name" title="${i.incharge}">${i.incharge}</h3>
+                    <div class="card-details">
+                        <div class="detail-row" title="${position}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .414-.336.75-.75.75H4.5a.75.75 0 0 1-.75-.75v-4.25m16.5 0a3 3 0 0 0-3-3H6.75a3 3 0 0 0-3 3m16.5 0V9a2.25 2.25 0 0 0-2.25-2.25H16.5V4.5a2.25 2.25 0 0 0-2.25-2.25h-4.5A2.25 2.25 0 0 0 7.5 4.5v2.25H5.25A2.25 2.25 0 0 0 3 9v5.15" />
+                            </svg>
+                            <span class="detail-text">${position}</span>
+                        </div>
+                        <div class="detail-row" title="${roleLabel}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0ZM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                            <span class="detail-text">${roleLabel}</span>
+                        </div>
+                    </div>
                     <div class="card-action-bar">
                         <span class="action-label">View Records</span>
                         <div class="action-icon">
@@ -1003,6 +1179,11 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.focus();
     };
 
+    window.clearModalDate = function() {
+        document.getElementById('modalFilterDate').value = '';
+        fetchInchargeRecords();
+    };
+
     // ── Modal ──
     const modal = document.getElementById('inchargeModal');
     let currentIncharge = '';
@@ -1024,7 +1205,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         document.getElementById('panelName').textContent = name;
         document.getElementById('modalSearch').value = '';
-        document.getElementById('modalFilterDate').value = '';
+        const now = new Date();
+        const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        document.getElementById('modalFilterDate').value = today;
         modal.classList.add('open');
         fetchInchargeRecords();
     };
@@ -1063,30 +1246,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 tbody.innerHTML = data.map((r, idx) => {
-                    let rc = 'gray';
+                    let bc = 'badge-gray';
                     const rem = (r.remarks || '').toLowerCase();
-                    if (rem.includes('approved') || rem.includes('with pay')) rc = 'green';
-                    else if (rem.includes('disapproved') || rem.includes('without pay') || rem.includes('cancelled')) rc = 'red';
-                    else if (rem.includes('pending') || rem.includes('review')) rc = 'yellow';
+                    if (rem.includes('with pay') && rem.includes('without pay')) bc = 'badge-violet';
+                    else if (rem.includes('with pay')) bc = 'badge-green';
+                    else if (rem.includes('without pay')) bc = 'badge-red';
+                    else if (rem.includes('approved')) bc = 'badge-green';
+                    else if (rem.includes('disapproved') || rem.includes('cancelled')) bc = 'badge-red';
+                    else if (rem.includes('pending') || rem.includes('review')) bc = 'badge-yellow';
 
                     return `<tr>
-                        <td style="color:#cbd5e1;font-size:0.72rem;font-family:monospace;">${idx + 1}</td>
-                        <td style="font-weight:700;color:#1e293b;">${r.name}</td>
-                        <td>${r.position || '—'}</td>
-                        <td>${r.school || '—'}</td>
-                        <td><span class="badge-type">${r.type_of_leave || '—'}</span></td>
-                        <td style="font-family:monospace;font-size:0.75rem;">${r.inclusive_dates || '—'}</td>
-                        <td><span class="remark-pill ${rc}">${r.remarks || '—'}</span></td>
-                        <td style="font-family:monospace;font-size:0.75rem;">${formatDate(r.date_of_action)}</td>
-                        <td>
-                            <div style="display:flex;gap:8px;">
-                                <button class="btn-edit" onclick="editRecord(${r.id})" title="Edit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <td class="cell-meta" style="font-weight: 600; font-family:monospace;">${idx + 1}</td>
+                        <td class="cell-name" style="font-weight: 700;">${r.name}</td>
+                        <td class="cell-position" style="font-weight: 600;">${r.position || '—'}</td>
+                        <td class="cell-subtext">${r.school || '—'}</td>
+                        <td><span class="badge-leave">${r.type_of_leave || '—'}</span></td>
+                        <td class="cell-meta" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '—'}</td>
+                        <td><span class="badge ${bc}">${r.remarks || '—'}</span></td>
+                        <td class="cell-meta" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
+                        <td class="cell-meta">${r.deduction_remarks || '—'}</td>
+                        <td class="cell-meta" style="font-style: italic; font-weight: 500;">${r.incharge || '—'}</td>
+                        <td style="width:12%;">
+                            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:nowrap;">
+                                <button class="btn-action btn-edit" onclick="editRecord(${r.id})" title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
                                     </svg>
                                 </button>
-                                <button class="btn-action btn-delete" onclick="deleteRecord(${r.id})" title="Delete" style="width:30px;height:30px;border-radius:9px;border:none;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:13px;height:13px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                                <button class="btn-action btn-delete" onclick="deleteRecord(${r.id})" title="Delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                                 </button>
                             </div>
                         </td>

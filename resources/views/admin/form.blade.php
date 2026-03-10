@@ -826,250 +826,433 @@
         }
     }
     /* ══════════════════════════════════════════
-       MODAL — PROFESSIONAL MINIMAL DESIGN
+       MODAL — PREMIUM SPLIT DESIGN
        ══════════════════════════════════════════ */
 
-    .modal-overlay {
+    .modal-backdrop {
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        inset: 0;
         background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(12px);
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
         z-index: 1000;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.25s ease;
-        backdrop-filter: blur(4px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .modal-overlay.open {
+
+    .modal-backdrop.open {
         opacity: 1;
         pointer-events: auto;
     }
 
-    .modal-container {
+    .modal-sheet {
         background: #fff;
-        width: 96%;
-        max-width: 1500px;
-        border-radius: 16px;
-        padding: 0;
-        transform: translateY(20px);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 92vh;
+        width: 98%;
+        max-width: none;
+        height: 92vh;
+        border-radius: 32px;
         display: flex;
-        flex-direction: column;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
         overflow: hidden;
-    }
-    .modal-overlay.open .modal-container {
-        transform: translateY(0);
+        transform: scale(0.95) translateY(30px);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 30px 60px -12px rgba(0, 0, 0, 0.3),
+            0 18px 36px -18px rgba(0, 0, 0, 0.2);
     }
 
-    /* ── Modal Header ── */
-    .modal-header {
+    .modal-backdrop.open .modal-sheet {
+        transform: scale(1) translateY(0);
+    }
+
+    /* ── Left Panel (Indigo Gradient) ── */
+    .modal-panel {
+        width: 280px;
+        flex-shrink: 0;
+        background: linear-gradient(160deg, #f5f7ff 0%, #eef2ff 50%, #e0e7ff 100%);
+        padding: 40px 28px;
         display: flex;
         flex-direction: column;
-        padding: 0;
-        background: #fff;
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        gap: 0;
+        align-items: flex-start;
+        position: relative;
+        overflow: hidden;
+        border-right: 1px solid #e0e7ff;
     }
-    .modal-header-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 20px 28px;
-        border-bottom: 1px solid #e5e7eb;
+
+    .modal-panel::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(99, 102, 241, 0.08);
+        top: -100px;
+        right: -100px;
     }
-    .modal-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 14px;
+
+    .modal-panel::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(139, 92, 246, 0.06);
+        bottom: -50px;
+        left: -50px;
     }
-    .modal-icon-box {
-        width: 38px;
-        height: 38px;
-        background: #6366f1;
-        border-radius: 10px;
+
+    .panel-icon-box {
+        width: 54px;
+        height: 54px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        position: relative;
+        z-index: 1;
     }
-    .modal-title {
-        font-size: 1.1rem;
+
+    .panel-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #1e1b4b;
+        line-height: 1.3;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.01em;
+    }
+
+    .panel-subtitle {
+        font-size: 0.78rem;
+        color: #6366f1;
+        font-weight: 600;
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .panel-divider {
+        width: 100%;
+        height: 1px;
+        background: rgba(99, 102, 241, 0.15);
+        margin: 24px 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .panel-stat-card {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease;
+    }
+
+    .panel-stat-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .ps-count {
+        display: block;
+        font-size: 2rem;
+        font-weight: 900;
+        color: #1e1b4b;
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .ps-label {
+        font-size: 0.7rem;
+        color: #6366f1;
         font-weight: 700;
-        color: #0f172a;
-        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
-    .modal-close {
+
+    .panel-filters-group {
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    .filter-item {
+        margin-bottom: 20px;
+    }
+
+    .filter-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .fi-label {
+        display: block;
+        font-size: 0.7rem;
+        color: #4338ca;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+
+    .fi-select-wrap {
+        position: relative;
+        background: #fff;
+        border: 1.5px solid #dbeafe;
+        border-radius: 14px;
+        transition: all 0.25s ease;
+    }
+
+    .fi-select-wrap:focus-within {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    }
+
+    .fi-select {
+        width: 100%;
+        padding: 11px 16px;
+        padding-right: 36px;
+        border: none;
         background: transparent;
-        border: 1px solid #e5e7eb;
+        outline: none;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #1e1b4b;
         cursor: pointer;
-        color: #94a3b8;
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
+        appearance: none;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .fi-select-wrap::after {
+        content: '';
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: contain;
+        pointer-events: none;
+    }
+
+    .panel-actions {
+        margin-top: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-panel {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.25s ease;
-    }
-    .modal-close:hover {
-        background: #fef2f2;
-        border-color: #fecaca;
-        color: #ef4444;
-        transform: rotate(90deg);
+        gap: 10px;
+        padding: 13px;
+        border-radius: 14px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+        border: 1.5px solid transparent;
     }
 
-    /* ── Filter Bar ── */
-    .modal-header-bottom {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 12px 28px;
-        background: #f9fafb;
-        border-bottom: 1px solid #e5e7eb;
-        width: 100%;
-        flex-wrap: wrap;
+    .btn-panel-primary {
+        background: #6366f1;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
     }
-    .modal-header-bottom .filter-divider {
-        width: 1px;
-        height: 22px;
-        background: #d1d5db;
+
+    .btn-panel-primary:hover {
+        background: #4f46e5;
+        transform: translateY(-2px);
     }
-    .modal-header-bottom .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .modal-header-bottom .filter-label {
-        font-size: 0.68rem;
-        font-weight: 700;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-    }
-    .modal-filter-input {
-        padding: 7px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 0.82rem;
-        font-family: 'Inter', sans-serif;
-        color: #1e293b;
+
+    .btn-panel-secondary {
         background: #fff;
-        outline: none;
-        transition: border-color 0.2s ease;
+        color: #4338ca;
+        border-color: #dbeafe;
     }
-    .modal-filter-input:focus {
+
+    .btn-panel-secondary:hover {
+        background: #f5f7ff;
         border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
     }
-    .modal-filter-select {
-        padding: 7px 32px 7px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 0.82rem;
-        font-family: 'Inter', sans-serif;
-        color: #1e293b;
+
+    .btn-panel-danger {
         background: #fff;
-        outline: none;
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 8px center;
-        background-size: 14px;
-        transition: border-color 0.2s ease;
+        color: #94a3b8;
+        border-color: #e2e8f0;
     }
-    .modal-filter-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+
+    .btn-panel-danger:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #ef4444;
     }
-    .modal-search-box {
-        position: relative;
-        display: flex;
-        align-items: center;
+
+    /* ── Main Content Area ── */
+    .modal-main {
         flex: 1;
-        min-width: 200px;
-        max-width: 280px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        position: relative;
     }
-    .modal-search-box .search-icon {
+
+    .modal-main-header {
+        padding: 24px 32px;
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    .mm-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #1e293b;
+        letter-spacing: -0.01em;
+    }
+
+    .mm-search-bar {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .mm-search-bar svg {
         position: absolute;
-        left: 10px;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
         width: 16px;
         height: 16px;
-        color: #9ca3af;
+        color: #94a3b8;
         pointer-events: none;
     }
-    .modal-search-input {
+
+    .mm-search-input {
         width: 100%;
-        padding: 7px 12px 7px 34px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 0.82rem;
-        font-family: 'Inter', sans-serif;
+        padding: 11px 16px 11px 40px;
+        background: #f8fafc;
+        border: 1.5px solid #f1f5f9;
+        border-radius: 14px;
+        font-size: 0.84rem;
         color: #1e293b;
-        background: #fff;
         outline: none;
-        transition: border-color 0.2s ease;
-    }
-    .modal-search-input::placeholder {
-        color: #9ca3af;
-    }
-    .modal-search-input:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+        transition: all 0.25s ease;
+        font-family: 'Inter', sans-serif;
     }
 
-    /* ── Modal Body ── */
-    .modal-body {
-        overflow-y: auto;
-        overflow-x: hidden;
-        flex: 1;
-        padding: 0;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+    .mm-search-input:focus {
+        background: #fff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
     }
-    .modal-body::-webkit-scrollbar {
+
+    .modal-main-body {
+        flex: 1;
+        overflow: auto;
+        padding: 0;
+        background: #fff;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .modal-main-body::-webkit-scrollbar {
         display: none;
+    }
+
+    /* Modal Main Footer (for selection count) */
+    .modal-main-footer {
+        padding: 14px 32px;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .selection-badge {
+        background: #6366f1;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 800;
     }
 
     /* ── Table ── */
     .record-table {
         width: 100%;
         border-collapse: collapse;
-        border-spacing: 0;
+        table-layout: fixed;
     }
     .record-table th {
+        background: #f8fafc;
+        padding: 12px 15px;
         text-align: left;
-        padding: 12px 20px;
-        font-size: 0.7rem;
-        font-weight: 700;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #6b7280;
-        background: #f9fafb;
-        border-bottom: 1px solid #e5e7eb;
         position: sticky;
         top: 0;
         z-index: 40;
-        height: 44px;
-        box-sizing: border-box;
+        border-bottom: 2px solid #f1f5f9;
         white-space: nowrap;
     }
     .record-table td {
-        padding: 14px 20px;
-        font-size: 0.84rem;
+        padding: 12px 15px;
+        font-size: 0.78rem;
         color: #374151;
         border-bottom: 1px solid #f3f4f6;
-        vertical-align: middle;
+        vertical-align: top;
         transition: all 0.2s ease;
+        word-wrap: break-word;
+        line-height: 1.4;
     }
+
+    /* Column widths for Registry Modal */
+    .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 3%; }  /* Selection */
+    .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 3%; }  /* # */
+    .record-table th:nth-child(3), .record-table td:nth-child(3) { width: 11%; } /* Name */
+    .record-table th:nth-child(4), .record-table td:nth-child(4) { width: 9%; }  /* Position */
+    .record-table th:nth-child(5), .record-table td:nth-child(5) { width: 9%; }  /* School */
+    .record-table th:nth-child(6), .record-table td:nth-child(6) { width: 6%; }  /* Leave Type */
+    .record-table th:nth-child(7), .record-table td:nth-child(7) { width: 10%; } /* Inclusive Dates */
+    .record-table th:nth-child(8), .record-table td:nth-child(8) { width: 8%; }  /* Remarks */
+    .record-table th:nth-child(9), .record-table td:nth-child(9) { width: 8%; }  /* Action Date */
+    .record-table th:nth-child(10), .record-table td:nth-child(10) { width: 13%; } /* Deduction Remark */
+    .record-table th:nth-child(11), .record-table td:nth-child(11) { width: 10%; } /* Incharge */
+    .record-table th:nth-child(12), .record-table td:nth-child(12) { width: 10%; } /* Actions */
     .record-table tbody tr.record-row {
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
@@ -1165,18 +1348,20 @@
         border-color: #c7d2fe;
     }
     .badge {
-        font-size: 0.7rem;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-weight: 600;
+        font-size: 0.72rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
         display: inline-block;
         transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .badge-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-    .badge-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .badge-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-    .badge-violet { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
-    .badge-gray { background: #f9fafb; color: #4b5563; border: 1px solid #e5e7eb; }
+    .badge-green { background: #ecfdf5; color: #059669; border: 1px solid rgba(5,150,105,0.1); }
+    .badge-red { background: #fef2f2; color: #dc2626; border: 1px solid rgba(220,38,38,0.1); }
+    .badge-yellow { background: #fffbeb; color: #d97706; border: 1px solid rgba(217,119,6,0.1); }
+    .badge-violet { background: #f5f3ff; color: #7c3aed; border: 1px solid rgba(124,58,237,0.1); }
+    .badge-gray { background: #f1f5f9; color: #64748b; border: 1px solid rgba(100,116,139,0.1); }
+    .nowrap { white-space: nowrap; }
 
     /* ── Action Buttons (Table) ── */
     .btn-action {
@@ -1293,35 +1478,8 @@
         display: flex;
     }
 
-    /* ── Modal Footer ── */
-    .modal-footer {
-        display: flex;
-        background: #fff;
-        padding: 14px 28px;
-        border-top: 1px solid #e5e7eb;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .modal-footer-info {
-        display: none;
-        align-items: center;
-        gap: 8px;
-        color: #6b7280;
-        font-weight: 600;
-        font-size: 0.82rem;
-    }
-    .printing-mode .modal-footer-info {
-        display: flex;
-    }
-    #selectedCount {
-        background: #6366f1;
-        color: #fff;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-family: 'Inter', monospace;
-        font-size: 0.78rem;
-        font-weight: 700;
-    }
+
+
     .export-actions {
         display: none;
         gap: 10px;
@@ -1483,57 +1641,67 @@
     body.dark-mode .btn-ghost:hover { background: #1e293b; border-color: #475569; color: #fff; }
 
     /* ── Modal Dark Mode ── */
-    body.dark-mode .modal-overlay { background: rgba(0, 0, 0, 0.7); }
-    body.dark-mode .modal-container { background: #0f172a; border: 1px solid #1e293b; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); }
+    body.dark-mode .modal-backdrop { background: rgba(0, 0, 0, 0.75); }
+    body.dark-mode .modal-sheet { 
+        background: #0f172a; 
+        border: 1px solid #1e293b; 
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); 
+    }
 
-    /* Modal Header */
-    body.dark-mode .modal-header { background: #0f172a; }
-    body.dark-mode .modal-header-top { border-bottom-color: #1e293b; }
-    body.dark-mode .modal-title { color: #fff; }
-    body.dark-mode .modal-close { background: #111827; border-color: #334155; color: #94a3b8; }
-    body.dark-mode .modal-close:hover { background: rgba(239, 68, 68, 0.1); border-color: #f87171; color: #f87171; }
+    body.dark-mode .modal-panel {
+        background: linear-gradient(160deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border-right: 1px solid #1e293b;
+    }
+    body.dark-mode .panel-title { color: #fff; }
+    body.dark-mode .panel-stat-card { background: rgba(30, 41, 59, 0.5); border-color: #334155; }
+    body.dark-mode .ps-count { color: #fff; }
+    body.dark-mode .fi-select-wrap { background: #0f172a; border-color: #334155; }
+    body.dark-mode .fi-select { color: #f1f5f9; background: #0f172a; }
+    body.dark-mode .fi-select option { background: #0f172a; color: #fff; }
+    body.dark-mode .btn-panel-secondary { background: #1e293b; color: #818cf8; border-color: #334155; }
+    body.dark-mode .btn-panel-secondary:hover { background: #334155; color: #fff; }
+    body.dark-mode .btn-panel-danger { background: #1e293b; color: #94a3b8; border-color: #334155; }
+    body.dark-mode .btn-panel-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: #f87171; color: #f87171; }
 
-    /* Modal Filter Bar */
-    body.dark-mode .modal-header-bottom { background: #111827; border-bottom-color: #1e293b; }
-    body.dark-mode .modal-header-bottom .filter-label { color: #94a3b8; }
-    body.dark-mode .modal-header-bottom .filter-divider { background: #334155; }
-    body.dark-mode .modal-filter-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-    body.dark-mode .modal-filter-input::placeholder { color: #64748b; }
-    body.dark-mode .modal-filter-input:focus { border-color: #6366f1; }
-    body.dark-mode .modal-filter-select { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-    body.dark-mode .modal-filter-select option { background: #0f172a; color: #f1f5f9; }
-    body.dark-mode .modal-filter-select:focus { border-color: #6366f1; }
-
-    /* Modal Search */
-    body.dark-mode .modal-search-input { background: #0f172a; border: 1px solid #334155; color: #fff; }
-    body.dark-mode .modal-search-input::placeholder { color: #64748b; }
-    body.dark-mode .modal-search-input:focus { border-color: #818cf8; }
-    body.dark-mode .modal-search-box .search-icon { color: #64748b; }
+    body.dark-mode .modal-main { background: #0f172a; }
+    body.dark-mode .modal-main-header { background: #0f172a; border-bottom-color: #1e293b; }
+    body.dark-mode .mm-title { color: #fff; }
+    body.dark-mode .mm-search-input { background: #111827; border-color: #1e293b; color: #fff; }
+    body.dark-mode .mm-search-input:focus { border-color: #6366f1; }
+    body.dark-mode .modal-main-body { background: #0f172a; }
+    body.dark-mode .modal-main-footer { background: #111827; border-top-color: #1e293b; }
 
     /* Table */
     body.dark-mode .record-table th { background: #111827; color: #94a3b8; border-bottom: 1px solid #1e293b; }
-    body.dark-mode .record-table td { color: #cbd5e1; border-bottom: 1px solid #1e293b; background: #0f172a; }
+    body.dark-mode .record-table td { color: #cbd5e1 !important; border-bottom: 1px solid #1e293b; background: #0f172a; }
     body.dark-mode .record-table tbody tr.record-row { background: #0f172a; }
     body.dark-mode .record-table tbody tr.record-row:hover { border-left-color: #818cf8; }
     body.dark-mode .record-table tbody tr.record-row:hover td { background: #111827; }
+    body.dark-mode .record-table .cell-name { color: #fff !important; }
+    body.dark-mode .record-table .cell-action-date { color: #fff !important; }
+    body.dark-mode .record-table .cell-position { color: #cbd5e1 !important; }
+    body.dark-mode .record-table .cell-school { color: #cbd5e1 !important; }
+    body.dark-mode .record-table .cell-dates { color: #94a3b8 !important; }
+    body.dark-mode .record-table .cell-deduction { color: #cbd5e1 !important; }
+    body.dark-mode .record-table .cell-incharge { color: #94a3b8 !important; }
 
     /* Forwarded Headers — Colored */
     body.dark-mode .forwarded-header { background: rgba(99, 102, 241, 0.08) !important; color: #818cf8; border-color: rgba(99, 102, 241, 0.15) !important; }
     body.dark-mode .batch-header-row { background: #0f172a !important; }
     body.dark-mode .batch-header-row:hover { background: #0f172a !important; }
-    body.dark-mode .forwarded-badge { background: rgba(99, 102, 241, 0.12); color: #818cf8; border-color: rgba(99, 102, 241, 0.25); }
-    body.dark-mode .forwarded-header-row:hover .forwarded-badge { background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc; }
-    body.dark-mode .forwarded-badge svg { color: #818cf8; }
-    body.dark-mode .forwarded-header-row:hover .forwarded-badge svg { color: #a5b4fc; }
+    body.dark-mode .forwarded-header-row { background: #0f172a !important; }
+    body.dark-mode .forwarded-badge { background: rgba(99, 102, 241, 0.15); color: #fff; border-color: rgba(99, 102, 241, 0.3); }
+    body.dark-mode .forwarded-header-row:hover .forwarded-badge { background: rgba(99, 102, 241, 0.25); border-color: rgba(99, 102, 241, 0.5); color: #fff; }
+    body.dark-mode .forwarded-badge svg { color: #fff; }
+    body.dark-mode .forwarded-header-row:hover .forwarded-badge svg { color: #fff; }
 
-    /* Table Badges */
-    body.dark-mode .badge-leave { background: rgba(99, 102, 241, 0.1); color: #818cf8; border-color: rgba(99, 102, 241, 0.2); }
-    body.dark-mode .badge-green { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.2); }
-    body.dark-mode .badge-red { background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
-    body.dark-mode .badge-yellow { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); }
-    body.dark-mode .badge-violet { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border-color: rgba(139, 92, 246, 0.2); }
-    body.dark-mode .badge-gray { background: rgba(30, 41, 59, 0.5); color: #94a3b8; border-color: #334155; }
-    body.dark-mode .forwarded-badge { background: #0f172a; color: #94a3b8; border-color: #334155; }
+    /* Badges - Premium White Text Style */
+    body.dark-mode .badge-leave { background: rgba(99, 102, 241, 0.25); color: #fff; border: 1px solid rgba(99, 102, 241, 0.3); }
+    body.dark-mode .badge-green { background: #059669; color: #fff; border: none; box-shadow: 0 4px 10px rgba(5,150,105,0.3); }
+    body.dark-mode .badge-red { background: #dc2626; color: #fff; border: none; box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
+    body.dark-mode .badge-yellow { background: #d97706; color: #fff; border: none; box-shadow: 0 4px 10px rgba(217,119,6,0.3); }
+    body.dark-mode .badge-violet { background: #7c3aed; color: #fff; border: none; box-shadow: 0 4px 10px rgba(124,58,237,0.3); }
+    body.dark-mode .badge-gray { background: #475569; color: #fff; border: none; }
 
     /* Table Action Buttons */
     body.dark-mode .btn-action { border-color: #334155; color: #94a3b8; }
@@ -1542,9 +1710,8 @@
     body.dark-mode .btn-delete { color: #f87171; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
     body.dark-mode .btn-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
 
-    /* Modal Footer */
-    body.dark-mode .modal-footer { background: #111827; border-top-color: #1e293b; }
-    body.dark-mode .modal-footer-info { color: #94a3b8; }
+
+
 
     /* Print/Excel Buttons */
     body.dark-mode .btn-print.btn-gray { background: #1e293b; color: #cbd5e1; border-color: #334155; }
@@ -2092,96 +2259,113 @@
 </script>
 
 <!-- Records Modal -->
-<div class="modal-overlay" id="recordsModal">
-    <div class="modal-container">
-        <div class="modal-header">
-            <div class="modal-header-top">
-                <div class="modal-title-wrapper">
-                    <div class="modal-icon-box">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:20px; height:20px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                        </svg>
+<div class="modal-backdrop" id="recordsModal">
+    <div class="modal-sheet">
+        <!-- Left Panel -->
+        <div class="modal-panel">
+            <div class="panel-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px; height:24px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+            </div>
+            <h2 class="panel-title">Records Registry</h2>
+            <p class="panel-subtitle">Leave Management</p>
+            
+            <div class="panel-stat-card">
+                <span class="ps-count" id="modalTotalRegistered">0</span>
+                <span class="ps-label">Total Registered</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <div class="panel-filters-group">
+                <div class="filter-item">
+                    <label class="fi-label">Forwarded</label>
+                    <div class="fi-select-wrap">
+                        <select id="filterForwarded" class="fi-select" onchange="filterModalRecords()">
+                            <option value="all">All Forwarded</option>
+                        </select>
                     </div>
-                    <h2 class="modal-title">Leave Records Registry</h2>
                 </div>
-                <button class="modal-close" onclick="closeRecordsModal()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-header-bottom">
-                <div class="modal-search-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                    <input type="text" id="modalSearch" class="modal-search-input" placeholder="Search records...">
-                </div>
-                <div class="filter-divider"></div>
-                <div class="filter-group">
-                    <span class="filter-label">Forwarded</span>
-                    <select id="filterForwarded" class="modal-filter-select" onchange="filterModalRecords()">
-                        <option value="all">All</option>
-                    </select>
-                </div>
-                <div class="filter-divider"></div>
-                <div class="filter-group">
-                    <span class="filter-label">Status</span>
-                    <select id="filterPay" class="modal-filter-select" onchange="filterModalRecords()">
-                        <option value="all">All</option>
-                        <option value="with pay">With Pay</option>
-                        <option value="without pay">Without Pay</option>
-                    </select>
+                <div class="filter-item">
+                    <label class="fi-label">Pay Status</label>
+                    <div class="fi-select-wrap">
+                        <select id="filterPay" class="fi-select" onchange="filterModalRecords()">
+                            <option value="all">All Status</option>
+                            <option value="with pay">With Pay</option>
+                            <option value="without pay">Without Pay</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="modal-body">
-            <table class="record-table">
-                <thead>
-                    <tr>
-                        <th class="selection-col"></th>
-                        <th style="width: 4%">#</th>
-                        <th style="width: 14%">Name</th>
-                        <th style="width: 10%">Position</th>
-                        <th style="width: 12%">School</th>
-                        <th style="width: 8%">Leave Type</th>
-                        <th style="width: 11%">Inclusive Dates</th>
-                        <th style="width: 9%">Remarks</th>
-                        <th style="width: 10%">Date of Action</th>
-                        <th style="width: 10%">Deduction</th>
-                        <th style="width: 8%">Incharge</th>
-                        <th style="width: 8%; text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="recordsTableBody">
-                    <tr><td colspan="12" style="text-align:center; padding: 40px; color: #9ca3af; font-size: 0.85rem;">Loading records...</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <!-- Modal Footer -->
-        <div class="modal-footer">
-            <div class="modal-footer-info">
-                <span id="selectedCount">0</span> records selected
-            </div>
-            <div style="flex: 1;"></div>
-            <div style="display: flex; gap: 10px;">
-                <button id="excelModeBtn" class="btn-print" onclick="togglePrintMode()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px; height:15px;">
+
+            <div class="panel-actions">
+                <button id="excelModeBtn" class="btn-panel btn-panel-secondary" onclick="togglePrintMode()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
-                    <span>Export</span>
+                    <span>Export Data</span>
                 </button>
-                <div class="export-actions">
-                    <button class="btn-print btn-gray" onclick="togglePrintMode()">Cancel</button>
-                    <button class="btn-print active" onclick="executeExport()">Download .xls</button>
+                <div class="export-actions" style="display: none; flex-direction: column; gap: 8px; width: 100%;">
+                    <button class="btn-panel btn-panel-primary" onclick="executeExport()">Download .xls</button>
+                    <button class="btn-panel btn-panel-secondary" onclick="togglePrintMode()">Cancel</button>
                 </div>
                 <!-- Done Button -->
-                <button id="doneBtn" class="btn-print" onclick="completeRegistryAction()" style="background: #10b981; border-color: #10b981; color: white;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:15px; height:15px;">
+                <button id="doneBtn" class="btn-panel btn-panel-primary" onclick="completeRegistryAction()" style="background: #10b981; border: none; color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
-                    <span>Done</span>
+                    <span>Finish Session</span>
                 </button>
+                
+                <button class="btn-panel btn-panel-danger" onclick="closeRecordsModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Close Registry
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Main Panel -->
+        <div class="modal-main">
+            <div class="modal-main-header">
+                <h3 class="mm-title">Leave Records Table</h3>
+                <div class="mm-search-bar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <input type="text" id="modalSearch" class="mm-search-input" placeholder="Search by name, position, school...">
+                </div>
+            </div>
+
+            <div class="modal-main-body">
+                <table class="record-table">
+                    <thead>
+                        <tr>
+                            <th class="selection-col"></th>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>School</th>
+                            <th>Leave Type</th>
+                            <th>Inclusive Dates</th>
+                            <th>Remarks</th>
+                            <th>Action Date</th>
+                            <th>Deduction Remark</th>
+                            <th>Incharge</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody">
+                        <tr><td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">Loading registry records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-main-footer" id="modalSelectionFooter">
+                <span class="selection-badge" id="selectedCount">0</span>
+                <span>items selected for export</span>
             </div>
         </div>
     </div>
@@ -2332,6 +2516,9 @@
             });
             data = sortedData;
             currentModalRecords = data;
+                // Update stat card
+                const totalEl = document.getElementById('modalTotalRegistered');
+                if (totalEl) totalEl.textContent = data.length;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
@@ -2385,7 +2572,7 @@
                         lastDept = null; 
                         html += `
                             <tr class="batch-header-row" data-batch="${batchId}">
-                                <td colspan="12" style="vertical-align: middle; padding: ${isFirstBatch ? '0' : '20px 40px'} !important; border:none; background: #fff !important;">
+                                <td colspan="12" style="vertical-align: middle; padding: ${isFirstBatch ? '0' : '20px 40px'} !important; border:none;" class="batch-header-cell">
                                     ${!isFirstBatch ? `
                                     <div style="display: flex; align-items: center; gap: 20px;">
                                         <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1); border-radius: 4px;"></div>
@@ -2445,18 +2632,18 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
                                 </div>
                             </td>
-                            <td class="cell-index">${index + 1}</td>
-                            <td class="cell-name">${r.name}</td>
-                            <td class="cell-position">${r.position || '-'}</td>
+                            <td style="font-weight: 600; font-family:monospace;" class="cell-idx">${index + 1}</td>
+                            <td class="cell-name" style="font-weight: 700;">${r.name}</td>
+                            <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
                             <td class="cell-school">${r.school || '-'}</td>
                             <td><span class="badge-leave">${r.type_of_leave}</span></td>
-                            <td class="cell-meta">${r.inclusive_dates || '-'}</td>
+                            <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
                             <td>${remarkBadge}</td>
-                            <td class="cell-meta">${formatDate(r.date_of_action)}</td>
-                            <td class="cell-subtext">${r.deduction_remarks || '-'}</td>
-                            <td class="cell-incharge" style="font-style: italic;">${r.incharge || '-'}</td>
+                            <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
+                            <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
+                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
                             <td>
-                                <div style="display: flex; gap: 8px;">
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                     <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />

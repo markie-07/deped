@@ -500,9 +500,21 @@
         -ms-overflow-style: none;
     }
     .modal-table-wrap::-webkit-scrollbar { display: none; }
-    .modal-table { width:100%; min-width: 1400px; border-collapse:collapse; text-align:left; }
-    .modal-table thead th { background:#fffcf5; padding:12px 18px; font-size:0.68rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; position:sticky; top:0; z-index:5; border-bottom:2px solid #fef3c7; white-space:nowrap; }
-    .modal-table tbody td { padding:13px 18px; font-size:0.81rem; color:#475569; border-bottom:1px solid #f8fafc; }
+    .modal-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+    .modal-table thead th { background: #fffcf5; padding: 12px 18px; font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; position: sticky; top: 0; z-index: 5; border-bottom: 2px solid #fef3c7; white-space: nowrap; }
+    .modal-table tbody td { padding: 13px 18px; font-size: 0.81rem; color: #475569; border-bottom: 1px solid #f8fafc; word-wrap: break-word; vertical-align: top; line-height: 1.4; }
+
+    /* Column widths for Admin Remarks Modal */
+    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 11%; } /* Name */
+    .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 11%; } /* Position */
+    .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 11%; } /* School */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 8%; }  /* Type */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 11%; } /* Dates */
+    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 9%; }  /* Remarks */
+    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 9%; }  /* Action Date */
+    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 12%; } /* Deduction Remarks */
+    .modal-table th:nth-child(9), .modal-table td:nth-child(9) { width: 9%; }  /* Incharge */
+    .modal-table th:nth-child(10), .modal-table td:nth-child(10) { width: 9%; } /* Actions */
     .modal-table tbody tr:hover td { background:#fffcf5; }
     .modal-table tbody tr:last-child td { border-bottom:none; }
     .badge { font-size:0.7rem; padding:4px 10px; border-radius:20px; font-weight:700; display:inline-block; }
@@ -779,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="cell-subtext">${r.deduction_remarks || '-'}</td>
                     <td class="cell-name" style="font-weight:500;">${r.incharge || '-'}</td>
                     <td>
-                        <div style="display:flex;gap:8px;justify-content:center;">
+                        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:nowrap;">
                             <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />

@@ -599,8 +599,187 @@
 
         .login-view,
         .otp-view,
-        .forgot-view {
+        .forgot-view,
+        .register-view {
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Password Strength Meter */
+        .strength-meter {
+            height: 4px;
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+            display: none;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+        }
+        .strength-text {
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Register View - Compact & No Scroll */
+        .register-view {
+            opacity: 0;
+            transform: translateX(40px);
+            position: absolute;
+            pointer-events: none;
+            visibility: hidden;
+            width: 100%;
+            padding: 0.5rem 0.5rem 1rem 0.5rem;
+            overflow: hidden; /* Remove scrolling */
+        }
+
+        .register-view.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .reg-header { 
+            text-align: center; 
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        
+        .reg-title { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            color: #0f0f23; 
+            letter-spacing: -0.04em; 
+            margin-bottom: 0.4rem;
+            background: linear-gradient(135deg, #0f0f23 0%, #4a5568 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .reg-desc { 
+            font-size: 0.82rem; 
+            color: #718096; 
+            line-height: 1.4;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* Enhanced Profile Upload - More Compact */
+        .reg-profile-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .reg-profile-upload {
+            width: 85px; height: 85px;
+            background: #fff;
+            border: 2px dashed #e2e8f0;
+            border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .reg-profile-upload:hover { 
+            border-color: #667eea; 
+            background: rgba(102,126,234,0.02);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.12);
+        }
+        
+        .reg-profile-upload::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(102,126,234,0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .reg-profile-upload:hover::before { opacity: 1; }
+
+        .reg-profile-upload img { 
+            width:100%; height:100%; object-fit:cover; position:absolute; inset:0; 
+            z-index: 2;
+        }
+        
+        .reg-profile-upload svg { 
+            width: 24px; height: 24px; color: #cbd5e0; 
+            margin-bottom: 4px;
+            transition: color 0.3s;
+        }
+        
+        .reg-profile-upload:hover svg { color: #667eea; }
+        
+        .reg-profile-upload span { 
+            font-size: 0.6rem; color: #a0aec0; font-weight: 700; 
+            letter-spacing: 0.02em;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .form-grid.span-2 { grid-template-columns: 1fr; }
+        
+        .register-view .field {
+            margin-bottom: 0.85rem;
+        }
+        
+        .register-view .input-box input {
+            background: #fff;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+        }
+        
+        .register-view .field-label {
+            margin-bottom: 0.35rem;
+        }
+        
+        .register-view .field-label label {
+            font-size: 0.75rem;
+        }
+        
+        .reg-select-wrap {
+            position: relative;
+        }
+        
+        .reg-select-wrap select {
+            width: 100%;
+            padding: 13px 16px;
+            background: #fff;
+            border: 1.5px solid #e8ecf4;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            color: #1a1a2e;
+            outline: none;
+            appearance: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        
+        .reg-select-wrap::after {
+            content: '';
+            position: absolute;
+            right: 16px; top: 50%;
+            transform: translateY(-50%);
+            width: 10px; height: 10px;
+            border-right: 2px solid #a0aec0;
+            border-bottom: 2px solid #a0aec0;
+            transform: translateY(-70%) rotate(45deg);
+            pointer-events: none;
+        }
+        
+        .reg-select-wrap select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
         /* Forgot Password View */
@@ -1259,7 +1438,111 @@
                     <div class="separator anim-5"><span>Secured by DepEd</span></div>
 
                     <div class="bottom-text anim-6">
-                        <p>Don't have an account? <a href="#">Contact your admin</a></p>
+                        <p>Don't have an account? <a href="#" id="showRegisterLink">Contact your admin</a></p>
+                    </div>
+                </div>
+
+                <!-- ═══ REGISTER VIEW ═══ -->
+                <div class="register-view" id="registerView">
+                    <button class="otp-back-btn" id="regBackBtn" title="Go back to login">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                        Back to login
+                    </button>
+
+                    <div class="reg-header anim-1">
+                        <h2 class="reg-title">Create Account</h2>
+                        <p class="reg-desc">Request access to the Schools Division Office platform.</p>
+                    </div>
+
+                    <form id="registerForm" enctype="multipart/form-data" class="anim-2">
+                        @csrf
+                        <div class="reg-profile-container">
+                            <div class="reg-profile-upload" onclick="document.getElementById('regProfileInput').click()">
+                                <img id="regProfilePreview" src="" alt="" style="display:none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
+                                <span>Photo</span>
+                                <input type="file" name="profile_image" id="regProfileInput" accept="image/*" style="display:none;" onchange="previewRegImage(this)">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <div class="field-label"><label>Username</label></div>
+                                <div class="input-box"><input type="text" name="username" placeholder="jdelacruz" required></div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label"><label>Email Address</label></div>
+                                <div class="input-box"><input type="email" name="email" placeholder="you@deped.gov.ph" required></div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <div class="field-label"><label>Last Name</label></div>
+                                <div class="input-box"><input type="text" name="last_name" placeholder="Dela Cruz" required></div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label"><label>First Name</label></div>
+                                <div class="input-box"><input type="text" name="first_name" placeholder="Juan" required></div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <div class="field-label"><label>Middle Name</label></div>
+                                <div class="input-box"><input type="text" name="middle_name" placeholder="Santos"></div>
+                            </div>
+                            <div class="field">
+                                <div class="field-label"><label>Suffix</label></div>
+                                <div class="input-box"><input type="text" name="suffix" placeholder="Jr., III"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="field">
+                            <div class="field-label"><label>Position</label></div>
+                            <div class="input-box"><input type="text" name="position" placeholder="e.g. Teacher I" required></div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field">
+                                <div class="field-label"><label>Password</label></div>
+                                <div class="input-box">
+                                    <input type="password" name="password" id="regPassword" placeholder="••••••••" required minlength="8">
+                                    <button type="button" class="eye-toggle" id="toggleRegPassword" aria-label="Toggle password visibility">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" id="eyeRegIcon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="strength-meter" id="strengthMeter">
+                                    <div class="strength-bar" id="strengthBar"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText"></span>
+                            </div>
+                            <div class="field">
+                                <div class="field-label"><label>Confirm Password</label></div>
+                                <div class="input-box">
+                                    <input type="password" name="password_confirmation" id="regConfirmPassword" placeholder="••••••••" required minlength="8">
+                                    <button type="button" class="eye-toggle" id="toggleRegConfirmPassword" aria-label="Toggle password visibility">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" id="eyeRegConfirmIcon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-login" id="regSubmitBtn">
+                            <span>Submit Registration</span>
+                        </button>
+                    </form>
+
+                    <div class="login-alert" id="regAlert" style="margin-top:1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+                        <span id="regAlertText"></span>
                     </div>
                 </div>
 
@@ -1410,11 +1693,11 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="password-strength">
-                                <div class="password-strength-bar" id="strengthBar"></div>
+                                <div class="strength-meter" id="resetStrengthMeter">
+                                    <div class="strength-bar" id="resetStrengthBar"></div>
+                                </div>
+                                <span class="strength-text" id="resetStrengthText"></span>
                             </div>
-                            <div class="strength-text" id="strengthText"></div>
-                        </div>
 
                         <div class="field">
                             <div class="field-label">
@@ -1464,6 +1747,108 @@
     </div>
 
     <script>
+        // ─── DOM ELEMENTS ───
+        const loginForm = document.getElementById('loginForm');
+        const loginView = document.getElementById('loginView');
+        const otpView = document.getElementById('otpView');
+        const forgotView = document.getElementById('forgotView');
+        const registerView = document.getElementById('registerView');
+        const resetView = document.getElementById('resetView');
+        const registerForm = document.getElementById('registerForm');
+        
+        const showRegisterLink = document.getElementById('showRegisterLink');
+        const regBackBtn = document.getElementById('regBackBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        
+        const loginAlert = document.getElementById('loginAlert');
+        const alertText = document.getElementById('alertText');
+        const alertIcon = document.getElementById('alertIcon');
+        const submitBtn = document.getElementById('submitBtn');
+
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetRegisterForm(); // Ensure clean form
+            loginView.classList.add('hidden');
+            setTimeout(() => {
+                loginView.style.display = 'none';
+                registerView.style.display = 'block';
+                setTimeout(() => registerView.classList.add('active'), 50);
+            }, 400);
+        });
+
+        regBackBtn.addEventListener('click', () => {
+            registerView.classList.remove('active');
+            setTimeout(() => {
+                registerView.style.display = 'none';
+                loginView.style.display = 'block';
+                setTimeout(() => loginView.classList.remove('hidden'), 50);
+            }, 400);
+        });
+
+        window.previewRegImage = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('regProfilePreview').src = e.target.result;
+                    document.getElementById('regProfilePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        function resetRegisterForm() {
+            registerForm.reset();
+            document.getElementById('regProfilePreview').style.display = 'none';
+            document.getElementById('regProfilePreview').src = '';
+            document.getElementById('regAlert').style.display = 'none';
+            // Also reset strength meter if it exists
+            const meter = document.getElementById('strengthMeter');
+            const text = document.getElementById('strengthText');
+            if (meter) meter.style.display = 'none';
+            if (text) text.textContent = '';
+        }
+
+        registerForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('regSubmitBtn');
+            const alert = document.getElementById('regAlert');
+            const alertText = document.getElementById('regAlertText');
+            
+            btn.disabled = true;
+            btn.querySelector('span').textContent = 'Submitting...';
+            
+            try {
+                const formData = new FormData(registerForm);
+                formData.append('role', 'user');
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await res.json();
+                
+                alert.style.display = 'flex';
+                if (res.ok) {
+                    alert.className = 'login-alert success';
+                    alertText.textContent = data.message;
+                    setTimeout(() => {
+                        regBackBtn.click();
+                        resetRegisterForm();
+                    }, 3000);
+                } else {
+                    alert.className = 'login-alert error';
+                    alertText.textContent = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Error during registration.');
+                }
+            } catch (err) {
+                alert.style.display = 'flex';
+                alert.className = 'login-alert error';
+                alertText.textContent = 'Server error. Please try again later.';
+            } finally {
+                btn.disabled = false;
+                btn.querySelector('span').textContent = 'Submit Registration';
+            }
+        });
+
         // ═══════════════════════════════════════════
         //  INTERACTIVE PARTICLE CONSTELLATION
         // ═══════════════════════════════════════════
@@ -1673,13 +2058,8 @@
         // ═══════════════════════════════════════════
         //  OTP LOGIN FLOW (INLINE)
         // ═══════════════════════════════════════════
-        const loginForm = document.getElementById('loginForm');
-        const loginView = document.getElementById('loginView');
-        const otpView = document.getElementById('otpView');
-        const loginAlert = document.getElementById('loginAlert');
-        const alertText = document.getElementById('alertText');
-        const alertIcon = document.getElementById('alertIcon');
-        const submitBtn = document.getElementById('submitBtn');
+        
+        // OTP Elements
         
         // OTP Elements
         const otpUserName = document.getElementById('otpUserName');
@@ -1729,7 +2109,7 @@
             }, 1000);
         }
 
-        const resetView = document.getElementById('resetView');
+
 
         function switchView(view) {
             // Hide all views first
@@ -1957,8 +2337,6 @@
         // ═══════════════════════════════════════════
         //  FORGOT PASSWORD FLOW
         // ═══════════════════════════════════════════
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const forgotView = document.getElementById('forgotView');
         const forgotForm = document.getElementById('forgotForm');
         const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
         const forgotBtnText = document.getElementById('forgotBtnText');
@@ -2046,9 +2424,6 @@
         const resetBackLink = document.getElementById('resetBackLink');
         const newPasswordInput = document.getElementById('newPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-        const strengthBar = document.getElementById('strengthBar');
-        const strengthTextEl = document.getElementById('strengthText');
-
         // Show email badge
         const resetEmailVal = document.getElementById('resetEmailInput').value;
         if (resetEmailVal) {
@@ -2060,60 +2435,6 @@
         if (resetToken) {
             switchView('reset');
         }
-
-        // Password strength checker
-        newPasswordInput.addEventListener('input', () => {
-            const val = newPasswordInput.value;
-            let score = 0;
-            if (val.length >= 8) score++;
-            if (val.length >= 12) score++;
-            if (/[A-Z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
-            if (/[^A-Za-z0-9]/.test(val)) score++;
-
-            const percent = (score / 5) * 100;
-            strengthBar.style.width = percent + '%';
-
-            if (score <= 1) {
-                strengthBar.style.background = '#ef4444';
-                strengthTextEl.textContent = 'Weak';
-                strengthTextEl.style.color = '#ef4444';
-            } else if (score <= 2) {
-                strengthBar.style.background = '#f59e0b';
-                strengthTextEl.textContent = 'Fair';
-                strengthTextEl.style.color = '#f59e0b';
-            } else if (score <= 3) {
-                strengthBar.style.background = '#3b82f6';
-                strengthTextEl.textContent = 'Good';
-                strengthTextEl.style.color = '#3b82f6';
-            } else {
-                strengthBar.style.background = '#10b981';
-                strengthTextEl.textContent = 'Strong';
-                strengthTextEl.style.color = '#10b981';
-            }
-
-            if (!val) {
-                strengthBar.style.width = '0';
-                strengthTextEl.textContent = '';
-            }
-        });
-
-        // Toggle password visibility for reset fields
-        function setupResetToggle(btnId, inputId, iconId) {
-            const btn = document.getElementById(btnId);
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            btn.addEventListener('click', () => {
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                icon.innerHTML = isPassword
-                    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />'
-                    : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
-            });
-        }
-
-        setupResetToggle('toggleNewPass', 'newPassword', 'eyeNewPass');
-        setupResetToggle('toggleConfirmPass', 'confirmPassword', 'eyeConfirmPass');
 
         // Back to login
         resetBackLink.addEventListener('click', () => {
@@ -2421,6 +2742,70 @@
                 ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />'
                 : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
         });
+
+        // ─── Registration Toggles ───
+        function setupToggle(btnId, inputId, iconId) {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!btn || !input || !icon) return;
+            btn.addEventListener('click', () => {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.innerHTML = isPassword
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />'
+                    : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+            });
+        }
+        setupToggle('toggleRegPassword', 'regPassword', 'eyeRegIcon');
+        setupToggle('toggleRegConfirmPassword', 'regConfirmPassword', 'eyeRegConfirmIcon');
+        setupToggle('toggleNewPass', 'newPassword', 'eyeNewPass');
+        setupToggle('toggleConfirmPass', 'confirmPassword', 'eyeConfirmPass');
+
+        // ─── Registration Password Strength ───
+        const regPassInput = document.getElementById('regPassword');
+        const meter = document.getElementById('strengthMeter');
+        const bar = document.getElementById('strengthBar');
+        const text = document.getElementById('strengthText');
+
+        function evaluateStrength(val, meterEl, barEl, textEl) {
+            if (!val) {
+                meterEl.style.display = 'none';
+                textEl.textContent = '';
+                return;
+            }
+            meterEl.style.display = 'block';
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+            const width = (score / 4) * 100;
+
+            barEl.style.width = width + '%';
+            barEl.style.backgroundColor = colors[Math.max(0, score - 1)];
+            textEl.textContent = labels[Math.max(0, score - 1)];
+            textEl.style.color = colors[Math.max(0, score - 1)];
+        }
+
+        regPassInput.addEventListener('input', () => {
+            evaluateStrength(regPassInput.value, meter, bar, text);
+        });
+
+        // ─── Reset Password Strength ───
+        const newPassInput = document.getElementById('newPassword');
+        const resetMeter = document.getElementById('resetStrengthMeter');
+        const resetBar = document.getElementById('resetStrengthBar');
+        const resetText = document.getElementById('resetStrengthText');
+
+        if (newPassInput) {
+            newPassInput.addEventListener('input', () => {
+                evaluateStrength(newPassInput.value, resetMeter, resetBar, resetText);
+            });
+        }
 
         // ─── Subtle input interaction ───
         document.querySelectorAll('.input-box input').forEach(input => {
