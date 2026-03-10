@@ -8,23 +8,103 @@ use App\Models\User;
 use App\Http\Controllers\LeaveRecordController;
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Models\AuditLog;
 use Illuminate\Support\Str;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect(Auth::user()->role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+    }
     return view('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+// Role-based route protection groups
+Route::middleware(['auth'])->group(function () {
+    // Admin Routes
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.dashboard');
+        });
+        Route::get('/form', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.form');
+        });
+        Route::get('/employee', [EmployeeController::class, 'index']);
+        Route::get('/leave-records', [LeaveRecordController::class, 'index']);
+        Route::get('/incharge', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.incharge');
+        });
+        Route::get('/school', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.school');
+        });
+        Route::get('/position', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.position');
+        });
+        Route::get('/types-of-leave', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.types-of-leave');
+        });
+        Route::get('/remarks', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.remarks');
+        });
+        Route::get('/employee-management', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
+            return view('admin.employee-management');
+        });
+        Route::get('/profile', function () {
+            if (Auth::user()->role !== 'admin') return redirect('/user/profile');
+            return view('admin.profile');
+        });
+    });
+
+    // User Routes
+    Route::prefix('user')->group(function () {
+        Route::get('/dashboard', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.dashboard');
+        });
+        Route::get('/form', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.form');
+        });
+        Route::get('/employee', [EmployeeController::class, 'index']);
+        Route::get('/leave-records', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.leave-records');
+        });
+        Route::get('/school', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.school');
+        });
+        Route::get('/position', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.position');
+        });
+        Route::get('/types-of-leave', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.types-of-leave');
+        });
+        Route::get('/remarks', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
+            return view('user.remarks');
+        });
+        Route::get('/profile', function () {
+            if (Auth::user()->role === 'admin') return redirect('/admin/profile');
+            return view('user.profile');
+        });
+    });
 });
 
-Route::get('/form', function () {
-    return view('form');
-});
+// Shared API and other routes
+Route::get('/api/employees', [EmployeeController::class, 'getEmployees']);
+Route::get('/api/employees/records', [EmployeeController::class, 'getRecordsByEmployee']);
 
-Route::get('/employee', [EmployeeController::class, 'index']);
-
-// Leave Record API routes
 Route::post('/leave-records', [LeaveRecordController::class, 'store']);
 Route::post('/leave-records/bulk', [LeaveRecordController::class, 'bulkStore']);
 Route::post('/leave-records/bulk-process', [LeaveRecordController::class, 'bulkProcess']);
@@ -34,73 +114,279 @@ Route::put('/leave-records/{id}', [LeaveRecordController::class, 'update']);
 Route::delete('/leave-records/{id}', [LeaveRecordController::class, 'destroy']);
 Route::get('/leave-records/dropdown-data', [LeaveRecordController::class, 'dropdownData']);
 Route::get('/leave-records/count', [LeaveRecordController::class, 'count']);
-
 Route::get('/leave-records/schools', [LeaveRecordController::class, 'getSchools']);
 Route::get('/leave-records/by-school', [LeaveRecordController::class, 'getBySchool']);
-
 Route::get('/leave-records/positions', [LeaveRecordController::class, 'getPositions']);
 Route::get('/leave-records/by-position', [LeaveRecordController::class, 'getByPosition']);
-
 Route::get('/leave-records/types', [LeaveRecordController::class, 'getLeaveTypes']);
 Route::get('/leave-records/by-type', [LeaveRecordController::class, 'getByLeaveType']);
-
 Route::get('/leave-records/remarks-list', [LeaveRecordController::class, 'getRemarksList']);
 Route::get('/leave-records/by-remark', [LeaveRecordController::class, 'getByRemark']);
-
 Route::get('/leave-records/incharges', [LeaveRecordController::class, 'getIncharges']);
 Route::get('/leave-records/by-incharge', [LeaveRecordController::class, 'getByIncharge']);
-
-
-Route::get('/incharge', function () {
-    return view('incharge');
+Route::get('/api/dashboard/stats', [LeaveRecordController::class, 'getDashboardStats']);
+Route::get('/api/dashboard/incharge-stats', [LeaveRecordController::class, 'getInchargeStats']);
+Route::get('/api/dashboard/module-usage', [LeaveRecordController::class, 'getModuleUsageStats']);
+Route::get('/api/dashboard/remark-stats', [LeaveRecordController::class, 'getRemarkStats']);
+Route::get('/api/dashboard/audit-logs', function(Request $request) {
+    if (!Auth::check()) return response()->json([], 401);
+    
+    $user = Auth::user();
+    $limit = $request->query('limit', 15);
+    $query = AuditLog::with('user')->orderBy('created_at', 'desc');
+    
+    // Non-admins can only see their own logs
+    if ($user->role !== 'admin') {
+        $query->where('user_id', $user->id);
+    }
+    
+    if ($request->has('today')) {
+        $query->whereDate('created_at', now()->toDateString());
+    }
+    
+    return response()->json($query->limit($limit)->get());
 });
 
-Route::get('/school', function () {
-    return view('school');
+Route::get('/profile', function () {
+    if (!Auth::check() && !session('authenticated')) {
+        return redirect('/');
+    }
+    $role = auth()->user()->role;
+    return redirect($role === 'admin' ? '/admin/profile' : '/user/profile');
 });
 
-Route::get('/position', function () {
-    return view('position');
+// Employee Account Management API
+Route::get('/api/user-accounts', function () {
+    return response()->json(User::orderBy('created_at', 'desc')->get([
+        'id', 'name', 'username', 'last_name', 'first_name', 'middle_name',
+        'suffix', 'position', 'profile_image', 'email', 'is_active', 'role', 'created_at'
+    ]));
 });
 
-Route::get('/types-of-leave', function () {
-    return view('types-of-leave');
+Route::post('/api/user-accounts', function (Request $request) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    
+    $request->validate([
+        'username' => 'required|string|max:255|unique:users,username',
+        'last_name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8',
+        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+    ]);
+
+    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
+
+    $data = [
+        'name' => $fullName,
+        'username' => $request->username,
+        'last_name' => $request->last_name,
+        'first_name' => $request->first_name,
+        'middle_name' => $request->middle_name,
+        'suffix' => $request->suffix,
+        'position' => $request->position,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role ?? 'user',
+        'is_active' => $request->has('is_active') ? ($request->is_active == '1') : true,
+    ];
+
+    if ($request->hasFile('profile_image')) {
+        $path = $request->file('profile_image')->store('profile-images', 'public');
+        $data['profile_image'] = $path;
+    }
+
+    $user = User::create($data);
+    AuditLog::logAction('Created user account', $user);
+    return response()->json(['success' => true, 'message' => 'Account created successfully.', 'user' => $user]);
 });
 
-Route::get('/remarks', function () {
-    return view('remarks');
+Route::put('/api/user-accounts/{id}/toggle', function ($id) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    $user = User::findOrFail($id);
+    $user->is_active = !$user->is_active;
+    $user->save();
+    AuditLog::logAction($user->is_active ? 'Activated user account' : 'Deactivated user account', $user);
+    return response()->json(['success' => true, 'message' => $user->is_active ? 'Account activated.' : 'Account deactivated.', 'user' => $user]);
 });
 
-// ═══════════════════════════════════════════
-//  Logout
-// ═══════════════════════════════════════════
+Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    $user = User::findOrFail($id);
+    $request->validate([
+        'username' => 'required|string|max:255|unique:users,username,' . $id,
+        'last_name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+    ]);
+
+    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
+
+    $user->name = $fullName;
+    $user->username = $request->username;
+    $user->last_name = $request->last_name;
+    $user->first_name = $request->first_name;
+    $user->middle_name = $request->middle_name;
+    $user->suffix = $request->suffix;
+    $user->position = $request->position;
+    $user->email = $request->email;
+    $user->role = $request->role ?? 'user';
+    $user->is_active = $request->has('is_active') ? ($request->is_active == '1') : $user->is_active;
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    if ($request->hasFile('profile_image')) {
+        if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
+            \Storage::disk('public')->delete($user->profile_image);
+        }
+        $path = $request->file('profile_image')->store('profile-images', 'public');
+        $user->profile_image = $path;
+    }
+
+    $user->save();
+    AuditLog::logAction('Updated user account', $user);
+    return response()->json(['success' => true, 'message' => 'Account updated successfully.', 'user' => $user]);
+});
+
+Route::post('/api/profile/update', function (Request $request) {
+    if (!auth()->check()) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    }
+    
+    $user = auth()->user();
+    $id = $user->id;
+    
+    try {
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'current_password' => 'nullable|required_with:password',
+            'password' => 'nullable|string|min:8|confirmed',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'profile_offset_x' => 'nullable|numeric',
+            'profile_offset_y' => 'nullable|numeric',
+            'profile_zoom' => 'nullable|numeric',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:4096',
+            'cover_offset_x' => 'nullable|numeric',
+            'cover_offset_y' => 'nullable|numeric',
+            'cover_zoom' => 'nullable|numeric',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed.',
+            'errors' => $e->errors(),
+        ], 422);
+    }
+
+    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
+
+    $user->name = $fullName;
+    $user->username = $request->username;
+    $user->last_name = $request->last_name;
+    $user->first_name = $request->first_name;
+    $user->middle_name = $request->middle_name;
+    $user->suffix = $request->suffix;
+    $user->position = $request->position;
+    $user->email = $request->email;
+
+    if ($request->filled('password')) {
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The provided current password does not match our records.',
+                'errors' => ['current_password' => ['Incorrect current password.']]
+            ], 422);
+        }
+        $user->password = Hash::make($request->password);
+    }
+
+    // Repositioning data
+    if ($request->has('profile_offset_x')) $user->profile_offset_x = $request->profile_offset_x;
+    if ($request->has('profile_offset_y')) $user->profile_offset_y = $request->profile_offset_y;
+    if ($request->has('profile_zoom')) $user->profile_zoom = $request->profile_zoom;
+    if ($request->has('cover_offset_x')) $user->cover_offset_x = $request->cover_offset_x;
+    if ($request->has('cover_offset_y')) $user->cover_offset_y = $request->cover_offset_y;
+    if ($request->has('cover_zoom')) $user->cover_zoom = $request->cover_zoom;
+
+    if ($request->hasFile('profile_image')) {
+        if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
+            \Storage::disk('public')->delete($user->profile_image);
+        }
+        $path = $request->file('profile_image')->store('profile-images', 'public');
+        $user->profile_image = $path;
+    }
+
+    if ($request->hasFile('cover_image')) {
+        if ($user->cover_image && \Storage::disk('public')->exists($user->cover_image)) {
+            \Storage::disk('public')->delete($user->cover_image);
+        }
+        $path = $request->file('cover_image')->store('cover-images', 'public');
+        $user->cover_image = $path;
+    }
+
+    $user->save();
+    AuditLog::logAction('Updated own profile', $user);
+    return response()->json(['success' => true, 'message' => 'Profile updated successfully.', 'user' => $user]);
+});
+
+Route::post('/api/profile/verify-password', function (Request $request) {
+    if (!session('authenticated') || !session('user_id')) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    }
+    $user = User::findOrFail(session('user_id'));
+    if ($request->password && Hash::check($request->password, $user->password)) {
+        return response()->json(['success' => true]);
+    }
+    return response()->json(['success' => false, 'message' => 'Incorrect password.']);
+});
+
+/*
+Route::delete('/api/user-accounts/{id}', function ($id) {
+    if (!Auth::check() || auth()->user()->role !== 'admin') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+    }
+    $user = User::findOrFail($id);
+    if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
+        \Storage::disk('public')->delete($user->profile_image);
+    }
+    $user->delete();
+    AuditLog::logAction('Deleted user account', $user);
+    return response()->json(['success' => true, 'message' => 'Account deleted successfully.']);
+});
+*/
+
 Route::post('/logout', function (Request $request) {
-    $request->session()->flush();
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
     return redirect('/');
 });
 
-// ═══════════════════════════════════════════
-//  Login: Validate credentials & send OTP
-// ═══════════════════════════════════════════
 Route::post('/login', function (Request $request) {
     try {
         $email = $request->input('email');
         $password = $request->input('password');
-
-        // Look up user in database
         $user = User::where('email', $email)->first();
-
         if (!$user || !Hash::check($password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid email or password.'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Invalid email or password.'], 401);
         }
-
-        // Generate 6-digit OTP
+        
+        if (!$user->is_active) {
+            return response()->json(['success' => false, 'message' => 'Your account has been deactivated. Please contact an administrator.'], 403);
+        }
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        // Store OTP in session (expires in 5 minutes)
         session([
             'otp_code' => $otp,
             'otp_email' => $email,
@@ -108,341 +394,65 @@ Route::post('/login', function (Request $request) {
             'otp_user_name' => $user->name,
             'otp_expires' => now()->addMinutes(5),
         ]);
-
-        // Try to send OTP email (non-blocking — OTP shows on screen regardless)
         $emailSent = false;
         try {
-            Mail::html('
-                <div style="font-family: Inter, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #ffffff;">
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="display: inline-block; padding: 12px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 14px;">
-                            <span style="color: #fff; font-size: 18px; font-weight: 700;">DepEd Manager</span>
-                        </div>
-                    </div>
-                    <h2 style="text-align: center; color: #1a1a2e; font-size: 22px; margin-bottom: 8px;">Verification Code</h2>
-                    <p style="text-align: center; color: #8892a4; font-size: 14px; margin-bottom: 28px;">
-                        Hello, <strong>' . htmlspecialchars($user->name) . '</strong>! Use the code below to complete your login.
-                    </p>
-                    <div style="text-align: center; margin-bottom: 28px;">
-                        <div style="display: inline-block; padding: 16px 40px; background: #f0f2f8; border-radius: 14px; letter-spacing: 8px; font-size: 32px; font-weight: 800; color: #667eea;">
-                            ' . $otp . '
-                        </div>
-                    </div>
-                    <p style="text-align: center; color: #b0b9c8; font-size: 12px;">This code expires in 5 minutes.</p>
-                    <hr style="border: none; border-top: 1px solid #e8ecf4; margin: 24px 0;">
-                    <p style="text-align: center; color: #c0c7d6; font-size: 11px;">
-                        &copy; ' . date('Y') . ' Department of Education. All rights reserved.
-                    </p>
-                </div>
-            ', function ($message) use ($email) {
-                $message->to($email)
-                        ->subject('Your Login OTP - DepEd Manager');
+            Mail::html('Verification code: ' . $otp, function ($message) use ($email) {
+                $message->to($email)->subject('Login OTP');
             });
             $emailSent = true;
         } catch (\Exception $e) {
             Log::warning('OTP email failed: ' . $e->getMessage());
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => $emailSent ? 'OTP sent to your email.' : 'OTP generated. Check your verification screen.',
-            'user_name' => $user->name,
-            'otp_code' => $otp,
-            'email_sent' => $emailSent,
-        ]);
-        
+        return response()->json(['success' => true, 'otp_code' => $otp, 'user_name' => $user->name]);
     } catch (\Throwable $e) {
-        Log::error('Login error: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error: ' . $e->getMessage()
-        ], 500);
+        return response()->json(['success' => false, 'message' => 'Server error.'], 500);
     }
 });
 
-// ═══════════════════════════════════════════
-//  Verify OTP
-// ═══════════════════════════════════════════
 Route::post('/verify-otp', function (Request $request) {
     $otp = $request->input('otp');
-
-    $storedOtp = session('otp_code');
-    $expiresAt = session('otp_expires');
-
-    if (!$storedOtp || !$expiresAt) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No OTP found. Please login again.'
-        ], 400);
+    if ($otp !== session('otp_code') || now()->greaterThan(session('otp_expires'))) {
+        return response()->json(['success' => false, 'message' => 'Invalid or expired OTP.'], 400);
     }
-
-    if (now()->greaterThan($expiresAt)) {
-        session()->forget(['otp_code', 'otp_email', 'otp_user_id', 'otp_user_name', 'otp_expires']);
-        return response()->json([
-            'success' => false,
-            'message' => 'OTP has expired. Please login again.'
-        ], 400);
+    $user = User::find(session('otp_user_id'));
+    if (!$user || !$user->is_active) {
+        return response()->json(['success' => false, 'message' => 'Your account has been deactivated. Please contact an administrator.'], 403);
     }
+    Auth::login($user);
+    session(['authenticated' => true, 'user_id' => $user->id]);
+    session()->forget(['otp_code', 'otp_expires', 'otp_user_id']);
+    
+    // Log login action
+    AuditLog::logAction('Logged in', $user);
 
-    if ($otp !== $storedOtp) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid OTP code. Please try again.'
-        ], 400);
-    }
-
-    // OTP verified! Clear OTP data and set authenticated session
-    session()->forget(['otp_code', 'otp_email', 'otp_expires']);
-    session(['authenticated' => true, 'user_id' => session('otp_user_id')]);
-    session()->forget(['otp_user_id', 'otp_user_name']);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'OTP verified! Redirecting...',
-        'redirect' => '/dashboard'
-    ]);
+    return response()->json(['success' => true, 'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard']);
 });
 
-// ═══════════════════════════════════════════
-//  Resend OTP
-// ═══════════════════════════════════════════
 Route::post('/resend-otp', function (Request $request) {
     $email = session('otp_email');
-    $userName = session('otp_user_name', 'User');
-
-    if (!$email) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Session expired. Please login again.'
-        ], 400);
-    }
-
-    // Generate new OTP
+    if (!$email) return response()->json(['success' => false], 400);
     $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-    session([
-        'otp_code' => $otp,
-        'otp_expires' => now()->addMinutes(5),
-    ]);
-
-    $emailSent = false;
-    try {
-        Mail::html('
-            <div style="font-family: Inter, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #ffffff;">
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="display: inline-block; padding: 12px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 14px;">
-                        <span style="color: #fff; font-size: 18px; font-weight: 700;">DepEd Manager</span>
-                    </div>
-                </div>
-                <h2 style="text-align: center; color: #1a1a2e; font-size: 22px; margin-bottom: 8px;">New Verification Code</h2>
-                <p style="text-align: center; color: #8892a4; font-size: 14px; margin-bottom: 28px;">
-                    Hello, <strong>' . htmlspecialchars($userName) . '</strong>! Here is your new verification code.
-                </p>
-                <div style="text-align: center; margin-bottom: 28px;">
-                    <div style="display: inline-block; padding: 16px 40px; background: #f0f2f8; border-radius: 14px; letter-spacing: 8px; font-size: 32px; font-weight: 800; color: #667eea;">
-                        ' . $otp . '
-                    </div>
-                </div>
-                <p style="text-align: center; color: #b0b9c8; font-size: 12px;">This code expires in 5 minutes.</p>
-            </div>
-        ', function ($message) use ($email) {
-            $message->to($email)
-                    ->subject('Your New OTP - DepEd Manager');
-        });
-        $emailSent = true;
-    } catch (\Exception $e) {
-        Log::warning('Resend OTP email failed: ' . $e->getMessage());
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => $emailSent ? 'New OTP sent to your email.' : 'New OTP generated.',
-        'otp_code' => $otp,
-        'email_sent' => $emailSent,
-    ]);
+    session(['otp_code' => $otp, 'otp_expires' => now()->addMinutes(5)]);
+    return response()->json(['success' => true, 'otp_code' => $otp]);
 });
 
-// ═══════════════════════════════════════════
-//  Forgot Password: Send Reset Link
-// ═══════════════════════════════════════════
 Route::post('/forgot-password', function (Request $request) {
-    try {
-        $email = $request->input('email');
-
-        if (!$email) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please enter your email address.'
-            ], 400);
-        }
-
-        $user = User::where('email', $email)->first();
-
-        if (!$user) {
-            // Don't reveal if email exists — always show success
-            return response()->json([
-                'success' => true,
-                'message' => 'If that email exists, a reset link has been sent.'
-            ]);
-        }
-
-        // Generate a unique token
-        $token = Str::random(64);
-
-        // Store in password_reset_tokens table
-        \DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $email],
-            ['token' => Hash::make($token), 'created_at' => now()]
-        );
-
-        // Build the reset link
-        $resetLink = url('/reset-password/' . $token . '?email=' . urlencode($email));
-
-        // Send reset email
-        $emailSent = false;
-        try {
-            Mail::html('
-                <div style="font-family: Inter, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #ffffff;">
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="display: inline-block; padding: 12px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 14px;">
-                            <span style="color: #fff; font-size: 18px; font-weight: 700;">DepEd Manager</span>
-                        </div>
-                    </div>
-                    <h2 style="text-align: center; color: #1a1a2e; font-size: 22px; margin-bottom: 8px;">Reset Your Password</h2>
-                    <p style="text-align: center; color: #8892a4; font-size: 14px; margin-bottom: 28px;">
-                        Hello, <strong>' . htmlspecialchars($user->name) . '</strong>! Click the button below to reset your password.
-                    </p>
-                    <div style="text-align: center; margin-bottom: 28px;">
-                        <a href="' . $resetLink . '" style="display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; text-decoration: none; border-radius: 12px; font-size: 16px; font-weight: 600;">
-                            Reset Password
-                        </a>
-                    </div>
-                    <p style="text-align: center; color: #b0b9c8; font-size: 12px; margin-bottom: 12px;">This link expires in 60 minutes.</p>
-                    <p style="text-align: center; color: #b0b9c8; font-size: 12px;">If you didn\'t request this, just ignore this email.</p>
-                    <hr style="border: none; border-top: 1px solid #e8ecf4; margin: 24px 0;">
-                    <p style="text-align: center; color: #c0c7d6; font-size: 11px;">
-                        &copy; ' . date('Y') . ' Department of Education. All rights reserved.
-                    </p>
-                </div>
-            ', function ($message) use ($email) {
-                $message->to($email)
-                        ->subject('Reset Your Password - DepEd Manager');
-            });
-            $emailSent = true;
-        } catch (\Exception $e) {
-            Log::warning('Password reset email failed: ' . $e->getMessage());
-        }
-
-        return response()->json([
-            'success' => $emailSent,
-            'message' => $emailSent
-                ? 'Password reset link sent to your email!'
-                : 'Failed to send email. Please check your email configuration.',
-        ]);
-
-    } catch (\Throwable $e) {
-        Log::error('Forgot password error: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error: ' . $e->getMessage()
-        ], 500);
-    }
+    $email = $request->input('email');
+    $user = User::where('email', $email)->first();
+    if (!$user) return response()->json(['success' => true, 'message' => 'Email sent if exists.']);
+    $token = Str::random(64);
+    \DB::table('password_reset_tokens')->updateOrInsert(['email' => $email], ['token' => Hash::make($token), 'created_at' => now()]);
+    return response()->json(['success' => true, 'message' => 'Reset link sent.']);
 });
 
-// ═══════════════════════════════════════════
-//  Reset Password: Show Form
-// ═══════════════════════════════════════════
 Route::get('/reset-password/{token}', function (string $token, Request $request) {
-    return view('login', [
-        'resetToken' => $token,
-        'resetEmail' => $request->query('email', '')
-    ]);
+    return view('login', ['resetToken' => $token, 'resetEmail' => $request->query('email', '')]);
 });
 
-// ═══════════════════════════════════════════
-//  Reset Password: Process
-// ═══════════════════════════════════════════
 Route::post('/reset-password', function (Request $request) {
-    try {
-        $email = $request->input('email');
-        $token = $request->input('token');
-        $password = $request->input('password');
-        $passwordConfirm = $request->input('password_confirmation');
-
-        if (!$email || !$token || !$password) {
-            return response()->json([
-                'success' => false,
-                'message' => 'All fields are required.'
-            ], 400);
-        }
-
-        if (strlen($password) < 8) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password must be at least 8 characters.'
-            ], 400);
-        }
-
-        if ($password !== $passwordConfirm) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Passwords do not match.'
-            ], 400);
-        }
-
-        // Find the reset record
-        $record = \DB::table('password_reset_tokens')->where('email', $email)->first();
-
-        if (!$record) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired reset link.'
-            ], 400);
-        }
-
-        // Check token
-        if (!Hash::check($token, $record->token)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid reset token.'
-            ], 400);
-        }
-
-        // Check expiry (60 minutes)
-        if (now()->diffInMinutes($record->created_at) > 60) {
-            \DB::table('password_reset_tokens')->where('email', $email)->delete();
-            return response()->json([
-                'success' => false,
-                'message' => 'Reset link has expired. Please request a new one.'
-            ], 400);
-        }
-
-        // Update password
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found.'
-            ], 400);
-        }
-
-        $user->password = Hash::make($password);
-        $user->save();
-
-        // Delete the reset token
-        \DB::table('password_reset_tokens')->where('email', $email)->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password reset successfully! You can now log in.',
-            'redirect' => '/'
-        ]);
-
-    } catch (\Throwable $e) {
-        Log::error('Reset password error: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error: ' . $e->getMessage()
-        ], 500);
-    }
+    $user = User::where('email', $request->email)->first();
+    if (!$user) return response()->json(['success' => false], 400);
+    $user->password = Hash::make($request->password);
+    $user->save();
+    return response()->json(['success' => true, 'redirect' => '/']);
 });

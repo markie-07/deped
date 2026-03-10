@@ -19,8 +19,24 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
+        'last_name',
+        'first_name',
+        'middle_name',
+        'suffix',
+        'position',
+        'profile_image',
+        'profile_offset_x',
+        'profile_offset_y',
+        'profile_zoom',
+        'cover_image',
+        'cover_offset_x',
+        'cover_offset_y',
+        'cover_zoom',
         'email',
         'password',
+        'is_active',
+        'role',
     ];
 
     /**
@@ -43,6 +59,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 }

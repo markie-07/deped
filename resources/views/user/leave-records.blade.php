@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    @include('partials.sidebar')
+    @include('partials.user-sidebar')
 
     <main class="main-content">
         @include('partials.navigation')
@@ -115,7 +115,7 @@
                     </thead>
                     <tbody id="masterTableBody">
                         <tr>
-                            <td colspan="11" class="loading-state">
+                            <td colspan="12" class="loading-state">
                                 <div class="loading-content">
                                     <div class="spinner"></div>
                                     <p>Loading records...</p>
@@ -292,19 +292,23 @@
         background: #fff;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
-        overflow: clip;
+        overflow-x: auto;
+        overflow-y: hidden;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
     }
+    .table-card::-webkit-scrollbar { display: none; }
 
     .master-table {
-        width: 100%; border-collapse: collapse; text-align: left;
+        width: 100%; min-width: 1400px; border-collapse: collapse; text-align: left;
     }
 
     /* ── Table Header ── */
     .master-table th {
         background: #f8fafc;
-        padding: 14px 20px;
-        font-size: 0.68rem;
+        padding: 12px 14px;
+        font-size: 0.65rem;
         font-weight: 600;
         color: #64748b;
         text-transform: uppercase;
@@ -318,8 +322,8 @@
 
     /* ── Table Cells ── */
     .master-table td {
-        padding: 14px 20px;
-        font-size: 0.84rem;
+        padding: 12px 14px;
+        font-size: 0.8rem;
         color: #334155;
         border-bottom: 1px solid #f1f5f9;
         vertical-align: middle;
@@ -338,7 +342,7 @@
 
     /* ── Row entrance animation ── */
     @keyframes rowSlideIn {
-        from { opacity: 0; transform: translateY(6px); }
+        from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
     .master-table tbody tr.animate-in {
@@ -513,6 +517,10 @@
         background: #fffbeb; color: #d97706;
     }
     .remark-badge.yellow::before { background: #f59e0b; }
+    .remark-badge.violet {
+        background: #f5f3ff; color: #7c3aed;
+    }
+    .remark-badge.violet::before { background: #8b5cf6; }
     .remark-badge.gray {
         background: #f1f5f9; color: #64748b;
     }
@@ -712,7 +720,7 @@
 
     .preview-table {
         width: 100%; 
-        min-width: 1200px; 
+        min-width: 1600px; 
         border-collapse: collapse; 
         font-size: 0.82rem;
     }
@@ -791,10 +799,201 @@
         .filter-input-wrap input,
         .filter-input-wrap select { width: 100%; }
     }
+
+    /* ══════════════════════════════════════════
+       DARK MODE — LEAVE RECORDS
+       ══════════════════════════════════════════ */
+
+    /* Page Header Card */
+    body.dark-mode .page-header-card {
+        background: #0f172a;
+        border-color: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    body.dark-mode .page-header-card.is-stuck {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        border-top-color: transparent;
+    }
+    body.dark-mode .header-title { color: #fff; }
+    body.dark-mode .header-subtitle { color: #64748b; }
+
+    /* Stat Chips */
+    body.dark-mode .stat-chip { background: #111827; border-color: #1e293b; }
+    body.dark-mode .stat-label { color: #64748b; }
+    body.dark-mode .stat-value { color: #f1f5f9; }
+
+    /* Filters */
+    body.dark-mode .filter-input-wrap input,
+    body.dark-mode .filter-input-wrap select {
+        background: #111827;
+        border-color: #64748b;
+        color: #f1f5f9;
+    }
+    body.dark-mode .filter-input-wrap input::placeholder { color: #94a3b8; }
+    body.dark-mode .filter-input-wrap input:focus,
+    body.dark-mode .filter-input-wrap select:focus { border-color: #818cf8; }
+    body.dark-mode .filter-input-wrap svg { color: #fff !important; }
+    body.dark-mode .filter-input-wrap select option { background: #0f172a; color: #f1f5f9; }
+
+    /* Date picker specific dark mode adjustments */
+    body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: brightness(0) invert(1) !important;
+        -webkit-filter: brightness(0) invert(1) !important;
+        cursor: pointer;
+        opacity: 1 !important;
+    }
+    body.dark-mode .filter-input-wrap input[type="date"] {
+        color-scheme: dark;
+    }
+    body.dark-mode .date-wrap svg { color: #fff !important; opacity: 1 !important; }
+
+    /* Import/Export Buttons */
+    body.dark-mode .btn-export-excel { background: #111827; color: #818cf8; border-color: #334155; }
+    body.dark-mode .btn-export-excel:hover { background: #1e293b; border-color: #818cf8; color: #a5b4fc; }
+
+    /* Table Card */
+    body.dark-mode .table-card {
+        background: #0f172a;
+        border-color: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Table Header */
+    body.dark-mode .master-table th {
+        background: #111827;
+        color: #94a3b8;
+        border-bottom-color: #1e293b;
+    }
+
+    /* Table Cells */
+    body.dark-mode .master-table td {
+        color: #cbd5e1;
+        border-bottom-color: #1e293b;
+        background: #0f172a;
+    }
+    body.dark-mode .master-table tbody tr:not(.forwarded-header-row):hover td { background: #111827; }
+    body.dark-mode .master-table tbody tr:not(.forwarded-header-row):nth-child(even):not(:hover) td { background: #0c1322; }
+
+    /* Cell-Specific */
+    body.dark-mode .cell-index { color: #475569; }
+    body.dark-mode .cell-name { color: #f1f5f9; }
+    body.dark-mode .cell-position { color: #94a3b8; }
+    body.dark-mode .cell-school { color: #94a3b8; }
+    body.dark-mode .cell-dates { color: #94a3b8; }
+    body.dark-mode .cell-action-date { color: #cbd5e1; }
+    body.dark-mode .cell-deduction { color: #64748b; }
+    body.dark-mode .cell-incharge { color: #94a3b8; }
+
+    /* Forwarded Header Rows — Colored */
+    body.dark-mode .forwarded-header-row td {
+        background: rgba(99, 102, 241, 0.08) !important;
+        border-color: rgba(99, 102, 241, 0.15);
+    }
+    body.dark-mode .forwarded-badge { background: rgba(99, 102, 241, 0.12); color: #fff; border-color: rgba(99, 102, 241, 0.25); }
+    body.dark-mode .forwarded-badge svg { color: #fff; }
+    body.dark-mode .forwarded-count { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; }
+    body.dark-mode .btn-add-forwarded-record { background: rgba(99, 102, 241, 0.1); color: #fff; border-color: rgba(99, 102, 241, 0.25); }
+    body.dark-mode .btn-add-forwarded-record:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
+    body.dark-mode .batch-header-row { background: #0a0f1e !important; }
+    body.dark-mode .batch-header-row:hover { background: #0a0f1e !important; }
+    body.dark-mode .batch-header-row td { border-bottom-color: #1e293b; }
+
+    /* Date badge in forwarded header */
+    body.dark-mode .header-date-badge { background: #111827 !important; border-color: #334155 !important; color: #94a3b8 !important; }
+    body.dark-mode .forwarded-incharge-name { color: #fff !important; opacity: 1 !important; }
+
+    .forwarded-incharge-name { color: #6366f1; opacity: 0.8; font-size: 0.65rem; margin-left: 4px; }
+
+    /* Badges */
+    body.dark-mode .badge-leave { background: rgba(99, 102, 241, 0.15); color: #fff; }
+    body.dark-mode .remark-badge.green { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+    body.dark-mode .remark-badge.red { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+    body.dark-mode .remark-badge.yellow { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
+    body.dark-mode .remark-badge.violet { background: rgba(139, 92, 246, 0.1); color: #a78bfa; }
+    body.dark-mode .remark-badge.gray { background: rgba(30, 41, 59, 0.5); color: #94a3b8; }
+
+    /* Action Buttons */
+    body.dark-mode .btn-edit { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.2); }
+    body.dark-mode .btn-edit:hover { background: #059669; color: #fff; border-color: #059669; }
+    body.dark-mode .btn-delete { background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+    body.dark-mode .btn-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+    /* Loading & Empty States */
+    body.dark-mode .loading-state { color: #94a3b8; }
+    body.dark-mode .spinner { border-color: #1e293b; border-top-color: #818cf8; }
+    body.dark-mode .loading-text { color: #94a3b8; }
+    body.dark-mode .loading-sub { color: #475569; }
+    body.dark-mode .empty-icon { background: #111827; color: #475569; }
+    body.dark-mode .empty-title { color: #94a3b8; }
+    body.dark-mode .empty-sub { color: #475569; }
+
+    /* Import Modal */
+    body.dark-mode .import-modal-content { background: #0f172a; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7); }
+    body.dark-mode .import-modal .modal-header { background: #0f172a; border-bottom-color: #1e293b; }
+    body.dark-mode .import-modal .modal-header h3 { color: #fff; }
+    body.dark-mode .import-modal .modal-body { background: #0c1322; }
+    body.dark-mode .preview-table th { background: #111827; color: #fff; border-bottom-color: #1e293b; font-size: 0.7rem; }
+    body.dark-mode .preview-table td { background: #0f172a; color: #cbd5e1; border-bottom-color: #1e293b; }
+    body.dark-mode .preview-table tr:hover td { background: #111827; }
+    body.dark-mode .preview-forwarded-row,
+    body.dark-mode .preview-forwarded-row td { 
+        background-color: rgba(99, 102, 241, 0.08) !important; 
+        color: #fff !important; 
+        border-bottom-color: rgba(99, 102, 241, 0.15) !important;
+    }
+    body.dark-mode .preview-forwarded-row svg { color: #fff !important; }
+    body.dark-mode .preview-batch-row { border-top-color: #1e293b !important; }
+    body.dark-mode .preview-batch-row td { background: #0a0f1e !important; border-bottom: none !important; }
+    body.dark-mode .import-modal .modal-footer { background: #0f172a; border-top-color: #1e293b; }
+    body.dark-mode .btn-cancel { background: #1e293b; color: #94a3b8; }
+    body.dark-mode .btn-cancel:hover { background: #334155; color: #fff; }
+
+    /* Export Floating Bar */
+    body.dark-mode .export-actions-bar { background: #111827; border: 1px solid #1e293b; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+
+    /* Checkbox */
+    body.dark-mode .row-checkbox { accent-color: #818cf8; }
+    body.dark-mode .batch-checkbox, body.dark-mode .forwarded-checkbox { accent-color: #818cf8; }
+
+    /* Content body */
+    body.dark-mode .content-body { background: transparent; }
+
+    /* Fix the name color and text in preview */
+    body.dark-mode .preview-table .cell-name { color: #f1f5f9 !important; font-weight: 600; }
+    body.dark-mode .preview-table .cell-index { color: #94a3b8 !important; }
+    body.dark-mode .preview-table .badge-leave { color: #fff !important; background: rgba(99, 102, 241, 0.2) !important; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; }
+    
+    body.dark-mode .remark-badge-preview.green { background: rgba(16, 185, 129, 0.1) !important; color: #34d399 !important; }
+    body.dark-mode .remark-badge-preview.red { background: rgba(239, 68, 68, 0.1) !important; color: #f87171 !important; }
+    body.dark-mode .remark-badge-preview.yellow { background: rgba(245, 158, 11, 0.1) !important; color: #fbbf24 !important; }
+    body.dark-mode .remark-badge-preview.violet { background: rgba(139, 92, 246, 0.1) !important; color: #a78bfa !important; }
+
+    body.dark-mode .btn-confirm { background-color: #10b981 !important; color: #fff !important; }
+    body.dark-mode .btn-confirm:hover { background-color: #059669 !important; }
+
+    .forwarded-preview-content { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .forwarded-preview-content svg { width: 14px; height: 14px; color: #6366f1; }
+    .remark-badge-preview.green { color: #16a34a; background: #f0fdf4; }
+    .remark-badge-preview.red { color: #dc2626; background: #fef2f2; }
+    .remark-badge-preview.yellow { color: #ca8a04; background: #fefce8; }
+    .remark-badge-preview.violet { color: #7c3aed; background: #f5f3ff; }
+
+    .preview-table .badge-leave { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #eef2ff; color: #4338ca; }
+    .preview-table .cell-name { font-weight: 600; color: #1e293b; }
+    .preview-table .cell-index { color: #94a3b8; font-weight: 500; }
+
 </style>
 
 <script>
+const AUTH_USER_ID = "{{ auth()->id() }}";
+const AUTH_USERNAME = "{{ auth()->user()->username ?? '' }}";
+const AUTH_NAME = "{{ auth()->user()->name ?? '' }}";
 document.addEventListener('DOMContentLoaded', function() {
+    // Set today's date as default for date filter
+    const now = new Date();
+    const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    document.getElementById('dateFilter').value = today;
+
     fetchMasterRecords();
     setupStickyObserver();
 
@@ -803,9 +1002,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function filterRecords() {
-    const q = document.getElementById('masterSearch').value.toLowerCase();
+    const searchVal = document.getElementById('masterSearch').value.trim().toLowerCase();
     const remarkFilter = document.getElementById('remarkFilter').value;
+    const inchargeFilter = document.getElementById('inchargeFilter')?.value || 'all';
     const rows = document.querySelectorAll('#masterTableBody tr');
+    
+    // If no filters active, just show everything (including all headers) and exit
+    if (searchVal === '' && (remarkFilter === 'all' || !remarkFilter) && (inchargeFilter === 'all' || !inchargeFilter)) {
+        rows.forEach(row => row.style.display = '');
+        return;
+    }
+
     let currentHeader = null;
     let currentBatchHeader = null;
     let hasVisibleInGroup = false;
@@ -813,28 +1020,25 @@ function filterRecords() {
 
     rows.forEach(row => {
         if (row.classList.contains('batch-header-row')) {
-            // Hide previous batch header if no visible records
-            if (currentBatchHeader && !hasVisibleInBatch) {
-                currentBatchHeader.style.display = 'none';
-            }
-            // Hide previous forwarded header if no visible records
-            if (currentHeader && !hasVisibleInGroup) {
-                currentHeader.style.display = 'none';
-            }
+            // Hide previous batch/group headers if no visible records
+            if (currentBatchHeader && !hasVisibleInBatch) currentBatchHeader.style.display = 'none';
+            if (currentHeader && !hasVisibleInGroup) currentHeader.style.display = 'none';
+            
             currentBatchHeader = row;
             hasVisibleInBatch = false;
             currentHeader = null;
             hasVisibleInGroup = false;
-            row.style.display = '';
+            row.style.display = ''; 
         } else if (row.classList.contains('forwarded-header-row')) {
-            if (currentHeader && !hasVisibleInGroup) {
-                currentHeader.style.display = 'none';
-            }
+            if (currentHeader && !hasVisibleInGroup) currentHeader.style.display = 'none';
+            
             currentHeader = row;
             hasVisibleInGroup = false;
-            row.style.display = '';
-        } else if (row.cells.length > 1) {
-            const matchesSearch = row.textContent.toLowerCase().includes(q);
+            row.style.display = ''; 
+        } else if (row.cells.length > 1) { // Data row
+            const textContent = row.textContent.toLowerCase();
+            const matchesSearch = searchVal === '' || textContent.includes(searchVal);
+            
             let matchesRemark = true;
             const rowRemarks = (row.getAttribute('data-remarks') || '').toLowerCase();
             if (remarkFilter === 'with pay') {
@@ -844,34 +1048,39 @@ function filterRecords() {
             } else if (remarkFilter === 'with pay & without pay') {
                 matchesRemark = rowRemarks.includes('with pay') && rowRemarks.includes('without pay');
             }
-            const visible = matchesSearch && matchesRemark;
-            row.style.display = visible ? '' : 'none';
-            if (visible) {
+            
+            let matchesIncharge = true;
+            if (inchargeFilter !== 'all') {
+                const rowIncharge = row.getAttribute('data-incharge') || '';
+                matchesIncharge = rowIncharge === inchargeFilter;
+            }
+            
+            const isVisible = matchesSearch && matchesRemark && matchesIncharge;
+            row.style.display = isVisible ? '' : 'none';
+            
+            if (isVisible) {
                 hasVisibleInGroup = true;
                 hasVisibleInBatch = true;
             }
         }
     });
 
-    if (currentHeader && !hasVisibleInGroup) {
-        currentHeader.style.display = 'none';
-    }
-    if (currentBatchHeader && !hasVisibleInBatch) {
-        currentBatchHeader.style.display = 'none';
-    }
+    // Handle last headers
+    if (currentHeader && !hasVisibleInGroup) currentHeader.style.display = 'none';
+    if (currentBatchHeader && !hasVisibleInBatch) currentBatchHeader.style.display = 'none';
 }
 
-function fetchMasterRecords() {
+function fetchMasterRecords(exportModeOverride = null) {
     const tbody = document.getElementById('masterTableBody');
     const dateFilter = document.getElementById('dateFilter').value;
     const inchargeFilter = document.getElementById('inchargeFilter').value;
-    let url = '/leave-records?';
+    const baseUrl = '{{ url("/leave-records") }}';
     const params = [];
     if (dateFilter) params.push(`date=${encodeURIComponent(dateFilter)}`);
     if (inchargeFilter) params.push(`incharge=${encodeURIComponent(inchargeFilter)}`);
-    url += params.join('&');
+    const finalUrl = baseUrl + (params.length ? '?' + params.join('&') : '');
 
-    fetch(url, {
+    fetch(finalUrl, {
         headers: {
             'Accept': 'application/json'
         }
@@ -886,57 +1095,68 @@ function fetchMasterRecords() {
 
             document.getElementById('statTotal').textContent = data.length;
             
-            // Group records by forwarded WITHIN each batch, preserving first-appearance order
-            // This ensures all SDO records in batch 1 are together, all SDS records together, etc.
+            // Group records by incharge + forwarded WITHIN each batch
             const grouped = {};
             data.forEach(r => {
                 const batchId = r.batch_id || 1;
-                if (!grouped[batchId]) grouped[batchId] = { forwardedOrder: [], forwardeds: {} };
+                const incharge = r.incharge || 'System';
                 const forwarded = r.forwarded || '';
-                if (!grouped[batchId].forwardeds[forwarded]) {
-                    grouped[batchId].forwardeds[forwarded] = [];
-                    grouped[batchId].forwardedOrder.push(forwarded);
+                const groupKey = `${incharge}|${forwarded}`;
+
+                if (!grouped[batchId]) grouped[batchId] = { groupOrder: [], groups: {} };
+                if (!grouped[batchId].groups[groupKey]) {
+                    grouped[batchId].groups[groupKey] = [];
+                    grouped[batchId].groupOrder.push(groupKey);
                 }
-                grouped[batchId].forwardeds[forwarded].push(r);
+                grouped[batchId].groups[groupKey].push(r);
             });
             // Flatten back to sorted array
             const sortedData = [];
             const batchIds = Object.keys(grouped).map(Number).sort((a, b) => a - b);
             batchIds.forEach(batchId => {
                 const batch = grouped[batchId];
-                batch.forwardedOrder.forEach(forwarded => {
-                    batch.forwardeds[forwarded].forEach(r => sortedData.push(r));
+                batch.groupOrder.forEach(key => {
+                    batch.groups[key].forEach(r => sortedData.push(r));
                 });
             });
             data = sortedData;
+
             const colCheckboxHeader = document.querySelector('th.col-checkbox');
-            const isExportMode = colCheckboxHeader && colCheckboxHeader.style.display !== 'none';
+            const isExportMode = exportModeOverride !== null ? exportModeOverride : (colCheckboxHeader && colCheckboxHeader.style.display !== 'none');
             let html = '';
-            let lastBatch = null;
+            let lastBatchId = null;
+            let lastInchargeName = null;
             let lastDept = null;
             let rowIndex = 0;
 
-            // Count unique batches and determine latest
-            const uniqueBatches = [...new Set(data.map(r => r.batch_id || 1))].sort((a, b) => a - b);
-            const showBatchHeaders = uniqueBatches.length > 1;
-            const latestBatch = uniqueBatches[uniqueBatches.length - 1];
+            // Count unique logical batches (batch_id + incharge)
+            const uniqueLogicalBatches = [...new Set(data.map(r => `${r.batch_id || 1}|${r.incharge || ''}`))];
+            const showBatchHeaders = uniqueLogicalBatches.length > 1;
+
+            const myRecords = data.filter(r => {
+                const inc = (r.incharge || '').toLowerCase();
+                return inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
+            });
+            const myLatestBatch = myRecords.length > 0 ? Math.max(...myRecords.map(r => r.batch_id || 1)) : -1;
 
             data.forEach((r, i) => {
                 const batchId = r.batch_id || 1;
+                const currentIncharge = r.incharge || 'System';
                 const forwarded = r.forwarded || '';
-                const isLatestBatch = batchId === latestBatch;
-                const shouldCheck = isExportMode && isLatestBatch;
+                const inc = (r.incharge || '').toLowerCase();
+                const isMyRecord = inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
+                const shouldCheck = isExportMode && isMyRecord && batchId === myLatestBatch;
 
-                // Add batch separator when batch changes
-                if (showBatchHeaders && batchId !== lastBatch) {
-                    const isFirstBatch = lastBatch === null;
-                    lastDept = null; // Reset forwarded grouping for new batch
+                // Add batch separator when batch OR incharge changes
+                if (batchId !== lastBatchId || currentIncharge.toLowerCase().trim() !== (lastInchargeName || '').toLowerCase().trim()) {
+                    const isFirstBatch = lastBatchId === null;
+                    lastDept = null; 
                     html += `
                         <tr class="batch-header-row" data-batch="${batchId}">
                             <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                                 <input type="checkbox" class="batch-checkbox" data-batch="${batchId}" ${shouldCheck ? 'checked' : ''} onchange="toggleBatchCheckbox(${batchId}, this.checked)">
                             </td>
-                            <td colspan="11" style="height: ${isFirstBatch ? '10px' : '60px'}; vertical-align: middle; padding: 0 40px !important;">
+                            <td colspan="${isExportMode ? '11' : '11'}" style="vertical-align: middle; padding: ${isFirstBatch ? '0' : '20px 40px'} !important;">
                                 ${!isFirstBatch ? `
                                 <div style="display: flex; align-items: center; gap: 20px;">
                                     <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1); border-radius: 4px;"></div>
@@ -951,53 +1171,58 @@ function fetchMasterRecords() {
                             </td>
                         </tr>
                     `;
-                    lastBatch = batchId;
+                    lastBatchId = batchId;
+                    lastInchargeName = currentIncharge;
                 }
 
                 const isProcessed = r.is_processed == 1 || r.is_processed === true;
 
-                if (forwarded && forwarded !== 'No Forwarded' && forwarded !== lastDept) {
+                const groupKey = `${r.incharge || 'System'}|${forwarded}`;
+                if (forwarded && forwarded !== 'No Forwarded' && groupKey !== lastDept) {
                     const groupDate = r.date_of_action ? formatDate(r.date_of_action) : '-';
                     html += `
-                        <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}">
+                        <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}" data-incharge="${r.incharge || ''}">
                             <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};"></td>
-                            <td colspan="11">
+                            <td colspan="${isExportMode ? '11' : '11'}">
                                 <div class="forwarded-header-content">
                                     <input type="checkbox" class="forwarded-checkbox" data-forwarded="${forwarded}" data-batch="${batchId}" ${shouldCheck ? 'checked' : ''} onchange="toggleForwardedCheckbox('${forwarded.replace(/'/g, "\\'")}', ${batchId}, this.checked)" style="display: ${isExportMode ? '' : 'none'};">
                                     <div class="forwarded-badge">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                                         </svg>
-                                        <span>${forwarded}</span>
+                                        <span>${forwarded} ${!isProcessed ? ` - <span class="forwarded-incharge-name">(${r.incharge || 'Unknown'})</span>` : ''}</span>
                                     </div>
                                     <div class="header-date-badge" style="margin-left: 10px; display: ${isProcessed ? 'flex' : 'none'}; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; color: #6366f1;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-18 3.75h18" />
-                                        </svg>
-                                        ${groupDate}
-                                    </div>
-                                    <a href="/form?forwarded=${encodeURIComponent(forwarded)}&batch=${batchId}&source=leave-records" class="btn-add-forwarded-record">
+                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; color: #6366f1;">
+                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                         </svg>
+                                         ${r.processed_at ? formatDate(r.processed_at) : groupDate}
+                                     </div>
+                                    ${isMyRecord ? `
+                                    <a href="/user/form?forwarded=${encodeURIComponent(forwarded)}&batch=${batchId}&source=leave-records" class="btn-add-forwarded-record">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
                                         Add
                                     </a>
+                                    ` : ''}
                                 </div>
                             </td>
                         </tr>
                     `;
-                    lastDept = forwarded;
+                    lastDept = groupKey;
                 }
 
                 rowIndex++;
                 let remarkClass = 'gray';
                 const rem = (r.remarks || '').toLowerCase();
-                if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'green';
+                if (rem.includes('with pay') && rem.includes('without pay')) remarkClass = 'violet';
+                else if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'green';
                 else if (rem.includes('disapproved') || rem.includes('without pay')) remarkClass = 'red';
                 else if (rem.includes('pending')) remarkClass = 'yellow';
 
                 html += `
-                    <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" class="animate-in" style="animation-delay: ${Math.min(i * 15, 300)}ms">
+                    <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                             <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${forwarded.replace(/'/g, "\\'")}', ${batchId})">
                         </td>
@@ -1011,7 +1236,8 @@ function fetchMasterRecords() {
                         <td class="cell-action-date">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
                         <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
                         <td class="cell-incharge">${r.incharge || '-'}</td>
-                        <td>
+                        <td class="col-actions">
+                            ${isMyRecord ? `
                             <div class="btn-action-group">
                                 <button onclick="editRecord(${r.id})" class="btn-action btn-edit">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -1020,47 +1246,54 @@ function fetchMasterRecords() {
                                 </button>
                                 <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.244 2.244 0 0 1-2.244 2.077H8.084a2.244 2.244 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                     </svg>
                                 </button>
                             </div>
+                            ` : '-'}
                         </td>
                     </tr>
                 `;
             });
 
             tbody.innerHTML = html;
-            updateStickyPositions();
-            // Important: Re-apply client-side filters (Search & Remark) after table rebuild
+            // updateStickyPositions(); // Temporarily disabled to bypass layout shifts
             filterRecords();
-            // Update export selection count after table rebuild
             updateSelectionCount();
         });
 
     // Populate Incharge filter once
     const inchargeSelect = document.getElementById('inchargeFilter');
     if (inchargeSelect && inchargeSelect.options.length <= 1) {
-        fetch('/leave-records/incharges')
+        fetch('{{ url("/leave-records/incharges") }}')
             .then(res => res.json())
             .then(data => {
                 data.forEach(i => {
                     const opt = document.createElement('option');
                     opt.value = i.incharge;
                     opt.textContent = i.incharge;
+                    
+                    // Default to current user's name or username
+                    if (i.incharge === AUTH_NAME || i.incharge === AUTH_USERNAME) {
+                        opt.selected = true;
+                    }
+                    
                     inchargeSelect.appendChild(opt);
                 });
+                // Trigger filter update to apply the default selection
+                filterRecords();
             });
     }
 }
 
 function editRecord(id) {
-    window.location.href = `/form?edit=${id}`;
+    window.location.href = "{{ url('/user/form') }}?edit=" + id + "&source=leave-records";
 }
 
 function deleteRecord(id) {
     if (!confirm('Are you sure you want to delete this record?')) return;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    fetch(`/leave-records/${id}`, {
+    fetch(`{{ url("/leave-records") }}/${id}`, {
         method: 'DELETE',
         headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
     })
@@ -1076,17 +1309,7 @@ function deleteRecord(id) {
 
 
 function updateStickyPositions() {
-    const navbar = document.querySelector('.top-navbar');
-    const headerCard = document.querySelector('.page-header-card');
-    if (!navbar || !headerCard) return;
-
-    const navbarH = navbar.offsetHeight;
-    const headerH = headerCard.offsetHeight;
-
-    const forwardedTop = navbarH + headerH;
-    document.querySelectorAll('.forwarded-header-row').forEach(row => {
-        row.style.top = forwardedTop + 'px';
-    });
+    return; // Disabled for debugging
 }
 
 function setupStickyObserver() {
@@ -1247,7 +1470,7 @@ function renderPreview() {
             const isFirstBatch = lastBatchNum === 0;
             lastBatchNum = batchNum;
             html += `
-                <tr class="preview-batch-row" style="height: ${isFirstBatch ? '10px' : '50px'}; background: #f8fafc;">
+                <tr class="preview-batch-row" style="height: ${isFirstBatch ? '10px' : '50px'};">
                     <td colspan="10" style="vertical-align: middle; padding: 0 32px;">
                         ${!isFirstBatch ? `
                         <div style="display: flex; align-items: center; gap: 15px;">
@@ -1265,8 +1488,8 @@ function renderPreview() {
             html += `
                 <tr class="preview-forwarded-row">
                     <td colspan="10">
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 14px; height: 14px; color: #6366f1;">
+                        <div class="forwarded-preview-content">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                             </svg>
                             <span>${forwarded}</span>
@@ -1279,22 +1502,22 @@ function renderPreview() {
 
         rowIndex++;
         
-        let remarkClass = '';
+        let remarkType = '';
         const rem = (r.remarks || '').toLowerCase();
-        if (rem.includes('with pay') && rem.includes('without pay')) remarkClass = 'color: #7c3aed; background: #f5f3ff;';
-        else if (rem.includes('approved') || rem.includes('with pay')) remarkClass = 'color: #16a34a; background: #f0fdf4;';
-        else if (rem.includes('disapproved') || rem.includes('without pay')) remarkClass = 'color: #dc2626; background: #fef2f2;';
-        else if (rem.includes('pending')) remarkClass = 'color: #ca8a04; background: #fefce8;';
+        if (rem.includes('with pay') && rem.includes('without pay')) remarkType = 'violet';
+        else if (rem.includes('approved') || rem.includes('with pay')) remarkType = 'green';
+        else if (rem.includes('disapproved') || rem.includes('without pay')) remarkType = 'red';
+        else if (rem.includes('pending')) remarkType = 'yellow';
         
         html += `
             <tr>
-                <td style="color: #94a3b8; font-weight: 500;">${rowIndex}</td>
-                <td style="font-weight: 600; color: #1e293b;">${r.name}</td>
+                <td class="cell-index">${rowIndex}</td>
+                <td class="cell-name">${r.name}</td>
                 <td>${r.position}</td>
                 <td>${r.school}</td>
-                <td><span class="badge-leave" style="font-size: 0.7rem; padding: 2px 6px;">${r.type_of_leave}</span></td>
+                <td><span class="badge-leave">${r.type_of_leave}</span></td>
                 <td>${r.inclusive_dates}</td>
-                <td><span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 500; ${remarkClass}">${r.remarks}</span></td>
+                <td><span class="remark-badge-preview ${remarkType}">${r.remarks}</span></td>
                 <td>${r.date_of_action}</td>
                 <td>${r.deduction_remarks}</td>
                 <td>${r.incharge}</td>
@@ -1311,6 +1534,16 @@ function closeImportModal() {
     pendingImportData = [];
 }
 
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const importModal = document.getElementById('importModal');
+        if (importModal && importModal.classList.contains('active')) {
+            closeImportModal();
+        }
+    }
+});
+
+
 function confirmImport() {
     if (pendingImportData.length === 0) return;
 
@@ -1320,7 +1553,7 @@ function confirmImport() {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    fetch('/leave-records/bulk', {
+    fetch('{{ url("/leave-records/bulk") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1346,7 +1579,7 @@ function confirmImport() {
         btn.classList.remove('loading');
     });
 }
-function formatDate(dateStr) {
+function formatDate(dateStr, includeTime = false) {
     if (!dateStr) return '-';
     try {
         const date = new Date(dateStr);
@@ -1354,7 +1587,16 @@ function formatDate(dateStr) {
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const dd = String(date.getDate()).padStart(2, '0');
         const yyyy = date.getFullYear();
-        return `${mm}-${dd}-${yyyy}`;
+        
+        let formatted = `${mm}-${dd}-${yyyy}`;
+        if (includeTime) {
+            const h = date.getHours();
+            const hh = String(h > 12 ? h - 12 : (h === 0 ? 12 : h)).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            formatted += ` ${hh}:${min} ${ampm}`;
+        }
+        return formatted;
     } catch (e) {
         return dateStr;
     }
@@ -1379,7 +1621,7 @@ function toggleSelectionMode(force = null) {
     }
     
     // Refresh table — updateSelectionCount is called after the table rebuilds
-    fetchMasterRecords();
+    fetchMasterRecords(isVisible);
 }
 
 function updateSelectionCount() {
@@ -1579,7 +1821,7 @@ function downloadSelectedExcel() {
                 
                 html += `<tr><td colspan="10" class="forwarded-header" style="background-color: ${bgColor}; border: 1px solid #cbd5e1;">${headerText}</td></tr>`;
             }
-        } else if (row.classList.contains('animate-in')) {
+        } else if (row.getAttribute('data-remarks')) {
             const cb = row.querySelector('.row-checkbox');
             if (cb && cb.checked) {
                 const cells = row.cells;

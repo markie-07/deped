@@ -17,5 +17,6 @@ class Employee extends Model
         'date_of_action',
         'deduction_remarks',
         'incharge',
+        'user_id',
     ];
 }

@@ -9,6 +9,7 @@ use App\Models\LeaveType;
 use App\Models\Remark;
 use App\Models\Forwarded;
 use App\Models\Employee;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 
 class LeaveRecordController extends Controller
@@ -22,8 +23,14 @@ class LeaveRecordController extends Controller
             ->orderBy('forwarded', 'asc')
             ->orderBy('created_at', 'asc');
 
+        // Isolation Logic:
+        // 1. The "Registry" modal (on the Form page) is personal work - only see your own records.
+        // 2. The "History" page (on leave-records page) shows everyone's work, but grouped separately.
         if ($request->has('view') && $request->view === 'registry') {
             $query->where('is_processed', false);
+            if (auth()->check()) {
+                $query->where('user_id', auth()->id());
+            }
         }
 
         if ($request->has('date') && $request->date) {
@@ -36,42 +43,50 @@ class LeaveRecordController extends Controller
 
         $records = $query->get();
 
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json($records);
-        }
-
-        return view('leave-records');
+    if ($request->wantsJson() || $request->ajax()) {
+        return response()->json($records);
     }
+
+    $role = auth()->user()->role ?? 'user';
+    $view = ($role === 'admin') ? 'admin.leave-records' : 'user.leave-records';
+    return view($view);
+}
 
     /**
      * Mark records as processed/cleared from registry.
      */
     public function bulkProcess(Request $request)
-    {
-        $ids = $request->input('ids');
-        
-        // Get the next batch_id for future records
-        $currentMaxBatch = LeaveRecord::max('batch_id') ?? 1;
-        $nextBatch = $currentMaxBatch + 1;
-        
-        if ($ids === 'all') {
-            LeaveRecord::where('is_processed', false)->update([
-                'is_processed' => true,
-                'date_of_action' => now()->format('Y-m-d')
-            ]);
-        } elseif (is_array($ids)) {
-            LeaveRecord::whereIn('id', $ids)->update([
-                'is_processed' => true,
-                'date_of_action' => now()->format('Y-m-d')
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Records cleared from registry successfully.',
-            'next_batch' => $nextBatch
-        ]);
+{
+    $ids = $request->input('ids');
+    
+    // Generate a unique batch_id for this specific group of processed records
+    $maxBatch = LeaveRecord::max('batch_id') ?? 1;
+    $newBatchId = $maxBatch + 1;
+    
+    $updateData = [
+        'is_processed' => true,
+        'batch_id' => $newBatchId,
+        'date_of_action' => now()->format('Y-m-d'),
+        'processed_at' => now()
+    ];
+    
+    if ($ids === 'all') {
+        LeaveRecord::where('is_processed', false)->update($updateData);
+    } elseif (is_array($ids)) {
+        LeaveRecord::whereIn('id', $ids)->update($updateData);
     }
+
+    $message = 'Records processed and assigned to batch #' . $newBatchId;
+    
+    // Log action
+    AuditLog::logAction('Bulk processed ' . (is_array($ids) ? count($ids) : 'all') . ' records', null, 'New Batch ID: ' . $newBatchId);
+
+    return response()->json([
+        'success' => true,
+        'message' => $message,
+        'next_batch' => $newBatchId + 1
+    ]);
+}
 
     /**
      * Get a specific leave record.
@@ -100,6 +115,10 @@ class LeaveRecordController extends Controller
             'incharge' => 'nullable|string|max:255',
         ]);
 
+        if (isset($validated['forwarded'])) {
+            $validated['forwarded'] = trim(explode(' - ', $validated['forwarded'])[0]);
+        }
+
         // Check if adding to a specific batch (from leave-records page Add button)
         $targetBatch = $request->input('target_batch');
         $isFromLeaveRecords = $request->input('source') === 'leave-records';
@@ -113,10 +132,19 @@ class LeaveRecordController extends Controller
             $validated['batch_id'] = $currentBatch;
         }
         
-        // If from leave-records page, mark as already processed
-        if ($isFromLeaveRecords) {
-            $validated['is_processed'] = true;
+        // Tag the record with the current user's ID
+        if (auth()->check()) {
+            $validated['user_id'] = auth()->id();
         }
+        
+        // If from leave-records page, mark as already processed
+    if ($isFromLeaveRecords) {
+        $validated['is_processed'] = true;
+        $validated['processed_at'] = now();
+    }
+
+        // Automatically set incharge to the current user's username
+        $validated['incharge'] = auth()->user()->username ?? auth()->user()->name ?? auth()->user()->email ?? '-';
 
         $record = LeaveRecord::create($validated);
 
@@ -125,6 +153,9 @@ class LeaveRecordController extends Controller
 
         // Sync with directory tables
         $this->syncDirectories($record);
+
+        // Log action
+        AuditLog::logAction('Created leave record', $record, 'Employee: ' . $record->name . ', Type: ' . $record->type_of_leave);
 
         return response()->json([
             'success' => true,
@@ -217,8 +248,10 @@ class LeaveRecordController extends Controller
 
         // Sync Forwarded
         if ($record->forwarded) {
+            // Strip date suffix if present (e.g. "SDO - 03-02-2026" -> "SDO")
+            $baseName = explode(' - ', $record->forwarded)[0];
             Forwarded::updateOrCreate(
-                ['name' => $record->forwarded],
+                ['name' => $baseName],
                 [
                     'employee_name' => $record->name,
                     'position' => $record->position,
@@ -237,6 +270,7 @@ class LeaveRecordController extends Controller
      */
     public function dropdownData()
     {
+        // Dropdown suggestions on the FORM should show all previous data to help with entry
         $names = LeaveRecord::distinct()->pluck('name')->filter()->values();
         $positions = Position::orderBy('name')->pluck('name');
         
@@ -249,15 +283,21 @@ class LeaveRecordController extends Controller
 
         $leaveTypes = LeaveType::orderBy('name')->pluck('name');
         $remarks = Remark::orderBy('name')->pluck('name');
-        $forwardeds = Forwarded::orderBy('name')->pluck('name');
+        
+        $forwardeds = Forwarded::orderBy('name')->pluck('name')
+            ->map(function($name) {
+                return trim(explode(' - ', $name)[0]);
+            })
+            ->unique()
+            ->values();
 
-        // Get latest position and school for each employee to auto-fill form
+        // The employee map should also show all data to enable auto-fill for everyone
         $employeeMap = LeaveRecord::orderBy('created_at', 'desc')
             ->get(['name', 'forwarded', 'position', 'school'])
             ->unique('name')
             ->mapWithKeys(function ($record) {
                 return [$record->name => [
-                    'forwarded' => $record->forwarded,
+                    'forwarded' => $record->forwarded ? trim(explode(' - ', $record->forwarded)[0]) : null,
                     'position' => $record->position,
                     'school' => $record->school
                 ]];
@@ -285,6 +325,8 @@ class LeaveRecordController extends Controller
         $school = $request->input('school');
         $query = LeaveRecord::where('school', $school);
 
+
+
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
         }
@@ -298,14 +340,20 @@ class LeaveRecordController extends Controller
      */
     public function getSchools() 
     {
-        $schools = School::withCount('leaveRecords as leave_count')
-            ->orderBy('name')
+        // Get unique schools from LeaveRecord table
+        $schools = LeaveRecord::whereNotNull('school')
+            ->where('school', '!=', '')
+            ->select('school')
+            ->selectRaw('COUNT(*) as leave_count')
+            ->groupBy('school')
+            ->orderBy('school')
             ->get()
-            ->map(function($s) {
+            ->map(function($r) {
+                $s = School::where('name', $r->school)->first();
                 return [
-                    'school' => $s->name,
-                    'type' => $s->type,
-                    'leave_count' => $s->leave_count
+                    'school' => $r->school,
+                    'type' => $s ? $s->type : 'Other',
+                    'leave_count' => $r->leave_count
                 ];
             });
             
@@ -317,8 +365,15 @@ class LeaveRecordController extends Controller
      */
     public function count()
     {
+        // The count on the sidebar/form usually refers to the personal registry
+        $query = LeaveRecord::where('is_processed', false);
+        
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        }
+
         return response()->json([
-            'count' => LeaveRecord::where('is_processed', false)->count(),
+            'count' => $query->count(),
         ]);
     }
 
@@ -327,15 +382,13 @@ class LeaveRecordController extends Controller
      */
     public function getPositions()
     {
-        $positions = Position::withCount('leaveRecords as leave_count')
-            ->orderBy('name')
-            ->get()
-            ->map(function($p) {
-                return [
-                    'position' => $p->name,
-                    'leave_count' => $p->leave_count
-                ];
-            });
+        $positions = LeaveRecord::whereNotNull('position')
+            ->where('position', '!=', '')
+            ->select('position')
+            ->selectRaw('COUNT(*) as leave_count')
+            ->groupBy('position')
+            ->orderBy('position')
+            ->get();
             
         return response()->json($positions);
     }
@@ -347,6 +400,8 @@ class LeaveRecordController extends Controller
     {
         $position = $request->input('position');
         $query = LeaveRecord::where('position', $position);
+
+
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
@@ -361,15 +416,23 @@ class LeaveRecordController extends Controller
      */
     public function getLeaveTypes()
     {
+        // For leave types, we use the LeaveType directory to know which types to count
+        // but we only return those with count > 0.
+        // Also support multi-type records by searching with 'like'.
         $types = LeaveType::orderBy('name')->get();
         
         $results = $types->map(function($t) {
             $count = LeaveRecord::where('type_of_leave', 'like', '%' . $t->name . '%')->count();
+            
             return [
                 'type_of_leave' => $t->name,
                 'leave_count' => $count
             ];
-        });
+        })
+        ->filter(function($t) {
+            return $t['leave_count'] > 0;
+        })
+        ->values();
             
         return response()->json($results);
     }
@@ -381,6 +444,8 @@ class LeaveRecordController extends Controller
     {
         $type = $request->input('type');
         $query = LeaveRecord::where('type_of_leave', 'like', '%' . $type . '%');
+
+
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
@@ -395,11 +460,18 @@ class LeaveRecordController extends Controller
      */
     public function getRemarksList()
     {
-        $remarks = Remark::all();
+        // Get unique remarks directly from LeaveRecord table
+        $remarks = LeaveRecord::whereNotNull('remarks')
+            ->where('remarks', '!=', '')
+            ->select('remarks')
+            ->selectRaw('COUNT(*) as leave_count')
+            ->groupBy('remarks')
+            ->get();
+
         $resultsGrouped = [];
         
         foreach ($remarks as $r) {
-            $name = $r->name;
+            $name = $r->remarks;
             $key = $name;
             
             // Normalize W/O to Without Pay for grouping
@@ -407,19 +479,16 @@ class LeaveRecordController extends Controller
                 $key = 'Without Pay';
             }
             
-            $count = LeaveRecord::where('remarks', $name)->count();
-            
             if (isset($resultsGrouped[$key])) {
-                $resultsGrouped[$key]['leave_count'] += $count;
+                $resultsGrouped[$key]['leave_count'] += $r->leave_count;
             } else {
                 $resultsGrouped[$key] = [
                     'remarks' => $key,
-                    'leave_count' => $count
+                    'leave_count' => $r->leave_count
                 ];
             }
         }
         
-        // Return sorted by name
         $final = array_values($resultsGrouped);
         usort($final, function($a, $b) { return strcmp($a['remarks'], $b['remarks']); });
         
@@ -433,6 +502,8 @@ class LeaveRecordController extends Controller
     {
         $remark = $request->input('remark');
         $query = LeaveRecord::query();
+
+
 
         if (strtolower($remark) === 'without pay') {
             $query->whereIn('remarks', ['Without Pay', 'W/O', 'w/o', 'WITHOUT PAY']);
@@ -469,6 +540,10 @@ class LeaveRecordController extends Controller
             'incharge' => 'nullable|string|max:255',
         ]);
 
+        if (isset($validated['forwarded'])) {
+            $validated['forwarded'] = trim(explode(' - ', $validated['forwarded'])[0]);
+        }
+
         $record->update($validated);
         
         // Also update the matching record in employees table if it was newly added 
@@ -479,6 +554,9 @@ class LeaveRecordController extends Controller
             ->update($validated);
 
         $this->syncDirectories($record);
+
+        // Log action
+        AuditLog::logAction('Updated leave record', $record, 'Employee: ' . $record->name);
 
         return response()->json([
             'success' => true,
@@ -501,6 +579,9 @@ class LeaveRecordController extends Controller
             
         $record->delete();
 
+        // Log action
+        AuditLog::logAction('Deleted leave record', $record, 'ID: ' . $id . ', Employee: ' . $record->name);
+
         return response()->json([
             'success' => true,
             'message' => 'Record deleted successfully!'
@@ -508,7 +589,7 @@ class LeaveRecordController extends Controller
     }
 
     /**
-     * Get list of all incharges with stats.
+     * Get list of all incharges with stats and user profile data.
      */
     public function getIncharges()
     {
@@ -519,8 +600,33 @@ class LeaveRecordController extends Controller
             ->groupBy('incharge')
             ->orderBy('incharge')
             ->get();
-            
-        return response()->json($incharges);
+
+        // Try to match incharge names to user accounts for profile/cover images
+        $users = \App\Models\User::all();
+        $userMap = [];
+        foreach ($users as $u) {
+            $fullName = trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? ''));
+            if ($fullName) $userMap[strtolower($fullName)] = $u;
+            if ($u->name) $userMap[strtolower($u->name)] = $u;
+            if ($u->username) $userMap[strtolower($u->username)] = $u;
+        }
+
+        $result = $incharges->map(function ($item) use ($userMap) {
+            $key = strtolower(trim($item->incharge));
+            $user = $userMap[$key] ?? null;
+            $item->profile_image = $user ? $user->profile_image : null;
+            $item->cover_image = $user ? $user->cover_image : null;
+            $item->position = $user ? $user->position : null;
+            $item->profile_offset_x = $user ? $user->profile_offset_x : 0;
+            $item->profile_offset_y = $user ? $user->profile_offset_y : 0;
+            $item->profile_zoom = $user ? $user->profile_zoom : 1.0;
+            $item->cover_offset_x = $user ? $user->cover_offset_x : 50;
+            $item->cover_offset_y = $user ? $user->cover_offset_y : 50;
+            $item->cover_zoom = $user ? $user->cover_zoom : 1.0;
+            return $item;
+        });
+
+        return response()->json($result);
     }
 
     /**
@@ -531,12 +637,136 @@ class LeaveRecordController extends Controller
         $incharge = $request->input('incharge');
         $query = LeaveRecord::where('incharge', $incharge);
 
+
+
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
         }
 
         $records = $query->orderBy('created_at', 'asc')->get();
         return response()->json($records);
+    }
+
+    /**
+     * Get statistics for the dashboard.
+     */
+    public function getDashboardStats()
+    {
+        $user = auth()->user();
+        $isUser = $user && $user->role !== 'admin';
+        
+        $query = LeaveRecord::query();
+        if ($isUser) {
+            $query->where('user_id', $user->id);
+        }
+
+        return response()->json([
+            'total_records' => (clone $query)->count(),
+            'total_employees' => (clone $query)->whereNotNull('name')->where('name', '!=', '')->distinct()->count('name'),
+            'total_schools' => (clone $query)->whereNotNull('school')->where('school', '!=', '')->distinct()->count('school'),
+            'total_positions' => (clone $query)->whereNotNull('position')->where('position', '!=', '')->distinct()->count('position'),
+            'unprocessed' => (clone $query)->where('is_processed', false)->count(),
+            'total_remarks' => (clone $query)->whereNotNull('remarks')->where('remarks', '!=', '')->distinct()->count('remarks'),
+            'total_types_of_leave' => LeaveType::count(), // Leave types are global
+            'processed' => (clone $query)->where('is_processed', true)->count(),
+            'today_records' => (clone $query)->whereDate('created_at', now()->toDateString())->count(),
+        ]);
+    }
+
+    /**
+     * Get record counts per incharge for a specific period.
+     */
+    public function getInchargeStats(Request $request)
+    {
+        $user = auth()->user();
+        $isUser = $user && $user->role !== 'admin';
+        $period = $request->query('period', 'day');
+        
+        $query = LeaveRecord::select('incharge')
+            ->selectRaw('COUNT(*) as total_count')
+            ->whereNotNull('incharge')
+            ->where('incharge', '!=', '')
+            ->where('incharge', '!=', '-')
+            ->groupBy('incharge')
+            ->orderBy('total_count', 'desc');
+
+        if ($isUser) {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($period === 'day') {
+            $query->whereDate('created_at', now()->toDateString());
+        } elseif ($period === 'month') {
+            $query->whereMonth('created_at', now()->month)
+                  ->whereYear('created_at', now()->year);
+        } elseif ($period === 'year') {
+            $query->whereYear('created_at', now()->year);
+        }
+
+        return response()->json($query->get());
+    }
+
+    /**
+     * Get module usage stats for bubble chart.
+     */
+    public function getModuleUsageStats(Request $request)
+    {
+        $user = auth()->user();
+        $period = $request->query('period', 'day');
+        
+        $query = AuditLog::select('action');
+
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($period === 'day') {
+            $query->whereDate('created_at', now()->toDateString());
+            $query->selectRaw('HOUR(created_at) as time_key');
+        } elseif ($period === 'month') {
+            $query->whereMonth('created_at', now()->month)
+                  ->whereYear('created_at', now()->year);
+            $query->selectRaw('DAY(created_at) as time_key');
+        } else { // year
+            $query->whereYear('created_at', now()->year);
+            $query->selectRaw('MONTH(created_at) as time_key');
+        }
+
+        $stats = $query->selectRaw('COUNT(*) as total')
+            ->groupBy('action', 'time_key')
+            ->get();
+
+        return response()->json($stats);
+    }
+
+    /**
+     * Get remark stats for pie chart.
+     */
+    public function getRemarkStats(Request $request)
+    {
+        $user = auth()->user();
+        $isUser = $user && $user->role !== 'admin';
+        $period = $request->query('period', 'day');
+        
+        $query = LeaveRecord::select('remarks')
+            ->selectRaw('COUNT(*) as total')
+            ->whereIn('remarks', ['With Pay', 'Without Pay', 'With Pay & Without Pay'])
+            ->groupBy('remarks');
+
+        if ($isUser) {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($period === 'day') {
+            $query->whereDate('created_at', now()->toDateString());
+        } elseif ($period === 'month') {
+            $query->whereMonth('created_at', now()->month)
+                  ->whereYear('created_at', now()->year);
+        } else { // year
+            $query->whereYear('created_at', now()->year);
+        }
+
+        return response()->json($query->get());
     }
     /**
      * Store multiple leave records from Excel import.
@@ -585,6 +815,10 @@ class LeaveRecordController extends Controller
             }
             $lastForwarded = $forwardedValue;
 
+            if ($forwardedValue) {
+                $forwardedValue = trim(explode(' - ', $forwardedValue)[0]);
+            }
+
             $record = LeaveRecord::create([
                 'name' => $data['name'],
                 'forwarded' => $forwardedValue,
@@ -597,10 +831,12 @@ class LeaveRecordController extends Controller
                     ? date('Y-m-d', strtotime($data['date_of_action'])) 
                     : null,
                 'deduction_remarks' => $data['deduction_remarks'] ?? '-',
-                'incharge' => $data['incharge'] ?? '-',
-                'batch_id' => $currentBatch,
-                'is_processed' => $isFromLeaveRecords,
-            ]);
+                'incharge' => auth()->user()->username ?? auth()->user()->name ?? auth()->user()->email ?? '-',
+            'batch_id' => $currentBatch,
+            'is_processed' => $isFromLeaveRecords,
+            'processed_at' => $isFromLeaveRecords ? now() : null,
+            'user_id' => auth()->id(),
+        ]);
 
             // Also save to employees table
             Employee::create([
@@ -613,12 +849,16 @@ class LeaveRecordController extends Controller
                 'remarks' => $record->remarks,
                 'date_of_action' => $record->date_of_action,
                 'deduction_remarks' => $record->deduction_remarks,
-                'incharge' => $record->incharge,
+                'incharge' => auth()->user()->username ?? auth()->user()->name ?? auth()->user()->email ?? '-',
+                'user_id' => auth()->id(),
             ]);
 
             $this->syncDirectories($record);
             $savedCount++;
         }
+
+        // Log action
+        AuditLog::logAction('Bulk imported ' . $savedCount . ' records', null, 'Total: ' . $savedCount);
 
         return response()->json([
             'success' => true,

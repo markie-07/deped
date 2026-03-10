@@ -20,7 +20,14 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'markjamesp11770@gmail.com'],
             [
-                'name' => 'Mark James',
+                'name' => 'Mark James Gabriel Pisngot',
+                'username' => 'Mark',
+                'first_name' => 'Mark James',
+                'last_name' => 'Pisngot',
+                'middle_name' => 'Gabriel',
+                'position' => 'ADMIN',
+                'role' => 'admin',
+                'is_active' => true,
                 'email' => 'markjamesp11770@gmail.com',
                 'password' => Hash::make('deped123'),
                 'email_verified_at' => now(),

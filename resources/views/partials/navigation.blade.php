@@ -17,11 +17,15 @@
                         'position' => 'Position',
                         'types-of-leave' => 'Types of Leave',
                         'remarks' => 'Remarks',
+                        'leave-records' => 'Leave Records',
                         'leave-records-registry' => 'Leave Records',
                         'incharge' => 'Incharge Registry',
+                        'profile' => 'Profile',
                     ];
                     $currentPath = request()->path();
-                    $pageTitle = $titles[$currentPath] ?? ucfirst($currentPath);
+                    // Strip prefix like 'admin/' or 'user/'
+                    $cleanPath = preg_replace('/^(admin|user)\//', '', $currentPath);
+                    $pageTitle = $titles[$cleanPath] ?? ucfirst($cleanPath);
                 @endphp
                 {{ $pageTitle }}
             </h1>
@@ -34,10 +38,12 @@
                         'position' => 'Manage positions and designations',
                         'types-of-leave' => 'Manage leave types and categories',
                         'remarks' => 'Manage remarks and notes',
+                        'leave-records' => 'Complete registry of all leave records',
                         'leave-records-registry' => 'Complete registry of all leave records',
                         'incharge' => 'Manage and view incharges and their recorded activities',
+                        'profile' => 'Manage your account settings',
                     ];
-                    $pageSubtitle = $subtitles[$currentPath] ?? '';
+                    $pageSubtitle = $subtitles[$cleanPath] ?? '';
                 @endphp
                 {{ $pageSubtitle }}
             </p>
@@ -53,6 +59,18 @@
             <input type="text" placeholder="Search..." />
         </div>
 
+        <!-- Dark mode toggle -->
+        <div class="navbar-icon-btn" id="darkModeToggle" title="Toggle Appearance">
+            <!-- Moon svg -->
+            <svg id="moonIcon" class="dm-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+            </svg>
+            <!-- Sun svg -->
+            <svg id="sunIcon" class="dm-icon" style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21m8.966-8.966h-2.25M5.284 12.034H3.034m15.364 6.364l-1.591-1.591M6.716 6.716L5.125 5.125m12.159 0l-1.591 1.591M6.716 17.284l-1.591 1.591M12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" />
+            </svg>
+        </div>
+
         <!-- Notification Bell -->
         <div class="navbar-icon-btn" title="Notifications">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -63,12 +81,16 @@
 
         <!-- User Dropdown -->
         <div class="navbar-user" id="navbarUserBtn">
-            <div class="navbar-user-avatar">
-                {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
-            </div>
+            @if(Auth::user() && Auth::user()->profile_image)
+                <img src="/storage/{{ Auth::user()->profile_image }}" class="navbar-user-avatar" style="object-fit: cover;">
+            @else
+                <div class="navbar-user-avatar">
+                    {{ Auth::user() ? strtoupper(substr(Auth::user()->username ?? Auth::user()->name ?? 'G', 0, 1)) : 'G' }}
+                </div>
+            @endif
             <div class="navbar-user-info">
-                <span class="navbar-user-name">{{ Auth::user()->name ?? 'User' }}</span>
-                <span class="navbar-user-role">Administrator</span>
+                <span class="navbar-user-name">{{ Auth::user() ? (Auth::user()->username ?? Auth::user()->name) : 'Guest' }}</span>
+                <span class="navbar-user-role">{{ Auth::user() ? (Auth::user()->position ?? 'User') : 'Guest' }}</span>
             </div>
             <svg class="navbar-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -76,7 +98,7 @@
 
             <!-- Dropdown Menu -->
             <div class="navbar-dropdown" id="navbarDropdown">
-                <a href="/dashboard" class="dropdown-item">
+                <a href="{{ (auth()->user() && auth()->user()->role === 'admin') ? '/admin/profile' : '/user/profile' }}" class="dropdown-item">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                     </svg>
@@ -380,20 +402,212 @@
         color: #dc2626;
     }
 
-    /* ── Responsive ── */
-    @media (max-width: 768px) {
-        .top-navbar {
-            padding: 0.75rem 1rem;
-        }
-
-        .navbar-search {
-            display: none;
-        }
-
-        .navbar-user-info {
-            display: none;
-        }
+    /* ── HYPER-MODERN DARK MODE SYSTEM ── */
+    :root {
+        --body-bg: #f8fafc;
+        --tile-bg: #ffffff;
+        --tile-border: #e2e8f0;
+        --nav-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --accent: #6366f1;
     }
+
+    body.dark-mode {
+        --body-bg: #020617; /* Deepest Indigo Slate */
+        --tile-bg: rgba(15, 23, 42, 0.8);
+        --tile-border: rgba(30, 41, 59, 0.5);
+        --nav-bg: rgba(15, 23, 42, 0.9);
+        --text-main: #f1f5f9;
+        --text-muted: #64748b;
+        --accent: #818cf8;
+    }
+
+    body.dark-mode { background-color: var(--body-bg) !important; color: var(--text-main); transition: background-color 0.3s ease; }
+
+    /* Top Navigation */
+    body.dark-mode .top-navbar { 
+        background: var(--nav-bg) !important; 
+        backdrop-filter: blur(12px); 
+        border-bottom: 1px solid var(--tile-border); 
+    }
+    body.dark-mode .page-title { color: #fff; text-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+    body.dark-mode .navbar-user:hover { background: rgba(30, 41, 59, 0.5); }
+    body.dark-mode .navbar-user-name { color: #fff; }
+    body.dark-mode .navbar-search { background: rgba(30, 41, 59, 0.5); border-color: var(--tile-border); }
+    body.dark-mode .navbar-search input { color: #fff; }
+    body.dark-mode .navbar-icon-btn, body.dark-mode .navbar-toggle { background: rgba(30, 41, 59, 0.5); border-color: var(--tile-border); color: #94a3b8; }
+    body.dark-mode .navbar-icon-btn:hover, body.dark-mode .navbar-toggle:hover { background: var(--accent); color: #fff; }
+
+    /* Sidebar */
+    body.dark-mode .sidebar { background: #0f172a !important; border-right: none !important; }
+    body.dark-mode .sidebar-header { border-bottom-color: rgba(30, 41, 59, 0.5); border-right: none; }
+    body.dark-mode .sidebar-brand .brand-name { color: #f1f5f9; }
+    body.dark-mode .sidebar-profile .profile-name { color: #fff; }
+    body.dark-mode .nav-link { color: #64748b; }
+    body.dark-mode .nav-link:hover { color: #fff; }
+    body.dark-mode .nav-text { color: #cbd5e1 !important; opacity: 1 !important; visibility: visible !important; }
+    body.dark-mode .nav-list-item.active .nav-text { color: #fff !important; font-weight: 800; }
+    
+    /* CURVE OUTSIDE FIX */
+    body.dark-mode .nav-list-item.active { background: #020617 !important; }
+    body.dark-mode .nav-list-item.active b { background: #020617 !important; display: block !important; }
+    body.dark-mode .nav-list-item.active b::before { background: #0f172a !important; }
+    
+    body.dark-mode .nav-list-item.active .nav-icon { background: #6366f1 !important; border-color: #020617 !important; box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+
+    /* Main Content & Dashboard Elements */
+    body.dark-mode .main-content { background: var(--body-bg) !important; }
+    body.dark-mode .tile, 
+    body.dark-mode .stat-mini, 
+    body.dark-mode .hero-banner { 
+        background: var(--tile-bg) !important; 
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--tile-border); 
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.6); 
+    }
+
+    /* Hero Banner */
+    body.dark-mode .hero-dots { background-image: radial-gradient(circle, #334155 1px, transparent 1px); opacity: 0.3; }
+    body.dark-mode .hero-title { color: #fff; }
+    body.dark-mode .hero-desc { color: #94a3b8; }
+    body.dark-mode .hero-right { 
+        background: linear-gradient(145deg, #1e1b4b 0%, #020617 100%); 
+        border-left: 1px solid var(--tile-border); 
+    }
+    body.dark-mode .hcc-label { color: var(--accent); }
+    body.dark-mode .hcc-time, body.dark-mode .hcc-secs { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+    body.dark-mode .hcc-date { color: var(--accent); }
+    body.dark-mode .hero-tag { background: rgba(99, 102, 241, 0.15); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
+    
+    /* Hero Meta Items (Total Records etc) */
+    body.dark-mode .hmi-num { color: #fff !important; }
+    body.dark-mode .hmi-label { color: #94a3b8 !important; }
+    body.dark-mode .hmi-icon { background: rgba(30, 41, 59, 0.5); }
+    body.dark-mode .hero-meta-divider { background: var(--tile-border); }
+
+    /* Stats & Labels Readability */
+    body.dark-mode .sm-num { color: #fff; }
+    body.dark-mode .sm-label { color: #94a3b8; font-weight: 600; }
+    body.dark-mode .stat-indigo { background: rgba(30, 41, 59, 0.4) !important; border-color: rgba(99, 102, 241, 0.2); }
+    body.dark-mode .stat-indigo .sm-icon { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
+    body.dark-mode .stat-emerald { background: rgba(6, 78, 59, 0.2) !important; border-color: rgba(52, 211, 153, 0.2); }
+    body.dark-mode .stat-emerald .sm-icon { background: rgba(5, 150, 105, 0.1); color: #34d399; }
+    body.dark-mode .stat-amber { background: rgba(69, 26, 3, 0.2) !important; border-color: rgba(251, 191, 36, 0.2); }
+    body.dark-mode .stat-amber .sm-icon { background: rgba(217, 119, 6, 0.1); color: #fbbf24; }
+    body.dark-mode .stat-rose { background: rgba(76, 5, 25, 0.2) !important; border-color: rgba(251, 113, 133, 0.2); }
+    body.dark-mode .stat-rose .sm-icon { background: rgba(225, 29, 72, 0.1); color: #fb7185; }
+    body.dark-mode .stat-purple { background: rgba(59, 7, 100, 0.2) !important; border-color: rgba(192, 132, 252, 0.2); }
+    body.dark-mode .stat-purple .sm-icon { background: rgba(147, 51, 234, 0.1); color: #c084fc; }
+    
+    /* ── Activity Timeline Dark Mode ── */
+    body.dark-mode .au-head .tc-title, body.dark-mode .au-head .tc-sub { color: #fff; }
+    body.dark-mode .au-act { color: #e2e8f0; }
+    body.dark-mode .au-act b { color: #818cf8; font-weight: 800; }
+    body.dark-mode .au-det { color: #94a3b8; }
+    body.dark-mode .au-tm { color: var(--accent); font-weight: 800; }
+    body.dark-mode .au-tm-full { color: #64748b; }
+    body.dark-mode .au-empty { color: #475569; }
+
+    /* Timeline Line */
+    body.dark-mode .au-timeline::before { 
+        background: linear-gradient(to bottom, rgba(99,102,241,0.3), rgba(30,41,59,0.5), transparent) !important; 
+    }
+
+    /* Timeline Entry Hover */
+    body.dark-mode .au-entry:hover { background: rgba(255, 255, 255, 0.03); border-radius: 12px; }
+
+    /* Timeline Dots - Glowing */
+    body.dark-mode .au-entry::before { border-color: #0f172a; box-shadow: 0 0 0 2px #1e293b; }
+    body.dark-mode .au-entry.e-login::before { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+    body.dark-mode .au-entry.e-create::before { background: #6366f1; box-shadow: 0 0 8px rgba(99, 102, 241, 0.5); }
+    body.dark-mode .au-entry.e-update::before { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
+    body.dark-mode .au-entry.e-delete::before { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+    body.dark-mode .au-entry.e-bulk::before { background: #8b5cf6; box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); }
+
+    /* Timeline Tags - Deep Tint */
+    body.dark-mode .t-login { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+    body.dark-mode .t-create { background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); }
+    body.dark-mode .t-update { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
+    body.dark-mode .t-delete { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+    body.dark-mode .t-bulk { background: rgba(139, 92, 246, 0.12); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.25); }
+
+    /* Timeline Avatar */
+    body.dark-mode .au-av img { border-color: #1e293b; }
+
+    /* Live Badge */
+    body.dark-mode .au-live { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #34d399; }
+    body.dark-mode .au-btn-list { background: #0f172a; border-color: #334155; color: #94a3b8; }
+    body.dark-mode .au-btn-list:hover { background: #1e293b; border-color: var(--accent); color: var(--accent); }
+
+    /* Chart Labels */
+    body.dark-mode .tc-title { color: #fff; }
+    body.dark-mode .tc-sub { color: #94a3b8; }
+
+    /* Quick Actions visibility fix */
+    body.dark-mode .ta-title { color: #fff; }
+    body.dark-mode .ta-btn { background: #0f172a !important; border-color: #1f2937 !important; }
+    body.dark-mode .ta-btn span { color: #cbd5e1 !important; font-weight: 700; }
+    body.dark-mode .ta-btn:hover { background: #1e293b !important; border-color: var(--accent) !important; transform: translateY(-3px) !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5) !important; }
+    body.dark-mode .ta-btn:hover span { color: #fff !important; }
+    body.dark-mode .ta-ico { background: rgba(30, 41, 59, 0.5) !important; border-color: #334155 !important; }
+    body.dark-mode .ta-btn:hover .ta-ico { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
+    body.dark-mode .tc-pill { background: #1f2937; border-color: #374151; color: #94a3b8; }
+    body.dark-mode .tc-pill.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+    /* Inputs & Forms (Modals etc) */
+    body.dark-mode .act-filter-select, 
+    body.dark-mode .act-filter-input { 
+        background: #0f172a !important; 
+        border-color: #334155 !important; 
+        color: #fff !important; 
+    }
+    body.dark-mode .act-filter-select option { background: #0f172a; color: #fff; }
+
+    /* Chart Pills / Filter Rows */
+    body.dark-mode .tc-pills { background: #0f172a; border-color: #334155; }
+    body.dark-mode .tc-pill { color: #94a3b8 !important; }
+    body.dark-mode .tc-pill:hover:not(.active) { background: #1e293b; color: #fff; }
+    body.dark-mode .tc-pill.active { background: var(--accent); color: #fff !important; }
+
+    /* Chart Titles & Text */
+    body.dark-mode .tc-title { color: #fff; }
+    body.dark-mode .tc-sub { color: #94a3b8; }
+
+    /* Native Date Picker Theme Support */
+    body.dark-mode input[type="date"],
+    body.dark-mode .act-filter-input {
+        color-scheme: dark;
+    }
+    body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+    body.dark-mode .act-filter-input::-webkit-calendar-picker-indicator {
+        filter: brightness(0) invert(1) !important;
+        cursor: pointer;
+    }
+
+    /* Target the SVG icons inside date wrappers used across various pages */
+    body.dark-mode .pf-date-wrap svg,
+    body.dark-mode .modal-date-wrapper svg,
+    body.dark-mode .date-wrap svg,
+    body.dark-mode .filter-input-wrap.date-wrap svg {
+        color: #fff !important;
+    }
+
+    /* Modals */
+    body.dark-mode .modal-container { background: #111827; border-color: #1f2937; }
+    body.dark-mode .modal-header { background: #111827; border-bottom-color: #1f2937; }
+    body.dark-mode .modal-title { color: #fff; }
+    body.dark-mode .modal-icon-box { background: #1e1b4b; color: #818cf8; }
+    body.dark-mode .modal-body { background: #111827; }
+    body.dark-mode .modal-footer { background: #111827; border-top-color: #1f2937; }
+
+    /* Scrollbars */
+    body.dark-mode *::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    body.dark-mode *::-webkit-scrollbar-track { background: transparent; }
+
+    /* Icons animation */
+    .dm-icon { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .navbar-icon-btn:hover .dm-icon { transform: rotate(45deg) scale(1.1); }
 </style>
 
 <script>
@@ -415,6 +629,68 @@
             }
         }
 
+        // Dark Mode Logic
+        const dmToggle = document.getElementById('darkModeToggle');
+        const sun = document.getElementById('sunIcon');
+        const moon = document.getElementById('moonIcon');
+        const body = document.body;
+
+        function updateThemeIcons(isDark) {
+            if (isDark) {
+                sun.style.display = 'block';
+                moon.style.display = 'none';
+            } else {
+                sun.style.display = 'none';
+                moon.style.display = 'block';
+            }
+        }
+
+        // Apply saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            updateThemeIcons(true);
+        }
+
+        if (dmToggle) {
+            dmToggle.addEventListener('click', () => {
+                const isDark = body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateThemeIcons(isDark);
+                
+                // If Chart.js exists, update it for dark mode
+                if (window.Chart) {
+                    Chart.helpers.each(Chart.instances, function(instance) {
+                        const isDarkNow = body.classList.contains('dark-mode');
+                        const gridColor = isDarkNow ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                        const textColor = isDarkNow ? '#94a3b8' : '#64748b';
+                        const tickColor = isDarkNow ? '#94a3b8' : '#475569';
+                        
+                        // Global defaults
+                        Chart.defaults.color = textColor;
+                        
+                        if (instance.options.scales) {
+                            if (instance.options.scales.x) {
+                                if(instance.options.scales.x.grid) instance.options.scales.x.grid.color = gridColor;
+                                if(instance.options.scales.x.ticks) instance.options.scales.x.ticks.color = tickColor;
+                            }
+                            if (instance.options.scales.y) {
+                                if(instance.options.scales.y.grid) instance.options.scales.y.grid.color = gridColor;
+                                if(instance.options.scales.y.ticks) instance.options.scales.y.ticks.color = tickColor;
+                            }
+                        }
+                        
+                        // Update Legend labels color
+                        if (instance.options.plugins && instance.options.plugins.legend) {
+                            instance.options.plugins.legend.labels.color = textColor;
+                        }
+                        
+                        instance.update();
+                    });
+                }
+            });
+        }
+
         // User dropdown
         const userBtn = document.getElementById('navbarUserBtn');
 
@@ -428,5 +704,26 @@
                 userBtn.classList.remove('open');
             });
         }
+
+        // Global Fetch Interceptor to handle deactivation (403)
+        const originalFetch = window.fetch;
+        window.fetch = async function() {
+            try {
+                const response = await originalFetch.apply(this, arguments);
+                if (response.status === 401 || response.status === 403) {
+                    // Check if it's a deactivation message
+                    const clone = response.clone();
+                    try {
+                        const data = await clone.json();
+                        if (data.message && data.message.toLowerCase().includes('deactivated')) {
+                            window.location.reload(); // Reload will trigger the middleware redirect
+                        }
+                    } catch(e) {}
+                }
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        };
     });
 </script>

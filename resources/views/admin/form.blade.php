@@ -234,8 +234,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group">
+                                <div class="form-group full-width">
                                     <label class="form-label" for="deductionRemarks">Deduction Remarks</label>
                                     <div class="input-wrapper">
                                         <div class="input-icon">
@@ -246,28 +245,6 @@
                                         <input type="text" id="deductionRemarks" name="deduction_remarks" class="form-input has-icon" placeholder="Enter deduction remarks">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="inchargeInput">Incharge</label>
-                                    <div class="combobox-wrapper" id="inchargeComboWrapper">
-                                        <div class="input-wrapper">
-                                            <div class="input-icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75c-2.213 0-4.204.957-5.592 2.486m11.582 0a7.488 7.488 0 0 1-5.99 2.764c-2.213 0-4.204-.957-5.593-2.487m11.583 0a7.488 7.488 0 0 0-2.235-4.521M4.508 18.725a7.488 7.488 0 0 1 2.235-4.521M12 12.75A3.75 3.75 0 1 0 12 5.25a3.75 3.75 0 0 0 0 7.5Z" />
-                                                </svg>
-                                            </div>
-                                            <input type="text" id="inchargeInput" class="form-input has-icon" placeholder="Search or type incharge name" autocomplete="off">
-                                            <span class="ghost-text" id="inchargeGhost"></span>
-                                            <input type="hidden" id="incharge" name="incharge">
-                                            <button type="button" class="combobox-toggle" data-target="inchargeDropdown" tabindex="-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div class="combobox-dropdown" id="inchargeDropdown"></div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Action Buttons -->
@@ -1123,6 +1100,17 @@
         top: 44px;
         z-index: 30;
     }
+
+    .batch-header-row {
+        background: #fff !important;
+    }
+    .batch-header-row:hover {
+        background: #fff !important;
+    }
+    .batch-header-row td {
+        padding: 0 !important;
+        border: none !important;
+    }
     .forwarded-header-content {
         display: inline-flex;
         align-items: center;
@@ -1419,6 +1407,156 @@
     .printing-mode .forwarded-select-all {
         display: flex !important;
     }
+
+    /* ══════════════════════════════════════════
+       DARK MODE — FORM PAGE
+       ══════════════════════════════════════════ */
+
+    /* Form Card */
+    body.dark-mode .form-card {
+        background: #0f172a;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        border: 1px solid #1e293b;
+    }
+
+    /* Form Header */
+    body.dark-mode .form-card-header {
+        background: linear-gradient(135deg, rgba(30, 27, 75, 0.3) 0%, rgba(15, 23, 42, 0.5) 100%);
+        border-bottom: 1px solid #1e293b;
+    }
+    body.dark-mode .form-card-title { color: #fff; }
+    body.dark-mode .form-card-subtitle { color: #94a3b8; }
+    body.dark-mode .form-badge { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    body.dark-mode .records-counter { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
+    body.dark-mode .records-counter:hover { background: rgba(99, 102, 241, 0.2); }
+
+    /* Section Labels */
+    body.dark-mode .section-label span { color: #818cf8; }
+    body.dark-mode .section-line { background: linear-gradient(90deg, #334155, transparent) !important; }
+    body.dark-mode .section-label .section-line:last-child { background: linear-gradient(90deg, transparent, #334155) !important; }
+
+    /* Form Labels */
+    body.dark-mode .form-label { color: #cbd5e1; }
+
+    /* Form Inputs — visible white lines */
+    body.dark-mode .form-input {
+        background: #111827 !important;
+        border: 1.5px solid #475569 !important;
+        color: #f1f5f9 !important;
+    }
+    body.dark-mode .form-input::placeholder { color: #64748b !important; }
+    body.dark-mode .form-input:hover { border-color: #64748b !important; background: #1e293b !important; }
+    body.dark-mode .form-input:focus { border-color: #818cf8 !important; background: #1e293b !important; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important; }
+    body.dark-mode .input-icon { color: #fff !important; }
+    body.dark-mode .input-wrapper:focus-within .input-icon { color: #818cf8 !important; }
+    body.dark-mode input[type="date"] { color-scheme: dark; }
+    body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator { filter: brightness(0) invert(1) !important; }
+    body.dark-mode .ghost-text { color: #475569; }
+    body.dark-mode .ghost-text .ghost-suggestion { color: #475569; }
+
+    /* Combobox */
+    body.dark-mode .combobox-toggle { color: #64748b; }
+    body.dark-mode .combobox-toggle.open { color: #818cf8; }
+    body.dark-mode .combobox-dropdown {
+        background: #111827;
+        border: 1px solid #334155;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode .combobox-option { color: #cbd5e1; }
+    body.dark-mode .combobox-option:hover,
+    body.dark-mode .combobox-option.highlighted { background: #1e293b; color: #fff; }
+    body.dark-mode .combobox-option.selected { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
+    body.dark-mode .combobox-option.add-new { color: #818cf8; border-top-color: #334155; }
+    body.dark-mode .combobox-group-label { color: #64748b; }
+    body.dark-mode .combobox-no-results { color: #64748b; }
+    body.dark-mode .combobox-dropdown::-webkit-scrollbar-thumb { background: #475569; }
+
+    /* Multi-Select Tags */
+    body.dark-mode .combobox-tag { background: rgba(99, 102, 241, 0.1); color: #818cf8; border-color: rgba(99, 102, 241, 0.3); }
+    body.dark-mode .combobox-tag:hover { background: rgba(99, 102, 241, 0.2); }
+    body.dark-mode .tag-remove { color: #64748b; }
+    body.dark-mode .tag-remove:hover { color: #f87171; }
+
+    /* Action Buttons */
+    body.dark-mode .form-actions { border-top: 1px solid #1e293b; }
+    body.dark-mode .btn-ghost { background: transparent; color: #94a3b8; border: 1.5px solid #334155; }
+    body.dark-mode .btn-ghost:hover { background: #1e293b; border-color: #475569; color: #fff; }
+
+    /* ── Modal Dark Mode ── */
+    body.dark-mode .modal-overlay { background: rgba(0, 0, 0, 0.7); }
+    body.dark-mode .modal-container { background: #0f172a; border: 1px solid #1e293b; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); }
+
+    /* Modal Header */
+    body.dark-mode .modal-header { background: #0f172a; }
+    body.dark-mode .modal-header-top { border-bottom-color: #1e293b; }
+    body.dark-mode .modal-title { color: #fff; }
+    body.dark-mode .modal-close { background: #111827; border-color: #334155; color: #94a3b8; }
+    body.dark-mode .modal-close:hover { background: rgba(239, 68, 68, 0.1); border-color: #f87171; color: #f87171; }
+
+    /* Modal Filter Bar */
+    body.dark-mode .modal-header-bottom { background: #111827; border-bottom-color: #1e293b; }
+    body.dark-mode .modal-header-bottom .filter-label { color: #94a3b8; }
+    body.dark-mode .modal-header-bottom .filter-divider { background: #334155; }
+    body.dark-mode .modal-filter-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+    body.dark-mode .modal-filter-input::placeholder { color: #64748b; }
+    body.dark-mode .modal-filter-input:focus { border-color: #6366f1; }
+    body.dark-mode .modal-filter-select { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+    body.dark-mode .modal-filter-select option { background: #0f172a; color: #f1f5f9; }
+    body.dark-mode .modal-filter-select:focus { border-color: #6366f1; }
+
+    /* Modal Search */
+    body.dark-mode .modal-search-input { background: #0f172a; border: 1px solid #334155; color: #fff; }
+    body.dark-mode .modal-search-input::placeholder { color: #64748b; }
+    body.dark-mode .modal-search-input:focus { border-color: #818cf8; }
+    body.dark-mode .modal-search-box .search-icon { color: #64748b; }
+
+    /* Table */
+    body.dark-mode .record-table th { background: #111827; color: #94a3b8; border-bottom: 1px solid #1e293b; }
+    body.dark-mode .record-table td { color: #cbd5e1; border-bottom: 1px solid #1e293b; background: #0f172a; }
+    body.dark-mode .record-table tbody tr.record-row { background: #0f172a; }
+    body.dark-mode .record-table tbody tr.record-row:hover { border-left-color: #818cf8; }
+    body.dark-mode .record-table tbody tr.record-row:hover td { background: #111827; }
+
+    /* Forwarded Headers — Colored */
+    body.dark-mode .forwarded-header { background: rgba(99, 102, 241, 0.08) !important; color: #818cf8; border-color: rgba(99, 102, 241, 0.15) !important; }
+    body.dark-mode .batch-header-row { background: #0f172a !important; }
+    body.dark-mode .batch-header-row:hover { background: #0f172a !important; }
+    body.dark-mode .forwarded-badge { background: rgba(99, 102, 241, 0.12); color: #818cf8; border-color: rgba(99, 102, 241, 0.25); }
+    body.dark-mode .forwarded-header-row:hover .forwarded-badge { background: rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc; }
+    body.dark-mode .forwarded-badge svg { color: #818cf8; }
+    body.dark-mode .forwarded-header-row:hover .forwarded-badge svg { color: #a5b4fc; }
+
+    /* Table Badges */
+    body.dark-mode .badge-leave { background: rgba(99, 102, 241, 0.1); color: #818cf8; border-color: rgba(99, 102, 241, 0.2); }
+    body.dark-mode .badge-green { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.2); }
+    body.dark-mode .badge-red { background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+    body.dark-mode .badge-yellow { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); }
+    body.dark-mode .badge-violet { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border-color: rgba(139, 92, 246, 0.2); }
+    body.dark-mode .badge-gray { background: rgba(30, 41, 59, 0.5); color: #94a3b8; border-color: #334155; }
+    body.dark-mode .forwarded-badge { background: #0f172a; color: #94a3b8; border-color: #334155; }
+
+    /* Table Action Buttons */
+    body.dark-mode .btn-action { border-color: #334155; color: #94a3b8; }
+    body.dark-mode .btn-edit { color: #34d399; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); }
+    body.dark-mode .btn-edit:hover { background: #059669; color: #fff; border-color: #059669; }
+    body.dark-mode .btn-delete { color: #f87171; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+    body.dark-mode .btn-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+    /* Modal Footer */
+    body.dark-mode .modal-footer { background: #111827; border-top-color: #1e293b; }
+    body.dark-mode .modal-footer-info { color: #94a3b8; }
+
+    /* Print/Excel Buttons */
+    body.dark-mode .btn-print.btn-gray { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+    body.dark-mode .btn-print.btn-gray:hover { background: #334155; border-color: #475569; }
+
+    /* Checkbox */
+    body.dark-mode .custom-checkbox { background: #0f172a; border-color: #334155; }
+    body.dark-mode .custom-checkbox.checked { background: #6366f1; border-color: #6366f1; }
+
+    /* Content Body */
+    body.dark-mode .content-body { background: transparent; }
+
 </style>
 
 <div class="toast" id="toast"></div>
@@ -1443,11 +1581,11 @@
         document.getElementById('leaveForm').reset();
         document.getElementById('recordId').value = '';
         if (nameCombo) nameCombo.clear();
+        if (forwardedCombo) forwardedCombo.clear();
         if (posCombo) posCombo.clear();
         if (schoolCombo) schoolCombo.clear();
         if (leaveCombo) leaveCombo.clear();
         if (remarksCombo) remarksCombo.clear();
-        if (inchargeCombo) inchargeCombo.clear();
         setTodayDate();
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = `
@@ -1487,6 +1625,14 @@
             </svg>
             Saving...
         `;
+        
+        // Sync all comboboxes to ensure typed values are captured
+        if (nameCombo) nameCombo.sync();
+        if (forwardedCombo) forwardedCombo.sync();
+        if (posCombo) posCombo.sync();
+        if (schoolCombo) schoolCombo.sync();
+        if (leaveCombo) leaveCombo.sync();
+        if (remarksCombo) remarksCombo.sync();
 
         const record = {
             name: document.getElementById('employeeName').value,
@@ -1498,13 +1644,12 @@
             remarks: document.getElementById('remarks').value,
             date_of_action: document.getElementById('dateOfAction').value,
             deduction_remarks: document.getElementById('deductionRemarks').value,
-            incharge: document.getElementById('incharge').value,
         };
 
-        // If adding from Leave Records page, include batch/source info
-        if (presetBatch && presetSource) {
-            record.target_batch = presetBatch;
+        // If coming from Leave Records page, include batch/source info
+        if (presetSource) {
             record.source = presetSource;
+            if (presetBatch) record.target_batch = presetBatch;
         }
 
         const recordId = document.getElementById('recordId').value;
@@ -1520,8 +1665,21 @@
             },
             body: JSON.stringify(record),
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(async res => {
+            const data = await res.json();
+            if (res.status === 422) {
+                const errors = data.errors || {};
+                const firstError = Object.values(errors)[0];
+                showToast(firstError ? firstError[0] : 'Validation failed', 'error');
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    Save Record
+                `;
+                return;
+            }
             if (data.success) {
                 showToast(data.message);
                 updateRecordCount();
@@ -1793,10 +1951,10 @@
 
         return {
             updateItems: function(newItems) {
-                allItems = [...newItems];
+                allItems = Array.isArray(newItems) ? [...newItems] : [];
             },
             updateGroupedItems: function(newGroups) {
-                groupedItems = newGroups;
+                groupedItems = newGroups && typeof newGroups === 'object' ? newGroups : {};
                 flattenItems();
             },
             clear: function() {
@@ -1814,16 +1972,32 @@
                     input.value = val || '';
                     hidden.value = val || '';
                 }
+            },
+            // Ensure any typed but un-entered value is captured
+            sync: function() {
+                if (input.value.trim() !== '') {
+                    const val = input.value.trim();
+                    if (isMulti) {
+                        if (!selectedValues.includes(val)) {
+                            selectedValues.push(val);
+                            updateTags();
+                            hidden.value = selectedValues.join(', ');
+                        }
+                        input.value = '';
+                    } else {
+                        hidden.value = val;
+                    }
+                }
             }
         };
     }
 
     // ── Initialize comboboxes ──
-    let nameCombo, forwardedCombo, posCombo, schoolCombo, leaveCombo, remarksCombo, inchargeCombo;
+    let nameCombo, forwardedCombo, posCombo, schoolCombo, leaveCombo, remarksCombo;
     let employeeDataMap = {};
     let allEmployeeNames = [];
 
-    const leaveTypes = ['FL', 'SL', 'SPL', 'VL', 'SP', 'CTO', 'LC', 'CL', 'PL', 'Wellness', 'SP/SPL', 'CTO/LC', 'SL/SPL', 'FL/SL', 'FL/SPL'];
+    const leaveTypes = ['FL', 'SL', 'SPL', 'VL', 'SP', 'CTO', 'LC', 'SP/SPL', 'CL', 'PL', 'CTO/LC', 'SL/SPL', 'FL/SL', 'FL/SPL'];
     const remarksList = ['With Pay', 'Without Pay', 'With Pay & Without Pay'];
 
     function autoFillEmployee(name) {
@@ -1849,11 +2023,10 @@
         schoolCombo = initCombobox('schoolInput', 'school', 'schoolDropdown', {}, { grouped: true });
         leaveCombo = initCombobox('leaveInput', 'typeOfLeave', 'leaveDropdown', leaveTypes, { 
             multi: true, 
-            strict: true,
+            strict: false,
             tagsId: 'leaveTags' 
         });
         remarksCombo = initCombobox('remarksInput', 'remarks', 'remarksDropdown', remarksList);
-        inchargeCombo = initCombobox('inchargeInput', 'incharge', 'inchargeDropdown', []);
 
         // Load from database
         updateRecordCount();
@@ -1904,17 +2077,15 @@
                 
                 employeeDataMap = data.employee_map || {};
 
+                // Merge hardcoded leaveTypes with dynamic ones from DB
                 if (leaveCombo) {
-                    leaveCombo.updateItems(leaveTypes);
+                    const dbTypes = data.leave_types || [];
+                    const combinedTypes = [...new Set([...leaveTypes, ...dbTypes])];
+                    leaveCombo.updateItems(combinedTypes);
                 }
-
-                if (remarksCombo) {
-                    remarksCombo.updateItems(remarksList);
-                }
-
-                if (inchargeCombo) {
-                    inchargeCombo.updateItems((data.incharges || []).sort());
-                }
+                
+                // Strictly use the hardcoded list for Remarks
+                if (remarksCombo) remarksCombo.updateItems(remarksList);
             })
             .catch(() => {});
     }
@@ -2039,6 +2210,13 @@
         }
     });
 
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && recordsModal.classList.contains('open')) {
+            closeRecordsModal();
+        }
+    });
+
+
     function filterModalRecords() {
         const q = document.getElementById('modalSearch').value.toLowerCase();
         const payStatus = document.getElementById('filterPay') ? document.getElementById('filterPay').value : 'all';
@@ -2127,10 +2305,33 @@
         })
             .then(res => res.json())
             .then(data => {
-                // Sort by forwarded first
-                data.sort((a, b) => (a.forwarded || '').localeCompare(b.forwarded || ''));
-                
-                currentModalRecords = data;
+            // Group records by batch_id + incharge + forwarded
+            const grouped = {};
+            data.forEach(r => {
+                const batchId = r.batch_id || 1;
+                const incharge = r.incharge || 'System';
+                const forwarded = r.forwarded || '';
+                const groupKey = `${incharge}|${forwarded}`;
+
+                if (!grouped[batchId]) grouped[batchId] = { groupOrder: [], groups: {} };
+                if (!grouped[batchId].groups[groupKey]) {
+                    grouped[batchId].groups[groupKey] = [];
+                    grouped[batchId].groupOrder.push(groupKey);
+                }
+                grouped[batchId].groups[groupKey].push(r);
+            });
+
+            // Flatten back to sorted array preserving batch order
+            const sortedData = [];
+            const batchIds = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+            batchIds.forEach(batchId => {
+                const batch = grouped[batchId];
+                batch.groupOrder.forEach(key => {
+                    batch.groups[key].forEach(r => sortedData.push(r));
+                });
+            });
+            data = sortedData;
+            currentModalRecords = data;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
@@ -2164,29 +2365,67 @@
                 });
                 forwardedSelect.value = forwardeds.includes(currentFilter) ? currentFilter : 'all';
 
-                let html = '';
+                let lastBatchId = null;
+                let lastInchargeName = null;
                 let lastDept = null;
 
+                const uniqueLogicalBatches = [...new Set(data.map(r => `${r.batch_id || 1}|${r.incharge || ''}`))];
+                const showBatchHeaders = uniqueLogicalBatches.length > 1;
+
+                let html = '';
                 data.forEach((r, index) => {
+                    const batchId = r.batch_id || 1;
+                    const incharge = r.incharge || 'System';
                     const forwarded = r.forwarded || 'No Forwarded';
-                if (forwarded !== lastDept) {
-                    html += `
-                        <tr class="forwarded-header-row" data-forwarded="${forwarded}">
-                            <td colspan="12" class="forwarded-header">
-                                <div class="forwarded-header-content">
-                                    <div class="custom-checkbox forwarded-select-all" data-forwarded="${forwarded}" onclick="toggleForwardedSelection('${forwarded.replace(/'/g, "\\'")}', this)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                    const isProcessed = r.is_processed == 1 || r.is_processed === true;
+
+                    // Add batch separator when batch OR incharge changes
+                    if (batchId !== lastBatchId || incharge.toLowerCase().trim() !== (lastInchargeName || '').toLowerCase().trim()) {
+                        const isFirstBatch = lastBatchId === null;
+                        lastDept = null; 
+                        html += `
+                            <tr class="batch-header-row" data-batch="${batchId}">
+                                <td colspan="12" style="vertical-align: middle; padding: ${isFirstBatch ? '0' : '20px 40px'} !important; border:none; background: #fff !important;">
+                                    ${!isFirstBatch ? `
+                                    <div style="display: flex; align-items: center; gap: 20px;">
+                                        <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1); border-radius: 4px;"></div>
+                                        <div style="display: flex; gap: 6px;">
+                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
+                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc;"></div>
+                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
+                                        </div>
+                                        <div style="flex: 1; height: 2px; background: linear-gradient(90deg, #6366f1, transparent); border-radius: 4px;"></div>
                                     </div>
-                                    <div class="forwarded-badge">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                                        </svg>
-                                        <span>${forwarded}</span>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `;
+                        lastBatchId = batchId;
+                        lastInchargeName = incharge;
+                    }
+
+                    if (forwarded !== lastDept) {
+                        const prepDate = r.created_at ? formatDate(r.created_at) : '-';
+                        html += `
+                            <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}">
+                                <td colspan="12" class="forwarded-header">
+                                    <div class="forwarded-header-content">
+                                        <div class="custom-checkbox forwarded-select-all" data-forwarded="${forwarded}" onclick="toggleForwardedSelection('${forwarded.replace(/'/g, "\\'")}', this)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                        </div>
+                                        <div class="forwarded-badge">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                            </svg>
+                                            <span>${forwarded}</span>
+                                        </div>
+                                        <div class="header-date-badge" style="display: none;">
+                                            ${prepDate}
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                                </td>
+                            </tr>
+                        `;
                         lastDept = forwarded;
                     }
 
@@ -2206,16 +2445,16 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
                                 </div>
                             </td>
-                            <td style="color:#94a3b8; font-weight: 600; font-family:monospace; font-size:0.8rem;">${index + 1}</td>
-                            <td style="font-weight: 700; color:#0f172a;">${r.name}</td>
-                            <td style="font-weight: 600; font-size: 0.82rem; color: #475569;">${r.position || '-'}</td>
-                            <td style="color:#64748b; font-size: 0.85rem;">${r.school || '-'}</td>
+                            <td class="cell-index">${index + 1}</td>
+                            <td class="cell-name">${r.name}</td>
+                            <td class="cell-position">${r.position || '-'}</td>
+                            <td class="cell-school">${r.school || '-'}</td>
                             <td><span class="badge-leave">${r.type_of_leave}</span></td>
-                            <td style="font-family:monospace; font-size:0.78rem; color:#475569; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
+                            <td class="cell-meta">${r.inclusive_dates || '-'}</td>
                             <td>${remarkBadge}</td>
-                            <td style="font-family:monospace; font-size:0.8rem; color:#0f172a; font-weight:700;">${formatDate(r.date_of_action)}</td>
-                            <td style="color:#64748b; font-size: 0.82rem;">${r.deduction_remarks || '-'}</td>
-                            <td style="color:#475569; font-size: 0.85rem; font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                            <td class="cell-meta">${formatDate(r.date_of_action)}</td>
+                            <td class="cell-subtext">${r.deduction_remarks || '-'}</td>
+                            <td class="cell-incharge" style="font-style: italic;">${r.incharge || '-'}</td>
                             <td>
                                 <div style="display: flex; gap: 8px;">
                                     <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -2260,12 +2499,22 @@
         
         // For comboboxes, use setValue
         if (nameCombo) nameCombo.setValue(r.name);
-        if (forwardedCombo) forwardedCombo.setValue(r.forwarded);
+        if (forwardedCombo) forwardedCombo.setValue(r.forwarded ? r.forwarded.split(' - ')[0].trim() : '');
         if (posCombo) posCombo.setValue(r.position);
         if (schoolCombo) schoolCombo.setValue(r.school);
         if (leaveCombo) leaveCombo.setValue(r.type_of_leave);
         if (remarksCombo) remarksCombo.setValue(r.remarks);
-        if (inchargeCombo) inchargeCombo.setValue(r.incharge);
+
+        // Standard inputs
+        if (document.getElementById('inclusiveDates')) {
+            document.getElementById('inclusiveDates').value = r.inclusive_dates || '';
+        }
+        if (document.getElementById('dateOfAction')) {
+            document.getElementById('dateOfAction').value = r.date_of_action ? r.date_of_action.substring(0, 10) : '';
+        }
+        if (document.getElementById('deductionRemarks')) {
+            document.getElementById('deductionRemarks').value = r.deduction_remarks || '';
+        }
 
         // Change submit button text
         const submitBtn = document.getElementById('submitBtn');
@@ -2421,6 +2670,9 @@
                     th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; }
                     td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
                     .forwarded-header { background-color: #e2e8f0; font-weight: bold; text-align: center; }
+                    .remark-with-pay { color: #16a34a; font-weight: bold; }
+                    .remark-without-pay { color: #dc2626; font-weight: bold; }
+                    .remark-both { color: #7c3aed; font-weight: bold; }
                 </style>
             </head>
             <body>
@@ -2445,13 +2697,26 @@
         let lastDept = null;
         let counter = 1;
 
+        // Color mapping for consistent forwarded headers (matches Leave Records page)
+        const forwardedColorMap = {};
+        const pastelColors = ['#e0f2fe', '#fef2f2', '#f0fdf4', '#f5f3ff', '#fff7ed', '#ecfeff', '#fdf2f8', '#ffedd5'];
+        let nextColorIdx = 0;
+
+        function getHeaderColor(name) {
+            const clean = (name || '').trim().toLowerCase();
+            if (!forwardedColorMap[clean]) {
+                forwardedColorMap[clean] = pastelColors[nextColorIdx % pastelColors.length];
+                nextColorIdx++;
+            }
+            return forwardedColorMap[clean];
+        }
+
         // Iterate through rows in the DOM to preserve grouping and sorting
         const rows = document.querySelectorAll('#recordsTableBody tr');
         rows.forEach(row => {
             if (row.classList.contains('forwarded-header-row')) {
                 const forwardedName = row.getAttribute('data-forwarded');
                 // Check if any selected row exists under this specific forwarded header
-                // Stop at the next forwarded-header-row or batch-header-row
                 let hasSelected = false;
                 let next = row.nextElementSibling;
                 while (next && !next.classList.contains('forwarded-header-row') && !next.classList.contains('batch-header-row')) {
@@ -2464,10 +2729,26 @@
                 if (hasSelected) {
                     const dateEl = row.querySelector('.header-date-badge');
                     const groupDate = dateEl ? dateEl.textContent.trim() : '';
-                    html += `<tr><td colspan="10" class="forwarded-header">${forwardedName} ${groupDate ? '(' + groupDate + ')' : ''}</td></tr>`;
+                    const bgColor = getHeaderColor(forwardedName);
+                    // Format: Forwarded Name - mm-dd-yyyy
+                    const headerText = groupDate ? `${forwardedName} - ${groupDate}` : forwardedName;
+                    html += `<tr><td colspan="10" class="forwarded-header" style="background-color: ${bgColor};">${headerText}</td></tr>`;
                 }
+
             } else if (row.classList.contains('print-selected')) {
                 const cells = row.cells;
+                const remarksText = cells[7].textContent.trim();
+                const lowerRemarks = remarksText.toLowerCase();
+                
+                let remarkStyleClass = '';
+                if (lowerRemarks.includes('with pay') && lowerRemarks.includes('without pay')) {
+                    remarkStyleClass = 'remark-both';
+                } else if (lowerRemarks.includes('with pay') || lowerRemarks.includes('approved')) {
+                    remarkStyleClass = 'remark-with-pay';
+                } else if (lowerRemarks.includes('without pay') || lowerRemarks.includes('disapproved')) {
+                    remarkStyleClass = 'remark-without-pay';
+                }
+
                 // Note: Index 0 is selection-col, index 1 is #, index 2 is Name...
                 html += `
                     <tr>
@@ -2477,7 +2758,7 @@
                         <td>${cells[4].textContent}</td>
                         <td>${cells[5].textContent}</td>
                         <td>${cells[6].textContent}</td>
-                        <td>${cells[7].textContent}</td>
+                        <td><span class="${remarkStyleClass}">${remarksText}</span></td>
                         <td>${cells[8].textContent}</td>
                         <td>${cells[9].textContent}</td>
                         <td>${cells[10].textContent}</td>
