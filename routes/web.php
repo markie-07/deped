@@ -467,8 +467,8 @@ Route::post('/login', function (Request $request) {
         ]);
         $emailSent = false;
         try {
-            Mail::html('Verification code: ' . $otp, function ($message) use ($email) {
-                $message->to($email)->subject('Login OTP');
+            Mail::send('emails.otp', ['otp' => $otp, 'userName' => $user->name], function ($message) use ($email) {
+                $message->to($email)->subject('Login OTP - DepEd Manager');
             });
             $emailSent = true;
         } catch (\Exception $e) {
@@ -533,8 +533,8 @@ Route::post('/forgot-password', function (Request $request) {
     $resetUrl = url('/reset-password/' . $token . '?email=' . urlencode($email));
 
     try {
-        Mail::html("Hello, <br><br> You requested a password reset. Click the link below to reset your password: <br><br> <a href='{$resetUrl}'>{$resetUrl}</a> <br><br> This link will expire shortly.", function ($message) use ($email) {
-            $message->to($email)->subject('Password Reset Link');
+        Mail::send('emails.password-reset', ['resetUrl' => $resetUrl], function ($message) use ($email) {
+            $message->to($email)->subject('Password Reset Link - DepEd Manager');
         });
     } catch (\Exception $e) {
         Log::error('Forgot password email failed: ' . $e->getMessage());

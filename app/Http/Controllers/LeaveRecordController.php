@@ -93,7 +93,14 @@ class LeaveRecordController extends Controller
      */
     public function show($id)
     {
-        return response()->json(LeaveRecord::findOrFail($id));
+        $leaveRecord = LeaveRecord::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->role !== 'admin' && $leaveRecord->user_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($leaveRecord);
     }
 
     /**
@@ -325,8 +332,6 @@ class LeaveRecordController extends Controller
         $school = $request->input('school');
         $query = LeaveRecord::where('school', $school);
 
-
-
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
         }
@@ -341,9 +346,10 @@ class LeaveRecordController extends Controller
     public function getSchools() 
     {
         // Get unique schools from LeaveRecord table
-        $schools = LeaveRecord::whereNotNull('school')
-            ->where('school', '!=', '')
-            ->select('school')
+        $query = LeaveRecord::whereNotNull('school')
+            ->where('school', '!=', '');
+
+        $schools = $query->select('school')
             ->selectRaw('COUNT(*) as leave_count')
             ->groupBy('school')
             ->orderBy('school')
@@ -382,9 +388,10 @@ class LeaveRecordController extends Controller
      */
     public function getPositions()
     {
-        $positions = LeaveRecord::whereNotNull('position')
-            ->where('position', '!=', '')
-            ->select('position')
+        $query = LeaveRecord::whereNotNull('position')
+            ->where('position', '!=', '');
+
+        $positions = $query->select('position')
             ->selectRaw('COUNT(*) as leave_count')
             ->groupBy('position')
             ->orderBy('position')
@@ -400,8 +407,6 @@ class LeaveRecordController extends Controller
     {
         $position = $request->input('position');
         $query = LeaveRecord::where('position', $position);
-
-
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
@@ -422,7 +427,9 @@ class LeaveRecordController extends Controller
         $types = LeaveType::orderBy('name')->get();
         
         $results = $types->map(function($t) {
-            $count = LeaveRecord::where('type_of_leave', 'like', '%' . $t->name . '%')->count();
+            $query = LeaveRecord::where('type_of_leave', 'like', '%' . $t->name . '%');
+
+            $count = $query->count();
             
             return [
                 'type_of_leave' => $t->name,
@@ -445,8 +452,6 @@ class LeaveRecordController extends Controller
         $type = $request->input('type');
         $query = LeaveRecord::where('type_of_leave', 'like', '%' . $type . '%');
 
-
-
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);
         }
@@ -460,10 +465,10 @@ class LeaveRecordController extends Controller
      */
     public function getRemarksList()
     {
-        // Get unique remarks directly from LeaveRecord table
-        $remarks = LeaveRecord::whereNotNull('remarks')
-            ->where('remarks', '!=', '')
-            ->select('remarks')
+        $query = LeaveRecord::whereNotNull('remarks')
+            ->where('remarks', '!=', '');
+
+        $remarks = $query->select('remarks')
             ->selectRaw('COUNT(*) as leave_count')
             ->groupBy('remarks')
             ->get();
@@ -502,9 +507,6 @@ class LeaveRecordController extends Controller
     {
         $remark = $request->input('remark');
         $query = LeaveRecord::query();
-
-
-
         if (strtolower($remark) === 'without pay') {
             $query->whereIn('remarks', ['Without Pay', 'W/O', 'w/o', 'WITHOUT PAY']);
         } else {
@@ -525,6 +527,11 @@ class LeaveRecordController extends Controller
     public function update(Request $request, $id)
     {
         $record = LeaveRecord::findOrFail($id);
+        
+        // Ownership Check
+        if (auth()->user()->role !== 'admin' && $record->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. You can only edit your own records.'], 403);
+        }
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -572,6 +579,11 @@ class LeaveRecordController extends Controller
     {
         $record = LeaveRecord::findOrFail($id);
         
+        // Ownership Check
+        if (auth()->user()->role !== 'admin' && $record->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. You can only delete your own records.'], 403);
+        }
+        
         // Optionally remove from employees table too
         Employee::where('name', $record->name)
             ->where('date_of_action', $record->date_of_action)
@@ -593,9 +605,10 @@ class LeaveRecordController extends Controller
      */
     public function getIncharges()
     {
-        $incharges = LeaveRecord::whereNotNull('incharge')
-            ->where('incharge', '!=', '')
-            ->select('incharge')
+        $query = LeaveRecord::whereNotNull('incharge')
+            ->where('incharge', '!=', '');
+
+        $incharges = $query->select('incharge')
             ->selectRaw('COUNT(*) as leave_count')
             ->groupBy('incharge')
             ->orderBy('incharge')
@@ -636,8 +649,6 @@ class LeaveRecordController extends Controller
     {
         $incharge = $request->input('incharge');
         $query = LeaveRecord::where('incharge', $incharge);
-
-
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('date_of_action', $request->date);

@@ -181,15 +181,6 @@
 </div>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-        background: #fff;
-        font-family: 'Poppins', sans-serif;
-    }
-
     /* ═══════════════════════════════════════
        SIDEBAR
        ═══════════════════════════════════════ */
@@ -200,9 +191,9 @@
         bottom: 0;
         width: 70px;
         background: #f1f5f9;
-        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s ease;
         overflow: visible;
-        z-index: 100;
+        z-index: 200; 
         display: flex;
         flex-direction: column;
     }
@@ -214,7 +205,7 @@
         right: 0;
         bottom: 0;
         width: 1px;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        background: rgba(0, 0, 0, 0.05);
         z-index: 3;
         pointer-events: none;
     }
@@ -519,11 +510,9 @@
     }
 
     .sidebar:not(.active) .nav-list-item.active .nav-icon {
-        position: absolute;
-        right: -15px; /* Subtle protrusion */
-        top: 50%;
-        transform: translateY(-50%);
-        margin: 0;
+        position: relative;
+        right: 0;
+        margin: 0 auto;
         width: 48px;
         height: 48px;
         min-width: 48px;
@@ -614,24 +603,155 @@
 
     /* ── Main Content Adjustment ── */
     .main-content {
-        margin-left: 70px; /* Matched to sidebar collapsed width */
+        margin-left: 70px;
         min-height: 100vh;
         background: #fff;
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
+        padding: 0;
     }
 
     .sidebar.active ~ .main-content {
-        margin-left: 260px; /* Matched to sidebar active width */
+        margin-left: 260px;
     }
 
+    /* Content Body Padding */
     .content-body {
-        padding: 2rem 2rem 2rem 3rem !important; /* Extra left padding to clear side icon */
+        padding: 2rem 2.5rem;
+        transition: padding 0.3s ease;
     }
 
-    /* Adjust top navbar separately if needed */
-    .top-navbar {
-        transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    /* ── Mobile Logic Overlay ── */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 280px !important;
+            transform: translateX(-100%);
+        }
+        .sidebar.mobile-open {
+            transform: translateX(0);
+            box-shadow: 20px 0 50px rgba(0,0,0,0.15);
+        }
+
+        /* ── Override ALL :not(.active) centering rules for mobile-open ── */
+
+        /* Brand / Header: left-align */
+        .sidebar.mobile-open .sidebar-brand {
+            padding-left: 5px !important;
+            justify-content: flex-start !important;
+            gap: 12px !important;
+        }
+        .sidebar.mobile-open .brand-logo {
+            min-width: 44px !important;
+            width: 44px !important;
+            height: 44px !important;
+        }
+        .sidebar.mobile-open .brand-name {
+            opacity: 1 !important;
+            width: auto !important;
+            overflow: visible !important;
+        }
+
+        /* Profile */
+        .sidebar.mobile-open .sidebar-profile {
+            padding: 20px 10px 15px !important;
+        }
+        .sidebar.mobile-open .profile-avatar {
+            width: 65px !important;
+            height: 65px !important;
+            font-size: 1.4rem !important;
+            border-width: 3px !important;
+        }
+        .sidebar.mobile-open .profile-name {
+            opacity: 1 !important;
+            max-height: 30px !important;
+        }
+        .sidebar.mobile-open .profile-role {
+            opacity: 1 !important;
+            max-height: 20px !important;
+        }
+
+        /* Nav list: left-align, standard padding */
+        .sidebar.mobile-open .nav-list {
+            padding: 35px 0 35px 5px !important;
+            align-items: flex-start !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        /* Nav items: left-aligned */
+        .sidebar.mobile-open .nav-list-item {
+            justify-content: flex-start !important;
+            padding-left: 0 !important;
+        }
+
+        /* Nav link: left-aligned */
+        .sidebar.mobile-open .nav-link {
+            justify-content: flex-start !important;
+        }
+
+        /* Nav text: visible */
+        .sidebar.mobile-open .nav-text {
+            opacity: 1 !important;
+            width: auto !important;
+            padding-right: 15px !important;
+            pointer-events: auto !important;
+            overflow: visible !important;
+        }
+
+        /* Nav arrow: visible */
+        .sidebar.mobile-open .nav-arrow {
+            display: block !important;
+        }
+
+        /* Active icon: match expanded sidebar style */
+        .sidebar.mobile-open .nav-list-item.active .nav-icon {
+            position: relative !important;
+            right: auto !important;
+            margin: 6px 8px 6px 8px !important;
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+        }
+
+        /* Curved outside: works on mobile like desktop expanded */
+        .sidebar.mobile-open .nav-list-item.active b:nth-child(1),
+        .sidebar.mobile-open .nav-list-item.active b:nth-child(2) {
+            display: block !important;
+        }
+
+        /* Tooltips: hide on mobile-open since text is visible */
+        .sidebar.mobile-open .nav-list-item[data-tooltip]::after {
+            display: none !important;
+        }
+
+        /* Back button: left align */
+        .sidebar.mobile-open .nav-back-item {
+            justify-content: flex-start !important;
+        }
+        .sidebar.mobile-open .nav-back-link {
+            justify-content: flex-start !important;
+            padding: 0 20px !important;
+            gap: 12px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        /* Panel containers */
+        .sidebar.mobile-open .nav-panels-container {
+            overflow: hidden !important;
+        }
+        .sidebar.mobile-open .nav-panel {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        /* Main content: full width on mobile */
+        .main-content, .sidebar.active ~ .main-content {
+            margin-left: 0 !important;
+        }
+
+        .content-body {
+            padding: 1.25rem 1rem !important;
+        }
     }
 </style>
 

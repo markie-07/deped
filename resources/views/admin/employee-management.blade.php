@@ -423,14 +423,15 @@
 .table-loading { text-align: center; padding: 60px !important; color: #94a3b8; font-size: 0.85rem; }
 
 /* ── User cell ── */
-.user-cell { display: flex; align-items: center; gap: 12px; }
-.user-avatar {
+.user-cell { display: flex; align-items: center; gap: 12px; min-width: 180px; }
+.user-avatar, .user-avatar-img {
     width: 40px; height: 40px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; font-size: 0.85rem; color: #fff;
     flex-shrink: 0;
+    object-fit: cover;
 }
-.user-name { font-weight: 700; color: #1e293b; font-size: 0.85rem; }
+.user-name { font-weight: 700; color: #1e293b; font-size: 0.85rem; display: block; line-height: 1.3; }
 
 /* ── Status Badge ── */
 .status-badge {
@@ -628,10 +629,68 @@
 .cell-pos { display: block; font-size: 0.7rem; color: #94a3b8; }
 
 @media (max-width: 768px) {
-    .hero-banner { flex-direction: column; }
-    .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; }
-    .table-header { flex-direction: column; align-items: stretch; }
+    .content-body { padding: 12px 14px !important; }
+    .hero-banner { flex-direction: column; border-radius: 22px; }
+    .hero-left { padding: 24px 20px; }
+    .hero-title { font-size: 1.35rem; }
+    .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; padding: 20px; }
+    .hero-meta { gap: 12px; }
+    .hero-meta-divider { display: none; }
+    
+    .table-header { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 20px; }
+    .table-tabs { gap: 16px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-tab { white-space: nowrap; padding: 12px 4px; font-size: 0.75rem; }
     .table-search-wrap input { width: 100%; }
+    
+    .accounts-table { min-width: 800px !important; }
+    .user-cell { min-width: 180px !important; }
+    
+    .modal-card {
+        width: 95% !important;
+        height: 85vh !important;
+        margin: auto !important;
+        border-radius: 20px !important;
+        flex-direction: column !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    }
+    .modal-layout { flex-direction: column !important; min-height: 0 !important; overflow: visible !important; }
+    
+    .modal-left {
+        width: 100% !important;
+        height: auto !important;
+        padding: 16px 20px !important;
+        flex-shrink: 0 !important;
+    }
+    .modal-left::before { display: none; }
+    .modal-left-content { 
+        padding: 0 !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: 100%;
+        text-align: left !important;
+    }
+    .profile-upload { width: 44px !important; height: 44px !important; border-width: 2px !important; }
+    .profile-upload-placeholder svg { width: 18px !important; height: 18px !important; }
+    .profile-upload-placeholder span { display: none !important; }
+    .modal-left-hint { display: none !important; }
+    .modal-left-icon-row { display: none !important; }
+    .modal-card-title { font-size: 0.85rem !important; text-align: left !important; }
+    .modal-card-desc { display: none !important; }
+    
+    .modal-right { flex: 1 !important; display: flex !important; flex-direction: column !important; background: #fff !important; }
+    .modal-card-body { padding: 16px 20px !important; }
+    .form-row { flex-direction: column !important; gap: 0 !important; }
+    .modal-card-footer { padding: 12px 20px 20px !important; background: #fff !important; }
+    .btn-cancel, .btn-save { flex: 1 !important; padding: 11px !important; font-size: 0.78rem !important; }
+    
+    body.dark-mode .modal-card { background: #0f172a !important; border: 1px solid #1e293b !important; }
+    body.dark-mode .modal-right { background: #0f172a !important; }
+    body.dark-mode .modal-card-footer { background: #0f172a !important; border-top-color: #1e293b !important; }
+    body.dark-mode .hero-right { border-top-color: #334155; }
 }
 
 /* ── Dark Mode Overrides ── */

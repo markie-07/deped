@@ -112,7 +112,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 1.5rem; /* Reduced horizontal padding for tighter layout */
+        padding: 0 2rem; /* Increased padding for better breathing room */
         background: #fff;
         border-bottom: 1px solid #eef0f6;
         position: sticky;
@@ -126,7 +126,7 @@
     .navbar-left {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 24px; /* Increased gap to push content away from sidebar toggle */
     }
 
     .page-title {
@@ -399,6 +399,65 @@
         color: #dc2626;
     }
 
+    /* ═══════════════════════════════════════
+       RESPONSIVE REFINEMENTS
+       ═══════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .top-navbar {
+            padding: 0 1rem;
+            min-height: 60px;
+        }
+        
+        .navbar-search {
+            display: none;
+        }
+
+        /* Hide subtitle on mobile to save space */
+        .page-subtitle {
+            display: none;
+        }
+
+        .page-title {
+            font-size: 1rem;
+        }
+
+        .navbar-left {
+            gap: 12px;
+        }
+
+        /* Adjust user info on small screens */
+        .navbar-user-info {
+            display: none;
+        }
+
+        .navbar-user {
+            padding: 4px;
+            gap: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .navbar-chevron {
+            display: none;
+        }
+
+        /* Sidebar toggle on mobile: fixed or positioned differently? */
+        .navbar-toggle {
+            width: 38px;
+            height: 38px;
+            gap: 3px;
+        }
+
+        .navbar-toggle span {
+            width: 16px;
+            height: 2px;
+        }
+        
+        .navbar-toggle span:nth-child(2) { margin-left: 8px; width: 10px; }
+        .navbar-toggle span:nth-child(3) { width: 14px; }
+    }
+
     /* ── HYPER-MODERN DARK MODE SYSTEM ── */
     :root {
         --body-bg: #f8fafc;
@@ -424,12 +483,15 @@
 
     /* Top Navigation */
     body.dark-mode .top-navbar { 
-        background: var(--nav-bg) !important; 
+        background: rgba(15, 23, 42, 0.95) !important; 
         backdrop-filter: blur(12px); 
-        border-bottom: 1px solid var(--tile-border); 
+        border-bottom: 1px solid rgba(30, 41, 59, 0.7); 
     }
     body.dark-mode .page-title { color: #fff; text-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
-    body.dark-mode .navbar-user { background: #0f172a; border-color: #1e293b; }
+    body.dark-mode .navbar-user { background: transparent; border-color: transparent; }
+    @media (min-width: 769px) {
+        body.dark-mode .navbar-user { background: #0f172a; border-color: #1e293b; }
+    }
     body.dark-mode .navbar-user:hover { background: #1a2233; border-color: #6366f1; }
     body.dark-mode .navbar-user-avatar { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
     body.dark-mode .navbar-user-name { color: #fff; }
@@ -630,8 +692,34 @@
 
         if (toggleBtn && sidebar) {
             toggleBtn.addEventListener('click', function () {
-                sidebar.classList.toggle('active');
-                localStorage.setItem('sidebar-open', sidebar.classList.contains('active'));
+                if (window.innerWidth <= 768) {
+                    const isOpen = sidebar.classList.toggle('mobile-open');
+                    
+                    // Handle overlay
+                    let overlay = document.getElementById('mobileOverlay');
+                    if (!overlay) {
+                        overlay = document.createElement('div');
+                        overlay.id = 'mobileOverlay';
+                        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:99;display:none;backdrop-filter:blur(2px);';
+                        overlay.onclick = function() {
+                            sidebar.classList.remove('mobile-open');
+                            overlay.style.display = 'none';
+                            document.body.style.overflow = '';
+                        };
+                        document.body.appendChild(overlay);
+                    }
+                    
+                    if (isOpen) {
+                        overlay.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        overlay.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                } else {
+                    sidebar.classList.toggle('active');
+                    localStorage.setItem('sidebar-open', sidebar.classList.contains('active'));
+                }
                 
                 // Trigger transition for elements that might need it
                 window.dispatchEvent(new Event('resize'));

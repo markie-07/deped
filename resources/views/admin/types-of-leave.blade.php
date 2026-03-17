@@ -269,7 +269,7 @@
     /* ── Grid ── */
     .types-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 24px;
         padding-bottom: 40px;
     }
@@ -325,7 +325,7 @@
     }
 
     .card-avatar-container {
-        margin-top: -40px;
+        margin-top: -56px;
         padding: 0 20px;
         z-index: 2;
         display: flex;
@@ -342,8 +342,9 @@
         align-items: center;
         justify-content: center;
         font-weight: 900;
-        font-size: 1.3rem;
+        font-size: var(--avatar-fs, 1.3rem);
         color: #fff;
+        line-height: 1;
         box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         transition: transform 0.3s ease;
     }
@@ -355,18 +356,18 @@
     .card-badge {
         background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(4px);
-        padding: 6px 14px;
-        border-radius: 12px;
-        font-size: 0.7rem;
+        padding: 4px 12px;
+        border-radius: 10px;
+        font-size: 0.65rem;
         font-weight: 800;
         color: #0d9488;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         border: 1px solid rgba(255,255,255,0.5);
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
 
     .card-main {
-        padding: 16px 20px 24px;
+        padding: 12px 20px 12px;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -374,24 +375,23 @@
     }
 
     .card-item-name {
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         font-weight: 800;
         color: #1e293b;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         letter-spacing: -0.02em;
         line-height: 1.2;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        min-height: 2.4em;
     }
 
     .card-details {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin-bottom: 20px;
+        gap: 2px;
+        margin-bottom: 8px;
     }
 
     .detail-row {
@@ -399,7 +399,7 @@
         align-items: center;
         gap: 8px;
         color: #64748b;
-        font-size: 0.82rem;
+        font-size: 0.7rem;
     }
 
     .detail-row svg {
@@ -410,7 +410,7 @@
 
     .card-action-bar {
         margin-top: auto;
-        padding-top: 16px;
+        padding-top: 12px;
         border-top: 1px solid #f1f5f9;
         display: flex;
         align-items: center;
@@ -526,9 +526,6 @@
     .badge-green { background:#ecfdf5; color:#059669; } .badge-red { background:#fef2f2; color:#dc2626; }
     .badge-violet { background:#f5f3ff; color:#7c3aed; } .badge-yellow { background:#fffbeb; color:#d97706; }
     .badge-gray { background:#f1f5f9; color:#64748b; } .badge-leave { font-size:0.7rem; font-weight:600; padding:4px 10px; border-radius:8px; background:#f0fdfa; color:#0d9488; display:inline-block; }
-    .btn-action { width:32px; height:32px; border-radius:10px; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s ease; }
-    .btn-edit { background:#f0fdf4; color:#16a34a; } .btn-edit:hover { background:#16a34a; color:#fff; transform:scale(1.1); }
-    .btn-delete { background:#fef2f2; color:#dc2626; } .btn-delete:hover { background:#dc2626; color:#fff; transform:scale(1.1); }
     .empty-icon { width: 100px; height: 100px; background: linear-gradient(135deg, #f1f5f9, #e8ecf3); border-radius: 26px; display: flex; align-items: center; justify-content: center; }
     .empty-icon svg { width: 40px; height: 40px; color: #94a3b8; }
     .empty-title { font-size: 1.1rem; color: #334155; font-weight: 700; margin-bottom: 6px; }
@@ -570,40 +567,47 @@
     .modal-table-wrap::-webkit-scrollbar { display: none; }
 
     .modal-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
-    .modal-table thead th { background: #f8fafc; padding: 12px 18px; font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; position: sticky; top: 0; z-index: 5; border-bottom: 2px solid #eef2ff; white-space: nowrap; }
-    .modal-table tbody td { padding: 13px 18px; font-size: 0.81rem; color: #475569; border-bottom: 1px solid #f8fafc; word-wrap: break-word; vertical-align: top; line-height: 1.4; }
+    .modal-table thead th { background: #f8fafc; padding: 12px 18px; font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; position: sticky; top: 0; z-index: 5; border-bottom: 2px solid #eef2ff; white-space: normal; vertical-align: middle; }
+    .modal-table tbody td { padding: 13px 18px; font-size: 0.81rem; color: #475569; border-bottom: 1px solid #f8fafc; word-break: break-word; vertical-align: top; line-height: 1.4; }
 
     /* Column widths for Admin Types of Leave Modal */
-    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 11%; } /* Name */
+    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 12%; } /* Name */
     .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 11%; } /* Position */
     .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 11%; } /* School */
-    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 11%; } /* Dates */
-    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 10%; } /* Remarks */
-    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 10%; } /* Action Date */
-    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 16%; } /* Deduction Remarks */
-    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 10%; } /* Incharge */
-    .modal-table th:nth-child(9), .modal-table td:nth-child(9) { width: 10%; } /* Actions */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 14%; } /* Dates */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 14%; } /* Remarks */
+    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 11%; } /* Action Date */
+    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 12%; } /* Deduction Remarks */
+    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 7%; }  /* Incharge - Reduced */
+    .modal-table th:nth-child(9), .modal-table td:nth-child(9) { width: 8%; }  /* Actions - Increased */
     .modal-table tbody tr:hover td { background: #f8fafc; }
     .modal-table tbody tr:last-child td { border-bottom: none; }
 
     /* Action Buttons */
+    /* Premium Action Buttons */
+    .btn-action-group { display: flex; gap: 8px; justify-content: center; align-items: center; }
     .btn-action {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        border: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1.5px solid transparent;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
-
-    .btn-edit { background: #f0fdf4; color: #16a34a; }
-    .btn-edit:hover { background: #16a34a; color: #fff; transform: scale(1.1); }
-
-    .btn-delete { background: #fef2f2; color: #dc2626; }
-    .btn-delete:hover { background: #dc2626; color: #fff; transform: scale(1.1); }
+    .btn-action svg { width: 16px; height: 16px; position: relative; z-index: 2; transition: transform 0.3s ease; }
+    
+    .btn-edit { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.05); }
+    .btn-edit:hover { background: #16a34a; color: #fff; border-color: #16a34a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(22, 163, 74, 0.2); }
+    .btn-edit:hover svg { transform: rotate(15deg) scale(1.1); }
+    
+    .btn-delete { background: #fef2f2; color: #dc2626; border-color: #fecaca; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.05); }
+    .btn-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(220, 38, 38, 0.2); }
+    .btn-delete:hover svg { transform: scale(1.1) rotate(-10deg); }
     .badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
     .badge-green { background: #ecfdf5; color: #059669; }
     .badge-red { background: #fef2f2; color: #dc2626; }
@@ -646,8 +650,10 @@
     body.dark-mode .modal-date-wrapper input::-webkit-calendar-picker-indicator { filter: brightness(0) invert(1) !important; }
     body.dark-mode .modal-table tbody tr:hover td { background: #1a1f35; }
     body.dark-mode .badge-leave { background: rgba(20, 184, 166, 0.15); color: #5eead4; }
-    body.dark-mode .btn-edit { background: rgba(22, 163, 74, 0.2); color: #4ade80; }
-    body.dark-mode .btn-delete { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+    body.dark-mode .btn-edit { background: rgba(22, 163, 74, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); box-shadow: none; }
+    body.dark-mode .btn-edit:hover { background: #16a34a; color: #fff; box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4); }
+    body.dark-mode .btn-delete { background: rgba(220, 38, 38, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); box-shadow: none; }
+    body.dark-mode .btn-delete:hover { background: #dc2626; color: #fff; box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4); }
 
     /* Custom classes for JS dynamic rows */
     body.dark-mode .cell-name { color: #f1f5f9 !important; }
@@ -682,13 +688,155 @@
     body.dark-mode .view-btn { color: #94a3b8; }
     body.dark-mode .view-btn.active { background: #334155; color: #5eead4; }
 
-    @media (max-width: 768px) { 
-        .page-header { flex-direction: column; align-items: flex-start; gap: 14px; } 
-        .hero-banner { flex-direction: column; }
-        .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; }
-        .search-filter-bar { flex-direction: column; align-items: stretch; } 
-        .view-toggles { display: none; } 
-        .modal-actions { flex-wrap: wrap; }
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .hero-banner { flex-direction: column; border-radius: 22px; }
+        .hero-left { padding: 24px 20px; }
+        .hero-title { font-size: 1.35rem; }
+        .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #99f6e4; padding: 20px; }
+        
+        .types-grid { 
+            grid-template-columns: repeat(2, 1fr) !important; 
+            gap: 10px !important; 
+        }
+        .type-card { 
+            border-radius: 16px !important; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+        }
+        .card-banner { height: 50px !important; }
+        .card-avatar-container { margin-top: -32px !important; padding: 0 10px !important; }
+        .card-avatar { width: 44px !important; height: 44px !important; border-radius: 12px !important; border-width: 3px !important; font-size: 0.9rem !important; }
+        .card-badge { padding: 2px 6px !important; font-size: 0.55rem !important; border-radius: 6px !important; }
+        .card-main { padding: 8px 10px 10px !important; }
+        .card-item-name { font-size: 0.78rem !important; margin-bottom: 4px !important; -webkit-line-clamp: 2 !important; min-height: 2.2em; }
+        .card-details { gap: 2px !important; margin-bottom: 6px !important; }
+        .detail-row { font-size: 0.6rem !important; gap: 4px !important; }
+        .detail-row svg { width: 11px !important; height: 11px !important; }
+        .card-action-bar { padding-top: 8px !important; }
+        .action-label { font-size: 0.58rem !important; gap: 4px !important; }
+        .action-icon { width: 22px !important; height: 22px !important; border-radius: 6px !important; }
+
+        .types-grid.list-view { grid-template-columns: 1fr !important; }
+        .types-grid.list-view .type-card { 
+            flex-direction: row !important; 
+            align-items: center !important; 
+            padding: 10px 16px !important; 
+            gap: 12px !important;
+            min-height: auto !important;
+        }
+        .types-grid.list-view .card-avatar-container { margin: 0 !important; flex-shrink: 0 !important; }
+        .types-grid.list-view .card-avatar { width: 44px !important; height: 44px !important; border-radius: 12px !important; }
+        .types-grid.list-view .card-main { 
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            align-items: center !important;
+            width: 100% !important;
+            padding: 0 !important;
+            flex: 1 !important;
+            gap: 2px 12px !important;
+        }
+        .types-grid.list-view .card-item-name { 
+            grid-column: 1 !important;
+            width: 100% !important; 
+            font-size: 0.82rem !important;
+            margin: 0 !important;
+        }
+        .types-grid.list-view .card-details { 
+            grid-column: 1 !important;
+            flex-direction: column !important; 
+            gap: 1px !important; 
+            width: 100% !important; 
+        }
+        .types-grid.list-view .detail-row { min-width: 0 !important; font-size: 0.68rem !important; }
+        .types-grid.list-view .detail-row svg { width: 12px !important; height: 12px !important; }
+        .types-grid.list-view .card-action-bar {
+            grid-column: 2 !important;
+            grid-row: 1 / 3 !important;
+            display: flex !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            width: auto !important;
+        }
+        .types-grid.list-view .action-label { display: none !important; }
+        .types-grid.list-view .action-icon { width: 24px !important; height: 24px !important; border-radius: 8px !important; background: #f1f5f9 !important; }
+
+        .modal-sheet {
+            width: 95% !important;
+            height: 85vh !important;
+            border-radius: 24px !important;
+            flex-direction: column !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+        }
+        .modal-panel {
+            width: 100% !important;
+            flex-shrink: 0 !important;
+            padding: 16px 20px !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 12px !important;
+            border-right: none !important;
+            border-bottom: 1px solid #99f6e4;
+        }
+        .modal-panel::before, .modal-panel::after { display: none !important; }
+        .panel-avatar { width: 40px !important; height: 40px !important; font-size: 0.9rem !important; margin-bottom: 0 !important; }
+        .panel-name { font-size: 0.85rem !important; margin-top: 0 !important; }
+        .panel-role { display: none !important; }
+        .panel-divider { display: none !important; }
+        .panel-stat-wrap { margin-top: 0 !important; padding: 8px 14px !important; }
+        .ps-num { font-size: 1.1rem !important; }
+        .panel-filters { display: flex !important; flex-direction: column !important; gap: 4px !important; width: 100% !important; margin-top: 12px; }
+        .pf-date-wrap { width: 100% !important; }
+        .pf-label { margin-bottom: 2px !important; }
+        .panel-close-btn { margin-top: 12px !important; width: 100% !important; padding: 11px !important; flex: none !important; }
+
+        .modal-main {
+            overflow: visible !important;
+            flex: none !important;
+        }
+        .modal-main-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+            padding: 12px 16px !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 50 !important;
+            background: #fafbff !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+        }
+        body.dark-mode .modal-main-header {
+            background: #111827 !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+        }
+        .mm-search { width: 100% !important; }
+        .mm-search input { width: 100% !important; }
+
+        .modal-table-wrap {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: visible !important;
+            flex: none !important;
+        }
+        .modal-table {
+            min-width: 900px !important;
+            table-layout: auto !important;
+        }
+        .modal-table thead th {
+            position: relative !important;
+            z-index: auto !important;
+            padding: 8px 10px !important;
+            font-size: 0.65rem !important;
+        }
+        .modal-table tbody td {
+            padding: 10px 8px !important;
+            font-size: 0.72rem !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+        body.dark-mode .modal-panel { border-bottom-color: #1e293b !important; }
         body.dark-mode .hero-right { border-top-color: #334155; }
     }
 </style>
@@ -721,7 +869,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const getInitials = (name) => {
         if (!name) return '??';
-        return name.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+        return name.trim().toUpperCase();
     };
 
     const PALETTE = [
@@ -763,29 +911,18 @@ document.addEventListener('DOMContentLoaded', function() {
         typesGrid.innerHTML = filtered.map((item, i) => {
             const initials = getInitials(item.type_of_leave);
             const colours = getColours(item.type_of_leave);
+            const fs = initials.length > 3 ? '0.85rem' : (initials.length > 2 ? '1.1rem' : '1.3rem');
+
             return `
                 <div class="type-card" onclick="openTypeModal('${item.type_of_leave.replace(/'/g, "\\'")}')" style="animation-delay: ${Math.min(i * 0.03, 0.6)}s; --card-color: ${colours.color}">
                     <div class="card-banner" style="background: ${colours.strip}"></div>
                     <div class="card-avatar-container">
-                        <div class="card-avatar" style="background: ${colours.avatar}">${initials}</div>
+                        <div class="card-avatar" style="background: ${colours.avatar}; --avatar-fs: ${fs}">${initials}</div>
                         <div class="card-badge">${item.leave_count} Record${item.leave_count !== 1 ? 's' : ''}</div>
                     </div>
                     <div class="card-main">
                         <h3 class="card-item-name" title="${item.type_of_leave}">${item.type_of_leave}</h3>
-                        <div class="card-details">
-                            <div class="detail-row">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                                </svg>
-                                <span class="detail-text">Category: Special Benefit</span>
-                            </div>
-                            <div class="detail-row">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                <span class="detail-text">Status: Active Record Type</span>
-                            </div>
-                        </div>
+                        <div class="card-details"></div>
                         <div class="card-action-bar">
                             <span class="action-label">View Records</span>
                             <div class="action-icon">
@@ -814,8 +951,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modalTypeName').textContent = typeName;
         const colours = getColours(typeName);
         const avatarEl = document.getElementById('modalTypeAvatar');
-        avatarEl.textContent = getInitials(typeName);
+        const initials = getInitials(typeName);
+        avatarEl.textContent = initials;
         avatarEl.style.background = colours.avatar;
+        avatarEl.style.setProperty('--avatar-fs', initials.length > 3 ? '0.85rem' : (initials.length > 2 ? '1.1rem' : '1.3rem'));
         document.getElementById('modalSearch').value = '';
         document.getElementById('modalFilterDate').value = new Date().toLocaleDateString('en-CA');
         
@@ -849,15 +988,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="cell-name">${r.name}</td>
                     <td class="cell-meta">${r.position || '-'}</td>
                     <td class="cell-meta">${r.school || '-'}</td>
-                    <td class="cell-meta" style="font-family:monospace; font-size:0.75rem;">${r.inclusive_dates || '-'}</td>
+                    <td class="cell-meta cell-dates" style="font-family:monospace; font-size:0.75rem;">${r.inclusive_dates || '-'}</td>
                     <td>${remarkBadge}</td>
                     <td class="cell-meta" style="font-family:monospace; font-size:0.75rem;">${formatDate(r.date_of_action)}</td>
                     <td class="cell-subtext">${r.deduction_remarks || '-'}</td>
                     <td class="cell-name">${r.incharge || '-'}</td>
                     <td>
-                        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
-                            <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg></button>
-                            <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
+                        <div class="btn-action-group">
+                            <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg></button>
+                            <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
                         </div>
                     </td>
                 </tr>`;
@@ -878,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', function() {
         rows.forEach(row => { if (row.cells.length < 2) return; const text = row.textContent.toLowerCase(); const isMatch = text.includes(q); row.style.display = isMatch ? '' : 'none'; if (isMatch) visibleCount++; });
         const tbody = document.getElementById('typeTableBody');
         const existingNoResults = document.getElementById('noResultsRow');
-        if (visibleCount === 0 && rows.length > 0) { if (!existingNoResults) { const noResultsRow = document.createElement('tr'); noResultsRow.id = 'noResultsRow'; noResultsRow.innerHTML = `<td colspan="7" style="text-align:center; padding: 40px; color: #94a3b8;">No records matching "${q}"</td>`; tbody.appendChild(noResultsRow); } } else if (existingNoResults) { existingNoResults.style.display = 'none'; }
+        if (visibleCount === 0 && rows.length > 0) { if (!existingNoResults) { const noResultsRow = document.createElement('tr'); noResultsRow.id = 'noResultsRow'; noResultsRow.innerHTML = `<td colspan="9" style="text-align:center; padding: 40px; color: #94a3b8;">No records matching "${q}"</td>`; tbody.appendChild(noResultsRow); } } else if (existingNoResults) { existingNoResults.style.display = 'none'; }
     }
     document.getElementById('modalSearch').addEventListener('input', filterModalRecords);
     window.editRecord = function(id) {

@@ -806,23 +806,47 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
+        .content-body {
+            padding: 12px 14px !important;
+        }
+
+        .form-container {
+            padding-bottom: 120px;
+        }
+
         .form-row {
             grid-template-columns: 1fr;
+            gap: 12px;
         }
 
         .form-card-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 12px;
-            padding: 20px 24px;
-        }
-
-        .leave-form {
-            padding: 24px;
+            gap: 16px;
+            padding: 20px;
         }
 
         .form-header-right {
-            flex-wrap: wrap;
+            width: 100%;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px;
+        }
+
+        .leave-form {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
         }
     }
     /* ══════════════════════════════════════════
@@ -1204,7 +1228,7 @@
         letter-spacing: 0.06em;
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 50;
         border-bottom: 2px solid #f1f5f9;
         white-space: nowrap;
     }
@@ -1221,8 +1245,8 @@
         border-bottom: 1px solid #e5e7eb !important;
         text-align: center !important;
         position: sticky;
-        top: 44px;
-        z-index: 30;
+        top: 42px;
+        z-index: 40;
     }
 
     .record-table td {
@@ -1793,16 +1817,231 @@
     body.dark-mode .modal-footer { background: #111827; border-top: 1px solid #1e293b; }
     body.dark-mode .modal-footer-info { color: #94a3b8; }
 
-    /* Print/Excel Buttons */
-    body.dark-mode .btn-print.btn-gray { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
-    body.dark-mode .btn-print.btn-gray:hover { background: #334155; border-color: #475569; }
+    /* ══════════════════════════════════════════
+       MODAL — MOBILE RESPONSIVE
+       ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .modal-sheet {
+            width: 95% !important;
+            height: 85vh !important;
+            border-radius: 24px !important;
+            flex-direction: column !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+            background: #fff !important;
+        }
 
-    /* Checkbox */
-    body.dark-mode .custom-checkbox { background: #111827; border-color: #475569; }
-    body.dark-mode .custom-checkbox.checked { background: #6366f1; border-color: #6366f1; }
+        /* Left panel becomes a compact top strip */
+        .modal-panel {
+            width: 100% !important;
+            flex-shrink: 0 !important;
+            padding: 16px 20px !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 12px !important;
+            border-right: none !important;
+            border-bottom: 2px solid #e0e7ff;
+            max-height: none !important;
+            overflow: visible !important;
+        }
 
-    /* Content Body */
-    body.dark-mode .content-body { background: transparent; }
+        /* Hide decorative circles on mobile */
+        .modal-panel::before,
+        .modal-panel::after {
+            display: none !important;
+        }
+
+        /* Compact icon */
+        .panel-icon-box {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 12px !important;
+            margin-bottom: 0 !important;
+        }
+        .panel-icon-box svg {
+            width: 20px !important;
+            height: 20px !important;
+        }
+
+        /* Title inline */
+        .panel-title {
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+        }
+
+        .panel-subtitle {
+            display: none !important;
+        }
+
+        .panel-divider {
+            display: none !important;
+        }
+
+        /* Stat card: compact inline */
+        .panel-stat-card {
+            padding: 10px 16px !important;
+            margin-bottom: 0 !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+        .ps-count {
+            font-size: 1.1rem !important;
+            margin-bottom: 0 !important;
+        }
+        .ps-label {
+            font-size: 0.65rem !important;
+        }
+
+        /* Filters: row layout */
+        .panel-filters-group {
+            display: flex !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .filter-item {
+            flex: 1 !important;
+            margin-bottom: 0 !important;
+        }
+        .fi-label {
+            font-size: 0.6rem !important;
+            margin-bottom: 4px !important;
+        }
+        .fi-select {
+            padding: 8px 12px !important;
+            font-size: 0.75rem !important;
+        }
+        .fi-select-wrap {
+            border-radius: 10px !important;
+        }
+
+        /* Actions: row layout */
+        .panel-actions {
+            margin-top: 0 !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .panel-actions .btn-panel {
+            flex: 1 !important;
+            min-width: 0 !important;
+            padding: 10px 12px !important;
+            font-size: 0.72rem !important;
+            border-radius: 10px !important;
+        }
+        .panel-actions .btn-panel svg {
+            width: 14px !important;
+            height: 14px !important;
+        }
+        .panel-actions .export-actions {
+            flex-direction: row !important;
+            width: 100% !important;
+        }
+
+        /* Main content: allow content to scroll within sheet */
+        .modal-main {
+            flex: none !important;
+            overflow: visible !important;
+            background: transparent !important;
+        }
+
+        /* Header: sticky at top of scroll */
+        .modal-main-header {
+            padding: 12px 16px !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 100 !important;
+            background: #fff !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+        }
+        body.dark-mode .modal-main-header {
+            background: #0f172a !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+        }
+        .mm-title {
+            font-size: 0.85rem !important;
+        }
+        .mm-search-bar {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        .mm-search-input {
+            padding: 9px 14px 9px 36px !important;
+            font-size: 0.78rem !important;
+            border-radius: 10px !important;
+        }
+
+        /* Body and Table */
+        .modal-main-body {
+            flex: none !important;
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .record-table {
+            min-width: 1100px !important;
+            table-layout: fixed !important;
+        }
+        .record-table th,
+        .record-table td {
+            padding: 10px 12px !important;
+            font-size: 0.72rem !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+
+        /* Column widths for mobile wrap */
+        .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 45px !important; }
+        .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 35px !important; }
+        .record-table th:nth-child(3), .record-table td:nth-child(3) { width: 140px !important; }
+
+        /* Remove static sticky positioning for table headers to avoid sheet scroll conflict */
+        .record-table th,
+        .forwarded-header {
+            position: relative !important;
+            top: auto !important;
+            z-index: auto !important;
+        }
+
+        /* Footer */
+        .modal-main-footer {
+            padding: 10px 16px !important;
+        }
+        .modal-footer {
+            padding: 10px 16px !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+        }
+
+        /* Form responsiveness */
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 10px;
+        }
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Toast on mobile */
+        .toast {
+            left: 16px !important;
+            right: 16px !important;
+            bottom: 16px !important;
+        }
+    }
+
+    /* Dark mode mobile overrides */
+    @media (max-width: 768px) {
+        body.dark-mode .modal-panel {
+            border-bottom: 1px solid #1e293b !important;
+        }
+    }
 
 </style>
 
@@ -2377,6 +2616,7 @@
                             <option value="all">All Status</option>
                             <option value="with pay">With Pay</option>
                             <option value="without pay">Without Pay</option>
+                            <option value="with pay & without pay">With Pay & Without Pay</option>
                         </select>
                     </div>
                 </div>
@@ -2502,9 +2742,11 @@
             let matchesPay = true;
             const rowRemarks = (row.getAttribute('data-remarks') || '').toLowerCase();
             if (payStatus === 'with pay') {
-                matchesPay = rowRemarks.includes('with pay') || (rowRemarks.includes('approved') && !rowRemarks.includes('disapproved'));
+                matchesPay = (rowRemarks.includes('with pay') && !rowRemarks.includes('without pay')) || (rowRemarks.includes('approved') && !rowRemarks.includes('disapproved'));
             } else if (payStatus === 'without pay') {
-                matchesPay = rowRemarks.includes('without pay') || rowRemarks.includes('disapproved');
+                matchesPay = (rowRemarks.includes('without pay') && !rowRemarks.includes('with pay')) || rowRemarks.includes('disapproved');
+            } else if (payStatus === 'with pay & without pay') {
+                matchesPay = rowRemarks.includes('with pay') && rowRemarks.includes('without pay');
             }
             
             const isVisible = matchesSearch && matchesPay && matchesForwarded;
@@ -2777,10 +3019,10 @@
         const selectionFooter = document.getElementById('modalSelectionFooter');
         
         if (isPrintingMode) {
-            sheet.classList.add('printing-mode');
-            exportActions.style.display = 'flex';
-            excelModeBtn.style.display = 'none';
-            selectionFooter.classList.add('active');
+            if (sheet) sheet.classList.add('printing-mode');
+            if (exportActions) exportActions.style.display = 'flex';
+            if (excelModeBtn) excelModeBtn.style.display = 'none';
+            if (selectionFooter) selectionFooter.classList.add('active');
             
             // AUTOMATIC SELECTION: Select all visible rows by default
             const visibleRows = document.querySelectorAll('.record-row:not([style*="display: none"])');
@@ -2791,13 +3033,15 @@
                 }
             });
         } else {
-            sheet.classList.remove('printing-mode');
-            exportActions.style.display = 'none';
-            excelModeBtn.style.display = 'flex';
-            selectionFooter.classList.remove('active');
+            if (sheet) sheet.classList.remove('printing-mode');
+            if (exportActions) exportActions.style.display = 'none';
+            if (excelModeBtn) excelModeBtn.style.display = 'flex';
+            if (selectionFooter) selectionFooter.classList.remove('active');
             
             // Clear selections when exiting print mode
-            selectedRecords.clear();
+            if (typeof selectedRecords !== 'undefined') {
+                selectedRecords.clear();
+            }
             document.querySelectorAll('.record-select.checked').forEach(cb => cb.classList.remove('checked'));
             document.querySelectorAll('.forwarded-select-all.checked').forEach(cb => cb.classList.remove('checked'));
             document.querySelectorAll('.record-row.selected-row').forEach(row => row.classList.remove('selected-row'));

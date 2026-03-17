@@ -15,27 +15,48 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        /* ─── SCOPED RESET: Override Tailwind Preflight ─── */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            overflow-x: hidden !important;
+        }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #FAFBFF;
-            color: #1a1a2e;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            background: #FAFBFF !important;
+            color: #1a1a2e !important;
             min-height: 100vh;
-            overflow: hidden;
+            min-height: 100dvh;
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: hidden !important;
+        }
+
+        /* Force all login-page elements to use border-box */
+        .login-page, .login-page * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-page p, .login-page h1, .login-page h2, .login-page h3 {
+            margin-top: 0;
         }
 
         /* ─── Layout ─── */
         .login-page {
             display: grid;
-            grid-template-columns: 1.1fr 1fr;
-            min-height: 100vh;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            background: #FAFBFF;
         }
 
-        @media (max-width: 960px) {
-            .login-page { grid-template-columns: 1fr; }
-            .visual-panel { display: none; }
-        }
+
 
         /* ═══════════════════════════════════════════
            LEFT VISUAL PANEL
@@ -158,8 +179,8 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            padding: 3rem;
-            max-width: 440px;
+            padding: 1.5rem;
+            max-width: 360px;
             animation: fadeIn 1s ease-out;
         }
 
@@ -167,7 +188,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 120px; height: 120px;
+            width: 80px; height: 80px;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(16px);
             border: 3px solid rgba(255,255,255,0.4);
@@ -185,7 +206,7 @@
         }
 
         .v-title {
-            font-size: 2.6rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: #fff;
             line-height: 1.15;
@@ -194,10 +215,10 @@
         }
 
         .v-subtitle {
-            font-size: 1.05rem;
+            font-size: 0.85rem;
             color: rgba(255,255,255,0.75);
-            line-height: 1.7;
-            margin-bottom: 2.5rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
         }
 
         /* Stats row */
@@ -236,15 +257,15 @@
         .features-grid {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
-            margin-top: 2.5rem;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
         }
 
         .feature-item {
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem 1.25rem;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
             background: rgba(255,255,255,0.08);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.12);
@@ -260,8 +281,8 @@
 
         .feature-icon {
             flex-shrink: 0;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -280,10 +301,10 @@
         }
 
         .feature-title {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.15rem;
             letter-spacing: -0.01em;
         }
 
@@ -300,9 +321,44 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem;
+            padding: 2rem;
             position: relative;
             background: #FAFBFF;
+            overflow-y: auto; /* Internal scroll for forms */
+            overflow-x: hidden;
+            height: 100%;
+            width: 100%;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+
+        .form-panel::-webkit-scrollbar {
+            display: none; /* Chrome/Safari/Opera */
+        }
+
+        /* Scrollable and white background for Register View */
+        .form-panel.panel-register {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            background: #fff !important;
+            padding: 3rem 2rem;
+        }
+
+        .form-panel.panel-register .form-wrapper {
+            margin: 0 auto !important;
+            max-width: 480px;
+            width: 100%;
+            padding-top: 1rem;
+        }
+
+        .form-panel.panel-register .page-footer {
+            position: relative !important;
+            bottom: auto !important;
+            margin: 3rem 0 1rem 0 !important;
+            width: 100%;
+            z-index: 10;
         }
 
         /* Subtle background accent */
@@ -321,6 +377,7 @@
             max-width: 400px;
             position: relative;
             z-index: 5;
+            margin: auto 0; /* Vertically center in flex when content is short */
         }
 
         /* Stagger animation */
@@ -333,7 +390,7 @@
 
         /* Greeting */
         .form-greeting {
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.5rem !important;
         }
 
         .greeting-badge {
@@ -379,14 +436,14 @@
 
         /* ─── Inputs ─── */
         .field {
-            margin-bottom: 1.35rem;
+            margin-bottom: 1.35rem !important;
         }
 
         .field-label {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.55rem;
+            margin-bottom: 0.55rem !important;
         }
 
         .field-label label {
@@ -574,6 +631,7 @@
             bottom: 1.5rem;
             left: 0; right: 0;
             text-align: center;
+            z-index: 10;
         }
 
         .page-footer p {
@@ -583,10 +641,19 @@
 
         /* ─── Right Panel Interactive Canvas ─── */
         #rightCanvas {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50%; /* Desktop default */
+            height: 100vh;
+            z-index: 1;
             pointer-events: none;
+        }
+
+        @media (max-width: 960px) {
+            #rightCanvas {
+                width: 100%;
+            }
         }
 
         /* ═══════════════════════════════════════════
@@ -594,7 +661,8 @@
            ═══════════════════════════════════════════ */
         .form-wrapper {
             position: relative;
-            overflow: hidden;
+            z-index: 10;
+            overflow: visible; /* Don't clip the register view */
         }
 
         .login-view,
@@ -635,7 +703,6 @@
             visibility: hidden;
             width: 100%;
             padding: 0.5rem 0.5rem 1rem 0.5rem;
-            overflow: hidden; /* Remove scrolling */
         }
 
         .register-view.active {
@@ -648,25 +715,25 @@
 
         .reg-header { 
             text-align: center; 
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.75rem;
             position: relative;
         }
         
         .reg-title { 
-            font-size: 1.6rem; 
+            font-size: 1.4rem; 
             font-weight: 800; 
             color: #0f0f23; 
             letter-spacing: -0.04em; 
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.25rem;
             background: linear-gradient(135deg, #0f0f23 0%, #4a5568 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
         .reg-desc { 
-            font-size: 0.82rem; 
+            font-size: 0.78rem; 
             color: #718096; 
-            line-height: 1.4;
+            line-height: 1.3;
             max-width: 280px;
             margin: 0 auto;
         }
@@ -679,10 +746,10 @@
         }
 
         .reg-profile-upload {
-            width: 85px; height: 85px;
+            width: 120px; height: 120px;
             background: #fff;
-            border: 2px dashed #e2e8f0;
-            border-radius: 24px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 38px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; position: relative; overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -713,7 +780,7 @@
         }
         
         .reg-profile-upload svg { 
-            width: 24px; height: 24px; color: #cbd5e0; 
+            width: 40px; height: 40px; color: #cbd5e0; 
             margin-bottom: 4px;
             transition: color 0.3s;
         }
@@ -721,21 +788,24 @@
         .reg-profile-upload:hover svg { color: #667eea; }
         
         .reg-profile-upload span { 
-            font-size: 0.6rem; color: #a0aec0; font-weight: 700; 
+            font-size: 0.7rem; color: #a0aec0; font-weight: 700; 
             letter-spacing: 0.02em;
         }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        @media (max-width: 540px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
         .form-grid.span-2 { grid-template-columns: 1fr; }
         
         .register-view .field {
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.6rem;
         }
         
         .register-view .input-box input {
             background: #fff;
-            padding: 10px 14px;
-            font-size: 0.85rem;
+            padding: 9px 14px 9px 42px; /* Slightly reduced for compactness */
+            font-size: 0.82rem;
         }
         
         .register-view .field-label {
@@ -1135,6 +1205,17 @@
             margin-bottom: 1.5rem;
         }
 
+        @media (max-width: 400px) {
+            .otp-inputs {
+                gap: 6px;
+            }
+            .otp-inputs input {
+                width: 38px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+        }
+
         .otp-inputs input {
             width: 48px; height: 56px;
             border: 2px solid #e8ecf4;
@@ -1295,6 +1376,154 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Mobile Logo Styling */
+        .mobile-logo {
+            display: none;
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+        .mobile-logo img {
+            height: 70px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+        }
+        .mobile-logo h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f0f23;
+            margin-top: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* ─── Responsive Queries (MUST BE AT THE BOTTOM) ─── */
+        @media (max-width: 960px) {
+            html, body {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+            }
+            .login-page { 
+                grid-template-columns: 1fr !important;
+                height: auto !important;
+                min-height: 100dvh !important;
+            }
+            .visual-panel { 
+                display: none !important; 
+            }
+
+            /* ── Default mobile form panel: no scroll, centered ── */
+            .form-panel {
+                height: auto !important;
+                min-height: 100dvh !important;
+                padding: 2rem 1.5rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: #fff !important;
+                overflow: hidden !important;
+                position: relative !important;
+            }
+
+            /* ── Register-mode mobile panel: scrollable (handled by base class now, just adjusting padding) ── */
+            .form-panel.panel-register {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+
+            .page-footer {
+                padding: 1.5rem 0 !important;
+                margin-top: auto !important;
+                position: relative !important;
+                bottom: auto !important;
+            }
+            .form-wrapper {
+                width: 100% !important;
+                max-width: 420px !important;
+                margin: 0 auto !important;
+                padding: 1rem 0 !important;
+                position: relative !important;
+                z-index: 5 !important;
+            }
+            .mobile-logo {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                margin-bottom: 1.75rem !important;
+                text-align: center !important;
+            }
+            .mobile-logo img {
+                height: 65px !important;
+                width: auto !important;
+            }
+            .mobile-logo h2 {
+                font-size: 1.1rem !important;
+                margin-top: 0.5rem !important;
+                font-weight: 800 !important;
+                color: #0f0f23 !important;
+            }
+            .greeting-badge {
+                display: none !important; 
+            }
+            .form-greeting {
+                text-align: center !important;
+                margin-bottom: 2rem !important;
+            }
+            .form-greeting h1 {
+                font-size: 1.75rem !important;
+                font-weight: 800 !important;
+                line-height: 1.2 !important;
+                margin-bottom: 0.5rem !important;
+                color: #0f0f23 !important;
+            }
+            .form-greeting p {
+                font-size: 0.9rem !important;
+                line-height: 1.5 !important;
+                color: #8892a4 !important;
+                margin-bottom: 0 !important;
+            }
+            .field {
+                margin-bottom: 1.35rem !important;
+            }
+            .field-label {
+                margin-bottom: 0.5rem !important;
+                display: flex !important;
+            }
+            .input-box input {
+                padding: 13px 16px 13px 46px !important;
+                font-size: 0.92rem !important;
+            }
+            .separator {
+                margin: 1.5rem 0 !important;
+            }
+            .btn-login {
+                padding: 14px !important;
+                margin-top: 0.5rem !important;
+            }
+            .bottom-text {
+                margin-top: 0 !important;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .form-grid { 
+                grid-template-columns: 1fr; 
+            }
+        }
+
+        @media (max-width: 400px) {
+            .otp-inputs {
+                gap: 6px;
+            }
+            .otp-inputs input {
+                width: 38px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1368,6 +1597,12 @@
             <!-- Interactive Ripple Canvas -->
             <canvas id="rightCanvas"></canvas>
             <div class="form-wrapper">
+                <!-- Mobile Logo (Visible on < 960px) -->
+                <div class="mobile-logo">
+                    <img src="{{ asset('images/SDO-Logo.png') }}" alt="DepEd Logo">
+                    <h2>Schools Division Office</h2>
+                </div>
+
                 <!-- ═══ LOGIN VIEW ═══ -->
                 <div class="login-view" id="loginView">
                     <!-- Greeting -->
@@ -1470,46 +1705,83 @@
                         <div class="form-grid">
                             <div class="field">
                                 <div class="field-label"><label>Username</label></div>
-                                <div class="input-box"><input type="text" name="username" placeholder="jdelacruz" required></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                    <input type="text" name="username" placeholder="jdelacruz" required>
+                                </div>
                             </div>
                             <div class="field">
                                 <div class="field-label"><label>Email Address</label></div>
-                                <div class="input-box"><input type="email" name="email" placeholder="you@deped.gov.ph" required></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                    <input type="email" name="email" placeholder="you@deped.gov.ph" required>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-grid">
                             <div class="field">
                                 <div class="field-label"><label>Last Name</label></div>
-                                <div class="input-box"><input type="text" name="last_name" placeholder="Dela Cruz" required></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                    <input type="text" name="last_name" placeholder="Dela Cruz" required>
+                                </div>
                             </div>
                             <div class="field">
                                 <div class="field-label"><label>First Name</label></div>
-                                <div class="input-box"><input type="text" name="first_name" placeholder="Juan" required></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                    <input type="text" name="first_name" placeholder="Juan" required>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-grid">
                             <div class="field">
                                 <div class="field-label"><label>Middle Name</label></div>
-                                <div class="input-box"><input type="text" name="middle_name" placeholder="Santos"></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                    <input type="text" name="middle_name" placeholder="Santos">
+                                </div>
                             </div>
                             <div class="field">
                                 <div class="field-label"><label>Suffix</label></div>
-                                <div class="input-box"><input type="text" name="suffix" placeholder="Jr., III"></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+                                    </svg>
+                                    <input type="text" name="suffix" placeholder="Jr., III">
+                                </div>
                             </div>
                         </div>
 
-
                         <div class="field">
                             <div class="field-label"><label>Position</label></div>
-                            <div class="input-box"><input type="text" name="position" placeholder="e.g. Teacher I" required></div>
+                            <div class="input-box">
+                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+                                </svg>
+                                <input type="text" name="position" placeholder="e.g. Teacher I" required>
+                            </div>
                         </div>
 
                         <div class="form-grid">
                             <div class="field">
                                 <div class="field-label"><label>Password</label></div>
                                 <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                    </svg>
                                     <input type="password" name="password" id="regPassword" placeholder="••••••••" required minlength="8">
                                     <button type="button" class="eye-toggle" id="toggleRegPassword" aria-label="Toggle password visibility">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" id="eyeRegIcon">
@@ -1525,6 +1797,9 @@
                             <div class="field">
                                 <div class="field-label"><label>Confirm Password</label></div>
                                 <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                                    </svg>
                                     <input type="password" name="password_confirmation" id="regConfirmPassword" placeholder="••••••••" required minlength="8">
                                     <button type="button" class="eye-toggle" id="toggleRegConfirmPassword" aria-label="Toggle password visibility">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" id="eyeRegConfirmIcon">
@@ -1754,35 +2029,70 @@
         const forgotView = document.getElementById('forgotView');
         const registerView = document.getElementById('registerView');
         const resetView = document.getElementById('resetView');
-        const registerForm = document.getElementById('registerForm');
+        const formPanel = document.getElementById('formPanel');
         
         const showRegisterLink = document.getElementById('showRegisterLink');
         const regBackBtn = document.getElementById('regBackBtn');
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const registerForm = document.getElementById('registerForm');
         
         const loginAlert = document.getElementById('loginAlert');
         const alertText = document.getElementById('alertText');
         const alertIcon = document.getElementById('alertIcon');
         const submitBtn = document.getElementById('submitBtn');
 
+        // Forgot and OTP elements
+        const forgotForm = document.getElementById('forgotForm');
+        const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
+        const forgotBtnText = document.getElementById('forgotBtnText');
+        const forgotSpinner = document.getElementById('forgotSpinner');
+        const forgotAlert = document.getElementById('forgotAlert');
+        const forgotAlertText = document.getElementById('forgotAlertText');
+        const forgotAlertIcon = document.getElementById('forgotAlertIcon');
+        const forgotBackBtn = document.getElementById('forgotBackBtn');
+        const forgotBackLink = document.getElementById('forgotBackLink');
+
+        const otpUserName = document.getElementById('otpUserName');
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const verifyBtnText = document.getElementById('verifyBtnText');
+        const verifySpinner = document.getElementById('verifySpinner');
+        const otpAlert = document.getElementById('otpAlert');
+        const otpAlertText = document.getElementById('otpAlertText');
+        const otpAlertIcon = document.getElementById('otpAlertIcon');
+        const resendBtn = document.getElementById('resendBtn');
+        const otpTimerEl = document.getElementById('otpTimer');
+        const otpBackBtn = document.getElementById('otpBackBtn');
+
+        const resetForm = document.getElementById('resetForm');
+        const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+        const resetBtnText = document.getElementById('resetBtnText');
+        const resetSpinner = document.getElementById('resetSpinner');
+        const resetAlert = document.getElementById('resetAlert');
+        const resetAlertText = document.getElementById('resetAlertText');
+        const resetAlertIcon = document.getElementById('resetAlertIcon');
+        const resetBackLink = document.getElementById('resetBackLink');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        // View switches for Register
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
-            resetRegisterForm(); // Ensure clean form
-            loginView.classList.add('hidden');
-            setTimeout(() => {
-                loginView.style.display = 'none';
-                registerView.style.display = 'block';
-                setTimeout(() => registerView.classList.add('active'), 50);
-            }, 400);
+            resetRegisterForm();
+            formPanel.classList.add('panel-register');
+            switchView('register');
         });
 
         regBackBtn.addEventListener('click', () => {
-            registerView.classList.remove('active');
-            setTimeout(() => {
-                registerView.style.display = 'none';
-                loginView.style.display = 'block';
-                setTimeout(() => loginView.classList.remove('hidden'), 50);
-            }, 400);
+            formPanel.classList.remove('panel-register');
+            switchView('login');
+        });
+
+        // View switches for Forgot Password (initial toggle)
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            formPanel.classList.remove('panel-register');
+            switchView('forgot');
         });
 
         window.previewRegImage = function(input) {
@@ -2059,22 +2369,7 @@
         //  OTP LOGIN FLOW (INLINE)
         // ═══════════════════════════════════════════
         
-        // OTP Elements
-        
-        // OTP Elements
-        const otpUserName = document.getElementById('otpUserName');
-        const otpDigits = document.querySelectorAll('.otp-digit');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const verifyBtnText = document.getElementById('verifyBtnText');
-        const verifySpinner = document.getElementById('verifySpinner');
-        const otpAlert = document.getElementById('otpAlert');
-        const otpAlertText = document.getElementById('otpAlertText');
-        const otpAlertIcon = document.getElementById('otpAlertIcon');
-        const resendBtn = document.getElementById('resendBtn');
-        const otpTimerEl = document.getElementById('otpTimer');
-        // Back buttons (both top left and bottom text logic if needed)
-        const otpBackBtn = document.getElementById('otpBackBtn');
-        
+        // OTP Elements (already declared at top)
         let countdownInterval = null;
 
         function showAlert(el, textEl, iconEl, msg, type) {
@@ -2112,26 +2407,38 @@
 
 
         function switchView(view) {
-            // Hide all views first
+            // Hide/Deactivate all views first
             loginView.classList.add('hidden');
             otpView.classList.remove('active');
             forgotView.classList.remove('active');
             resetView.classList.remove('active');
+            registerView.classList.remove('active');
 
             setTimeout(() => {
+                // Ensure all views are display:none except the target
+                loginView.style.display = (view === 'login' || !view) ? 'block' : 'none';
+                otpView.style.display = (view === 'otp') ? 'block' : 'none';
+                forgotView.style.display = (view === 'forgot') ? 'block' : 'none';
+                resetView.style.display = (view === 'reset') ? 'block' : 'none';
+                registerView.style.display = (view === 'register') ? 'block' : 'none';
+
+                // Activate the target view
                 if (view === 'otp') {
                     otpView.classList.add('active');
                     otpDigits[0].focus();
                 } else if (view === 'forgot') {
                     forgotView.classList.add('active');
-                    document.getElementById('forgotEmail').focus();
+                    const emailInput = document.getElementById('forgotEmail');
+                    if(emailInput) emailInput.focus();
                 } else if (view === 'reset') {
                     resetView.classList.add('active');
-                    document.getElementById('newPassword').focus();
+                    if(newPasswordInput) newPasswordInput.focus();
+                } else if (view === 'register') {
+                    registerView.classList.add('active');
                 } else {
                     loginView.classList.remove('hidden');
                 }
-            }, 100);
+            }, 400); // Standardized delay for transitions
         }
 
         // ─── Login Form Submit ───
@@ -2337,32 +2644,27 @@
         // ═══════════════════════════════════════════
         //  FORGOT PASSWORD FLOW
         // ═══════════════════════════════════════════
-        const forgotForm = document.getElementById('forgotForm');
-        const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
-        const forgotBtnText = document.getElementById('forgotBtnText');
-        const forgotSpinner = document.getElementById('forgotSpinner');
-        const forgotAlert = document.getElementById('forgotAlert');
-        const forgotAlertText = document.getElementById('forgotAlertText');
-        const forgotAlertIcon = document.getElementById('forgotAlertIcon');
-        const forgotBackBtn = document.getElementById('forgotBackBtn');
-        const forgotBackLink = document.getElementById('forgotBackLink');
+        // Forgot Password Flow elements (already declared at top)
 
-        // "Forgot?" link click
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchView('forgot');
-        });
+        // "Forgot?" link click - handled in the top listener
+        // forgotPasswordLink.addEventListener('click', (e) => { ... });
 
         // Back buttons
-        forgotBackBtn.addEventListener('click', () => {
-            switchView('login');
-            hideAlert(forgotAlert);
-        });
+        if (forgotBackBtn) {
+            forgotBackBtn.addEventListener('click', () => {
+                formPanel.classList.remove('panel-register');
+                switchView('login');
+                hideAlert(forgotAlert);
+            });
+        }
 
-        forgotBackLink.addEventListener('click', () => {
-            switchView('login');
-            hideAlert(forgotAlert);
-        });
+        if (forgotBackLink) {
+            forgotBackLink.addEventListener('click', () => {
+                formPanel.classList.remove('panel-register');
+                switchView('login');
+                hideAlert(forgotAlert);
+            });
+        }
 
         // Forgot Password form submit
         forgotForm.addEventListener('submit', async (e) => {
@@ -2414,16 +2716,7 @@
         // ═══════════════════════════════════════════
         //  RESET PASSWORD FLOW
         // ═══════════════════════════════════════════
-        const resetForm = document.getElementById('resetForm');
-        const resetSubmitBtn = document.getElementById('resetSubmitBtn');
-        const resetBtnText = document.getElementById('resetBtnText');
-        const resetSpinner = document.getElementById('resetSpinner');
-        const resetAlert = document.getElementById('resetAlert');
-        const resetAlertText = document.getElementById('resetAlertText');
-        const resetAlertIcon = document.getElementById('resetAlertIcon');
-        const resetBackLink = document.getElementById('resetBackLink');
-        const newPasswordInput = document.getElementById('newPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+        // Reset Flow elements (already declared at top)
         // Show email badge
         const resetEmailVal = document.getElementById('resetEmailInput').value;
         if (resetEmailVal) {
@@ -2506,15 +2799,20 @@
         // ═══════════════════════════════════════════
         const rCanvas = document.getElementById('rightCanvas');
         const rCtx = rCanvas.getContext('2d');
-        const formPanel = document.getElementById('formPanel');
+        // formPanel already declared at the top of the script
+        // const formPanel = document.getElementById('formPanel');
         const ripples = [];
         const bubbles = [];
         let rMouse = { x: -1000, y: -1000 };
         let bubbleTimer = 0;
 
         function resizeRightCanvas() {
-            rCanvas.width = formPanel.offsetWidth;
-            rCanvas.height = formPanel.offsetHeight;
+            // Use window size for fixed canvas to prevent distortion when scrolling long forms
+            const isDesktop = window.innerWidth > 960;
+            rCanvas.width = isDesktop ? formPanel.offsetWidth : window.innerWidth;
+            rCanvas.height = window.innerHeight;
+            
+            // Re-draw background to fill if necessary? No, animation does it.
         }
         resizeRightCanvas();
         window.addEventListener('resize', resizeRightCanvas);

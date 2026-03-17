@@ -236,7 +236,7 @@
                 btn.disabled = false;
                 showFieldError('current_password', 'Incorrect password.');
             }
-        } catch(err) {
+        } catch(err) {  
             console.error(err);
             showToast('Error', 'Failed to communicate with server.', 'error');
             btn.innerHTML = orig;

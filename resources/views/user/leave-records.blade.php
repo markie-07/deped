@@ -113,7 +113,7 @@
                     <thead>
                         <tr>
                             <th class="col-checkbox" style="display: none;"></th>
-                            <th>#</th>
+                            <th class="col-index">#</th>
                             <th>Name</th>
                             <th>Position</th>
                             <th>School</th>
@@ -314,25 +314,23 @@
         text-transform: uppercase;
         letter-spacing: 0.06em;
         border-bottom: 2px solid #f1f5f9;
-        white-space: nowrap;
-        position: sticky;
-        top: 0;
-        z-index: 20;
+        white-space: normal;
+        min-height: 40px;
+        vertical-align: middle;
     }
-    .master-table th.col-index { width: 3%; text-align: center; }
-    .master-table th.col-checkbox { width: 3%; text-align: center; }
-    
-    /* Column widths for Main Table */
-    .master-table th:nth-child(3), .master-table td:nth-child(3) { width: 11%; } /* Name */
-    .master-table th:nth-child(4), .master-table td:nth-child(4) { width: 9%; }  /* Position */
-    .master-table th:nth-child(5), .master-table td:nth-child(5) { width: 9%; }  /* School */
-    .master-table th:nth-child(6), .master-table td:nth-child(6) { width: 6%; }  /* Leave Type */
-    .master-table th:nth-child(7), .master-table td:nth-child(7) { width: 10%; } /* Inclusive Dates */
-    .master-table th:nth-child(8), .master-table td:nth-child(8) { width: 8%; }  /* Remarks */
-    .master-table th:nth-child(9), .master-table td:nth-child(9) { width: 8%; }  /* Action Date */
-    .master-table th:nth-child(10), .master-table td:nth-child(10) { width: 13%; } /* Deduction Remark */
-    .master-table th:nth-child(11), .master-table td:nth-child(11) { width: 10%; } /* Incharge */
-    .master-table th:nth-child(12), .master-table td:nth-child(12) { width: 10%; } /* Actions */
+    /* Fixed Column Widths for Desktop (Total 100%) */
+    .master-table th:nth-child(1), .master-table td:nth-child(1) { width: 3%; }  /* Checkbox */
+    .master-table th:nth-child(2), .master-table td:nth-child(2) { width: 3%; }  /* # Index */
+    .master-table th:nth-child(3), .master-table td:nth-child(3) { width: 12%; } /* Name */
+    .master-table th:nth-child(4), .master-table td:nth-child(4) { width: 8%; }  /* Position */
+    .master-table th:nth-child(5), .master-table td:nth-child(5) { width: 8%; }  /* School */
+    .master-table th:nth-child(6), .master-table td:nth-child(6) { width: 5%; }  /* Leave Type */
+    .master-table th:nth-child(7), .master-table td:nth-child(7) { width: 11%; } /* Inclusive Date */
+    .master-table th:nth-child(8), .master-table td:nth-child(8) { width: 14%; } /* Remarks */
+    .master-table th:nth-child(9), .master-table td:nth-child(9) { width: 11%; } /* Action Date */
+    .master-table th:nth-child(10), .master-table td:nth-child(10) { width: 10%; } /* Deduction */
+    .master-table th:nth-child(11), .master-table td:nth-child(11) { width: 8%; }  /* Incharge */
+    .master-table th:nth-child(12), .master-table td:nth-child(12) { width: 7%; }  /* Actions */
 
     /* ── Table Cells ── */
     .master-table td {
@@ -514,7 +512,8 @@
     .remark-badge {
         font-size: 0.7rem; font-weight: 600; padding: 4px 10px;
         border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;
-        white-space: nowrap;
+        white-space: normal;
+        text-align: left;
     }
     .remark-badge::before {
         content: '';
@@ -1005,12 +1004,141 @@
     .preview-table .cell-name { font-weight: 600; color: #1e293b; }
     .preview-table .cell-index { color: #94a3b8; font-weight: 500; }
 
+    /* ── Responsive Refinements ── */
+    @media (max-width: 768px) {
+        .content-body {
+            padding: 12px 14px !important;
+        }
+
+        .hero-banner { 
+            flex-direction: column; 
+            border-radius: 14px;
+        }
+
+        .hero-left {
+            padding: 24px 20px;
+        }
+
+        .hero-title {
+            font-size: 1.35rem;
+        }
+
+        .hero-right { 
+            width: 100%; 
+            border-left: none; 
+            border-top: 1.5px solid #e0e7ff; 
+            padding: 24px 20px;
+        }
+
+        .hero-filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-filters-grid .filter-item:last-child {
+            grid-column: span 1;
+        }
+
+        .hsc-actions {
+            flex-direction: column;
+        }
+
+        .btn-hsc {
+            width: 100%;
+        }
+
+        .table-card {
+            border-radius: 12px;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Make table scroll horizontally on mobile with improved wrapping */
+        .master-table {
+            min-width: 900px !important;
+            table-layout: fixed !important;
+        }
+
+        .master-table th,
+        .master-table td {
+            padding: 10px 8px !important;
+            font-size: 0.72rem !important;
+            white-space: normal !important;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        /* Keep important small columns nowrap */
+        .col-checkbox, .cell-idx, .badge-leave, .btn-action-group {
+            white-space: nowrap !important;
+        }
+
+        /* Specific wrap for dates to match user preference */
+        .cell-dates {
+            word-break: break-all;
+            min-width: 80px;
+        }
+
+        /* Remove sticky headers on mobile to prevent collision */
+        .master-table th {
+            position: relative !important;
+            z-index: auto !important;
+        }
+
+        .forwarded-header-row {
+            position: relative !important;
+            z-index: auto !important;
+        }
+
+        .import-modal-content {
+            width: 98%;
+            max-height: 98vh;
+        }
+
+        .preview-table {
+            min-width: 1000px !important;
+        }
+
+        .preview-table th, .preview-table td {
+            white-space: normal !important;
+            word-break: break-all;
+            padding: 8px 10px !important;
+            font-size: 0.72rem !important;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            flex-direction: column-reverse;
+        }
+
+        .btn-modal {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .export-actions-bar {
+            width: 92%;
+            bottom: 20px;
+            padding: 12px 16px;
+            flex-direction: column;
+            gap: 12px;
+            border-radius: 14px;
+        }
+        
+        .selection-info {
+            font-size: 0.8rem;
+        }
+    }
 </style>
 
 <script>
 const AUTH_USER_ID = "{{ auth()->id() }}";
 const AUTH_USERNAME = "{{ auth()->user()->username ?? '' }}";
 const AUTH_NAME = "{{ auth()->user()->name ?? '' }}";
+const AUTH_ROLE = "{{ auth()->user()->role ?? 'user' }}";
 document.addEventListener('DOMContentLoaded', function() {
     // Set today's date as default for date filter
     const now = new Date();
@@ -1167,7 +1295,8 @@ function fetchMasterRecords(exportModeOverride = null) {
                 const currentIncharge = r.incharge || 'System';
                 const forwarded = r.forwarded || '';
                 const inc = (r.incharge || '').toLowerCase();
-                const isMyRecord = inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
+                const isMyRecord = (r.user_id == AUTH_USER_ID) || (inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase());
+                const canEdit = isMyRecord || AUTH_ROLE === 'admin';
                 const shouldCheck = isExportMode && isMyRecord && batchId === myLatestBatch;
 
                 // Add batch separator when batch OR incharge changes
@@ -1221,7 +1350,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                                          </svg>
                                          ${r.processed_at ? formatDate(r.processed_at) : groupDate}
                                      </div>
-                                    ${isMyRecord ? `
+                                    ${canEdit ? `
                                     <a href="/user/form?forwarded=${encodeURIComponent(forwarded)}&batch=${batchId}&source=leave-records" class="btn-add-forwarded-record">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -1264,6 +1393,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                             <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
                             <td>
                                 <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
+                                    ${canEdit ? `
                                     <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
@@ -1274,6 +1404,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                         </svg>
                                     </button>
+                                    ` : ``}
                                 </div>
                             </td>
                     </tr>
@@ -1540,7 +1671,7 @@ function renderPreview() {
                 <td>${r.position}</td>
                 <td>${r.school}</td>
                 <td><span class="badge-leave">${r.type_of_leave}</span></td>
-                <td>${r.inclusive_dates}</td>
+                <td class="cell-dates">${r.inclusive_dates}</td>
                 <td><span class="remark-badge-preview ${remarkType}">${r.remarks}</span></td>
                 <td>${r.date_of_action}</td>
                 <td>${r.deduction_remarks}</td>

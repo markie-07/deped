@@ -30,7 +30,7 @@
                             </svg>
                             User Dashboard
                         </div>
-                        <h1 class="hero-title">Welcome back, {{ Auth::user()->first_name ?? Auth::user()->username ?? 'User' }}</h1>
+                        <h1 class="hero-title">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->username ?? 'User' }}</h1>
                         <p class="hero-desc">Your personal overview and activity at a glance. Manage your forms and view system history.</p>
                         <div class="hero-meta">
                             <div class="hero-meta-item">
@@ -182,39 +182,59 @@
     </main>
 
     <!-- ACTIVITY LOGS MODAL -->
-    <div id="activityLogsModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-header-container" style="width: 100%;">
-                    <div class="modal-header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div class="modal-icon-box">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:20px; height:20px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                            </div>
-                            <div class="modal-title">My Activity History</div>
-                        </div>
-                        <button class="modal-close" onclick="closeActivityModal()">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-                    <div class="modal-header-bottom" style="display: flex; align-items: center; gap: 12px; padding: 12px 0 0; border-top: 1px solid #f1f5f9;">
-                        <!-- User filter removed for users as they only see themselves -->
-                        <div class="filter-group" style="display: flex; align-items: center; gap: 8px;">
-                            <span class="filter-label" style="font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Date:</span>
-                            <input type="date" id="actDateFilter" class="act-filter-input" onchange="applyActivityFilters()">
-                        </div>
+    <div class="modal-backdrop" id="activityLogsModal" onclick="handleBackdropClick(event)">
+        <div class="modal-sheet">
+            <!-- Left Panel -->
+            <div class="modal-panel">
+                <div class="panel-avatar">
+                   @if(Auth::user() && Auth::user()->profile_image)
+                       <img src="/storage/{{ Auth::user()->profile_image }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                   @else
+                       {{ Auth::user() ? strtoupper(substr(Auth::user()->username ?? Auth::user()->name ?? 'U', 0, 1)) : 'U' }}
+                   @endif
+                </div>
+                <h2 class="panel-name">Activity History</h2>
+                <p class="panel-role">{{ Auth::user()->first_name ?? Auth::user()->username }}</p>
+                <div class="panel-stat-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px; color:#6366f1;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span class="ps-label">Total Logs:</span>
+                    <span class="ps-num" id="modalHistoryCount">0</span>
+                </div>
+                <div class="panel-divider"></div>
+                <div class="panel-filters">
+                    <label class="pf-label">Filter by Date</label>
+                    <div class="pf-date-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                        </svg>
+                        <input type="date" id="actDateFilter" onchange="applyActivityFilters()">
                     </div>
                 </div>
+                <button class="panel-close-btn" onclick="closeActivityModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                    Close History
+                </button>
             </div>
-            <div class="modal-body">
-                <div class="au-timeline" id="fullActivityLogList" style="padding-left: 28px;">
-                    <div class="au-empty">Loading history…</div>
+            <!-- Right Main Panel -->
+            <div class="modal-main">
+                <div class="modal-main-header">
+                    <h3 class="mm-title">Recent Transactions</h3>
+                    <div class="mm-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        <input type="text" id="actSearchInput" placeholder="Search activities..." oninput="applyActivityFilters()">
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-done" onclick="closeActivityModal()">Done</button>
+                <div class="modal-body">
+                    <div class="au-timeline" id="fullActivityLogList" style="padding-left: 28px;">
+                        <div class="au-empty">Loading history…</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -236,6 +256,7 @@
     border-radius: 22px;
     border: 1.5px solid #e8edf5;
     display: flex;
+    flex-wrap: wrap; /* Allow stacking on small screens */
     align-items: stretch;
     overflow: hidden;
     box-shadow: 0 4px 24px rgba(99,102,241,0.07);
@@ -268,7 +289,7 @@
 }
 .hero-desc {
     font-size: 0.82rem; color: #64748b;
-    line-height: 1.6; max-width: 420px; margin-bottom: 20px;
+    line-height: 1.6; max-width: 480px; margin-bottom: 20px;
 }
 .hero-meta { display: flex; align-items: center; gap: 20px; }
 .hero-meta-item { display: flex; align-items: center; gap: 10px; }
@@ -290,6 +311,7 @@
     border-left: 1.5px solid #e0e7ff;
     display: flex; align-items: center; justify-content: center;
     padding: 24px; position: relative; z-index: 1;
+    min-width: 280px;
 }
 .hero-clock-card { width: 100%; text-align: center; }
 .hcc-label {
@@ -500,95 +522,146 @@
     .bento { grid-template-columns: repeat(2, 1fr); }
     .hero-banner { grid-column: span 2; }
     .stat-row { grid-column: span 2; grid-template-columns: repeat(2, 1fr); }
-    .stat-row .stat-mini:last-child { grid-column: span 2; }
-    .tile-chart { grid-column: span 2; }
-    .tile-audit { grid-column: span 2; }
-    .tile-actions { grid-column: span 2; }
+    .stat-row .stat-mini:last-child { grid-column: span 1; }
+    .tile-chart, .tile-audit, .tile-actions { grid-column: span 2; }
+}
+@media (max-width: 900px) {
+    .hero-banner { flex-direction: column; }
+    .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; padding: 40px 24px; min-width: unset; }
+    .hero-left { padding: 32px 24px; }
+    .hero-title { font-size: 1.4rem; }
+    .hero-meta { flex-wrap: wrap; gap: 15px; }
+    .hero-meta-divider { display: none; }
 }
 @media (max-width: 768px) {
-    .bento { grid-template-columns: 1fr; }
-    .hero-banner { grid-column: span 1; flex-direction: column; }
-    .hero-right { width: 100%; border-left: none; border-top: 1.5px solid #e0e7ff; }
-    .stat-row { grid-column: span 1; grid-template-columns: repeat(2, 1fr); }
-    .stat-row .stat-mini:last-child { grid-column: span 2; }
-    .tile-chart, .tile-actions, .tile-audit { grid-column: span 1; }
-    .ta-grid { grid-template-columns: repeat(2, 1fr); }
-    .bento-wrap { padding: 12px; }
+    .bento { grid-template-columns: 1fr !important; gap: 12px; }
+    .hero-banner, .stat-row, .tile-chart, .tile-actions, .tile-audit { grid-column: span 1 !important; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-mini { padding: 14px; gap: 10px; }
+    .sm-num { font-size: 1.2rem; }
+    .sm-icon { width: 34px; height: 34px; }
+    .ta-grid { grid-template-columns: 1fr; }
+    .bento-wrap { padding: 12px 14px; }
+    .tc-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .tc-pills { width: 100%; justify-content: space-between; }
+    .tc-pill { flex: 1; text-align: center; padding: 6px 0; }
+    .hero-title { font-size: 1.3rem; }
+    .hero-desc { font-size: 0.8rem; margin-bottom: 24px; }
+    .hero-meta { justify-content: space-between; width: 100%; }
+    .hero-meta-item { flex: 1; }
+    .hmi-num { font-size: 1.1rem; }
+    .tile-audit { max-height: 500px; }
+    .au-timeline { max-height: 400px; }
+    .au-tm-full { display: none; }
 }
 
-/* ── Modal Overlay ── */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(15, 23, 42, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    backdrop-filter: blur(4px);
+@media (max-width: 480px) {
+    .stat-row { grid-template-columns: 1fr; }
+    .hero-meta { flex-direction: column; align-items: flex-start; gap: 16px; }
 }
-.modal-overlay.open { opacity: 1; pointer-events: auto; }
 
-.modal-container {
-    background: #fff;
-    width: 96%;
-    max-width: 800px;
-    border-radius: 22px;
-    transform: translateY(20px);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-}
-.modal-overlay.open .modal-container { transform: translateY(0); }
+    /* ── Modal Backdrop ── */
+    .modal-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1000; opacity: 0; pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
 
-.modal-header {
-    flex-direction: column;
-    padding: 20px 28px;
-    border-bottom: 1.5px solid #f1f5f9;
-    background: #fff;
-}
-.act-filter-select, .act-filter-input {
-    padding: 6px 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-family: 'Inter';
-    color: #1e293b;
-    outline: none;
-    background: #f8fafc;
-}
-.act-filter-select:focus, .act-filter-input:focus { border-color: #6366f1; background: #fff; }
-.modal-icon-box {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: #eef2ff; color: #6366f1;
-    display: flex; align-items: center; justify-content: center;
-}
-.modal-title { font-size: 1.1rem; font-weight: 900; color: #1e1b4b; letter-spacing: -0.02em; }
-.modal-close {
-    width: 32px; height: 32px; border-radius: 8px;
-    border: 1px solid #e2e8f0; background: transparent;
-    color: #94a3b8; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-}
-.modal-close:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; transform: rotate(90deg); }
-.modal-body { flex: 1; overflow-y: auto; padding: 24px; scrollbar-width: thin; }
-.modal-body::-webkit-scrollbar { width: 5px; }
-.modal-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-.modal-footer { padding: 16px 28px; border-top: 1.5px solid #f1f5f9; background: #f8fafc; display: flex; justify-content: flex-end; }
-.btn-done {
-    padding: 10px 32px; border-radius: 12px;
-    background: #1e1b4b; color: #fff; border: none;
-    font-size: 0.85rem; font-weight: 700; cursor: pointer;
-    transition: all 0.25s; box-shadow: 0 4px 12px rgba(30,27,75,0.2);
-}
-.btn-done:hover { background: #6366f1; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(99,102,241,0.3); }
+    .modal-sheet {
+        background: #fff; width: 94%; max-width: 900px;
+        height: 80vh; border-radius: 24px; overflow: hidden;
+        box-shadow: 0 32px 80px -12px rgba(0,0,0,0.25);
+        transform: scale(0.95) translateY(24px);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+    }
+    .modal-backdrop.open .modal-sheet { transform: scale(1) translateY(0); }
+
+    /* ── Modal (split-panel, indigo) ── */
+    .modal-panel { width:240px; flex-shrink:0; background:linear-gradient(160deg,#eef2ff 0%,#e0e7ff 60%,#c7d2fe 100%); padding:36px 24px 28px; display:flex; flex-direction:column; align-items:center; position:relative; overflow:hidden; border-right:1px solid #c7d2fe; }
+    .modal-panel::before { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:rgba(99,102,241,0.15); top:-60px; right:-60px; }
+    .modal-panel::after { content:''; position:absolute; width:140px; height:140px; border-radius:50%; background:rgba(99,102,241,0.1); bottom:40px; left:-40px; }
+    .panel-avatar { width:76px; height:76px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#4f46e5); border:4px solid #fff; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:900; color:#fff; position:relative; z-index:1; box-shadow:0 8px 24px rgba(99,102,241,0.3); }
+    .panel-name { font-size:0.9rem; font-weight:700; color:#1e1b4b; text-align:center; margin-top:14px; line-height:1.35; position:relative; z-index:1; }
+    .panel-role { font-size:0.68rem; color:#4f46e5; text-align:center; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; position:relative; z-index:1; }
+    .panel-stat-wrap { margin-top:20px; background:rgba(255,255,255,0.7); border:1.5px solid rgba(99,102,241,0.4); border-radius:12px; padding:11px 16px; display:flex; align-items:center; justify-content:center; gap:8px; width:100%; position:relative; z-index:1; }
+    .ps-num { font-size:1.1rem; font-weight:800; color:#1e1b4b; }
+    .ps-label { font-size:0.75rem; color:#1e1b4b; font-weight:600; }
+    .panel-divider { width:100%; height:1px; background:rgba(99,102,241,0.25); margin:20px 0; position:relative; z-index:1; }
+    .panel-filters { width:100%; position:relative; z-index:1; }
+    .pf-label { display:block; font-size:0.65rem; color:#6366f1; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+    .pf-date-wrap { position:relative; background:rgba(255,255,255,0.75); border:1.5px solid rgba(99,102,241,0.4); border-radius:12px; display:flex; align-items:center; padding:0 12px; }
+    .pf-date-wrap svg { width:14px; height:14px; color:#6366f1; flex-shrink:0; }
+    .pf-date-wrap input { flex:1; border:none; outline:none; background:transparent; padding:10px 8px; font-size:0.78rem; color:#1e1b4b; font-family:'Inter',sans-serif; cursor:pointer; min-width:0; }
+    .panel-close-btn { margin-top:28px; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:11px; border-radius:12px; border:1.5px solid rgba(99,102,241,0.4); background:rgba(255,255,255,0.7); color:#1e1b4b; font-size:0.8rem; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.2s; position:relative; z-index:1; }
+    .panel-close-btn svg { width:16px; height:16px; }
+    .panel-close-btn:hover { background:#fee2e2; border-color:#fca5a5; color:#ef4444; }
+
+    .modal-main { flex:1; background:#fff; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+    .modal-main-header { display:flex; align-items:center; justify-content:space-between; padding:20px 26px; border-bottom:1px solid #f1f5f9; background:#f8fafc; flex-shrink:0; gap:14px; }
+    .mm-title { font-size:1rem; font-weight:700; color:#1e293b; }
+    .mm-search { position:relative; display:flex; align-items:center; background:#f1f5f9; border-radius:12px; padding:0 14px; gap:8px; border:1.5px solid transparent; transition:all 0.2s; }
+    .mm-search:focus-within { background:#fff; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.08); }
+    .mm-search svg { width:14px; height:14px; color:#94a3b8; flex-shrink:0; }
+    .mm-search:focus-within svg { color:#6366f1; }
+    .mm-search input { border:none; outline:none; background:transparent; padding:9px 0; font-size:0.8rem; font-family:'Inter',sans-serif; color:#1e293b; width:200px; }
+    .mm-search input::placeholder { color:#b0bac9; }
+
+    /* ── Dark Mode (Modal Overrides) ── */
+    body.dark-mode .modal-sheet { background: #0f172a; border: 1px solid #1e293b; box-shadow: 0 40px 100px -12px rgba(0,0,0,0.7); }
+    body.dark-mode .modal-panel { background: linear-gradient(160deg, #1e1b4b 0%, #0f172a 60%, #020617 100%); border-right: 1px solid #1e293b; }
+    body.dark-mode .modal-panel::before { background: rgba(99,102,241,0.05); }
+    body.dark-mode .modal-panel::after { background: rgba(99,102,241,0.03); }
+    body.dark-mode .panel-avatar { border-color: #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    body.dark-mode .panel-name { color: #f1f5f9; }
+    body.dark-mode .panel-role { color: #818cf8; }
+    body.dark-mode .panel-stat-wrap { background: rgba(30,41,59,0.4); border-color: rgba(99,102,241,0.15); }
+    body.dark-mode .ps-num { color: #fff; }
+    body.dark-mode .ps-label { color: #818cf8; }
+    body.dark-mode .panel-divider { background: rgba(30,41,59,0.7); }
+    body.dark-mode .pf-label { color: #818cf8; }
+    body.dark-mode .pf-date-wrap { background: rgba(15,23,42,0.4); border-color: #334155; }
+    body.dark-mode .pf-date-wrap input { color: #f1f5f9; color-scheme: dark; }
+    body.dark-mode .pf-date-wrap svg { color: #818cf8; }
+    body.dark-mode .panel-close-btn { background: rgba(30,41,59,0.5); border-color: #334155; color: #cbd5e1; }
+    body.dark-mode .panel-close-btn:hover { background: rgba(239,68,68,0.1); border-color: #f87171; color: #f87171; }
+    body.dark-mode .modal-main { background: #0f172a; }
+    body.dark-mode .modal-main-header { background: #111827; border-bottom: 1px solid #1e293b; }
+    body.dark-mode .mm-title { color: #f1f5f9; }
+    body.dark-mode .mm-search { background: #1e293b; }
+    body.dark-mode .mm-search input { color: #f1f5f9; }
+    body.dark-mode .mm-search svg { color: #64748b; }
+    body.dark-mode .modal-body::-webkit-scrollbar-thumb { background: #334155; }
+
+    .modal-body { flex: 1; overflow-y: auto; padding: 24px; scrollbar-width: thin; }
+    .modal-body::-webkit-scrollbar { width: 5px; }
+    .modal-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+    @media (max-width: 768px) {
+        .modal-sheet { width: 100%; height: 100vh; border-radius: 0; flex-direction: column; max-height: none; overflow-y: auto; }
+        .modal-panel { width: 100%; flex-shrink: 0; padding: 24px 20px; flex-direction: column; align-items: center; gap: 4px; border-right: none; border-bottom: 1px solid #c7d2fe; position: relative; }
+        .modal-main { flex: none; overflow-y: visible; }
+        .modal-panel::before, .modal-panel::after { display: none; }
+        .panel-avatar { width: 64px; height: 64px; font-size: 1.2rem; margin-bottom: 4px; }
+        .panel-name { font-size: 1rem; margin-top: 8px; text-align: center; }
+        .panel-role, .panel-divider { display: none; }
+        .panel-stat-wrap { margin-top: 0; padding: 11px 20px; width: 100%; }
+        .ps-num { font-size: 1.1rem; }
+        .panel-filters { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 20px; }
+        .pf-label { display: block; margin-bottom: 4px; }
+        .pf-date-wrap { width: 100%; }
+        .panel-close-btn { margin-top: 12px; width: 100%; padding: 11px; border-radius: 12px; position: static; height: auto; font-size: 0.8rem; }
+        .panel-close-btn svg { width: 16px; height: 16px; margin-right: 6px; }
+        
+        .modal-main-header { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 16px; }
+        .mm-search { width: 100%; }
+        .mm-search input { width: 100%; }
+        body.dark-mode .modal-panel { border-bottom-color: #1e293b; }
+    }
 </style>
 
 <script>
@@ -837,21 +910,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderLogs(logs, container) {
         if(!logs.length){container.innerHTML='<div class="au-empty">No matching activity</div>';return;}
-        container.innerHTML=logs.map(l=>{
-            const a=l.action.toLowerCase();
-            let ecls='e-create',tag='Created',tcls='t-create';
-            if(a.includes('logged')){ecls='e-login';tag='Login';tcls='t-login';}
-            else if(a.includes('updated')){ecls='e-update';tag='Updated';tcls='t-update';}
-            else if(a.includes('deleted')){ecls='e-delete';tag='Deleted';tcls='t-delete';}
-            else if(a.includes('bulk')){ecls='e-bulk';tag='Bulk';tcls='t-bulk';}
-            const t=new Date(l.created_at);
-            const ago=timeAgo(t);
+        if (container.id === 'fullActivityLogList') {
+            const countEl = document.getElementById('modalHistoryCount');
+            if (countEl) countEl.textContent = logs.length;
+        }
+        if(!logs.length){
+            container.innerHTML='<div class="au-empty">No activity found.</div>';
+            return;
+        }
+        container.innerHTML = logs.map(l => {
+            const t = new Date(l.created_at);
+            const ago = timeAgo(t);
+            let tcls = 't-create', tag = 'Created';
+            let icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>';
+            
+            if (l.action.includes('Logged in')) { tcls='t-login'; tag='Login'; icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25V9m3 0a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H12.75a.75.75 0 0 1-.75-.75V9Z"/></svg>'; }
+            else if (l.action.includes('Updated')) { tcls='t-update'; tag='Updated'; icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>'; }
+            else if (l.action.includes('Deleted')) { tcls='t-delete'; tag='Deleted'; icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>'; }
+            else if (l.action.includes('Bulk')) { tcls='t-bulk'; tag='Bulk'; icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>'; }
+
+            const eCls = tcls.replace('t-', 'e-');
             const av=l.user&&l.user.profile_image?`/storage/${l.user.profile_image}`:`https://ui-avatars.com/api/?name=${encodeURIComponent(l.user?l.user.username:'S')}&background=eef2ff&color=6366f1&bold=true&size=64`;
-            const user=l.user?l.user.username:'system';
-            return `<div class="au-entry ${ecls}">
+
+            return `
+            <div class="au-entry ${eCls}">
                 <div class="au-av"><img src="${av}"></div>
                 <div class="au-body">
-                    <div class="au-act"><b>@${user}</b> ${l.action.replace(/^[A-Z]/, c=>c.toLowerCase())}</div>
+                    <div class="au-act">${l.action}</div>
                     <div class="au-meta">
                         <span class="au-tag ${tcls}">${tag}</span>
                         ${l.details?`<span class="au-det">${l.details}</span>`:''}
@@ -865,12 +950,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.applyActivityFilters = function() {
         const dateVal = document.getElementById('actDateFilter').value;
+        const searchVal = (document.getElementById('actSearchInput') ? document.getElementById('actSearchInput').value : '').toLowerCase();
         let filtered = activityLogs;
         
         if (dateVal) {
             filtered = filtered.filter(l => {
                 const logDate = new Date(l.created_at).toISOString().split('T')[0];
                 return logDate === dateVal;
+            });
+        }
+
+        if (searchVal) {
+            filtered = filtered.filter(l => {
+                return (l.action || '').toLowerCase().includes(searchVal) || 
+                       (l.details || '').toLowerCase().includes(searchVal);
             });
         }
         
@@ -888,6 +981,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.closeActivityModal = function() {
         document.getElementById('activityLogsModal').classList.remove('open');
         document.body.style.overflow = '';
+    };
+
+    window.handleBackdropClick = function(e) {
+        if (e.target.classList.contains('modal-backdrop')) closeActivityModal();
     };
 
     document.addEventListener('keydown', function(e) {
