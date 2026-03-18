@@ -51,6 +51,14 @@
     </div>
 
     <div class="navbar-right">
+        <!-- DateTime Display -->
+        <div class="navbar-datetime" id="navbarDateTime">
+            <div class="datetime-content">
+                <span id="navbarDate" class="date-text"></span>
+                <span id="navbarTime" class="time-text"></span>
+            </div>
+        </div>
+
         <!-- Dark mode toggle -->
         <div class="navbar-icon-btn" id="darkModeToggle" title="Toggle Appearance">
             <!-- Moon svg -->
@@ -227,6 +235,49 @@
 
     .navbar-search input::placeholder {
         color: #cbd5e1;
+    }
+
+    /* ── Date & Time ── */
+    .navbar-datetime {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 1.5px solid #eef2ff;
+        padding: 5px 15px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: default;
+    }
+
+    .navbar-datetime:hover {
+        border-color: #6366f1;
+        background: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+    }
+
+    .datetime-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .date-text {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        line-height: 1.1;
+    }
+
+    .time-text {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
     }
 
     /* ── Icon Buttons ── */
@@ -408,7 +459,8 @@
             min-height: 60px;
         }
         
-        .navbar-search {
+        .navbar-search,
+        .navbar-datetime {
             display: none;
         }
 
@@ -501,6 +553,22 @@
     body.dark-mode .navbar-toggle span { background: #818cf8; }
     body.dark-mode .navbar-icon-btn:hover, body.dark-mode .navbar-toggle:hover { background: #6366f1; border-color: #6366f1; color: #fff; }
     body.dark-mode .navbar-toggle:hover span { background: #fff; }
+
+    body.dark-mode .navbar-datetime {
+        background: rgba(30, 41, 59, 0.5);
+        border-color: rgba(99, 102, 241, 0.15);
+    }
+    body.dark-mode .navbar-datetime:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: #6366f1;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    body.dark-mode .date-text {
+        color: #6366f1;
+    }
+    body.dark-mode .time-text {
+        color: #f1f5f9;
+    }
 
     /* User Dropdown Dark Mode */
     body.dark-mode .navbar-dropdown { 
@@ -830,5 +898,31 @@
                 throw error;
             }
         };
+
+        // Digital Clock Logic
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true 
+            });
+            
+            const dateEl = document.getElementById('navbarDate');
+            const timeEl = document.getElementById('navbarTime');
+            
+            if (dateEl) dateEl.textContent = dateStr;
+            if (timeEl) timeEl.textContent = timeStr;
+        }
+        
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
     });
 </script>
