@@ -10,17 +10,17 @@
 
     <!-- Profile Section -->
     <a href="/admin/profile" class="sidebar-profile" style="text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-        @if(Auth::user() && Auth::user()->profile_image)
-            <img src="/storage/{{ Auth::user()->profile_image }}" class="profile-avatar" style="object-fit: cover; border: 3px solid #e2e8f0;">
-        @elseif(Auth::user())
+        @if(auth()->user() && auth()->user()->profile_image)
+            <img src="/storage/{{ auth()->user()->profile_image }}" class="profile-avatar" style="object-fit: cover; border: 3px solid #e2e8f0;">
+        @elseif(auth()->user())
             <div class="profile-avatar">
-                {{ strtoupper(substr(Auth::user()->username ?? Auth::user()->name ?? 'U', 0, 1)) }}
+                {{ strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'U', 0, 1)) }}
             </div>
         @else
             <div class="profile-avatar">G</div>
         @endif
-        <span class="profile-name">{{ Auth::user()->username ?? Auth::user()->name ?? 'Guest' }}</span>
-        <span class="profile-role">{{ Auth::user()->position ?? 'User' }}</span>
+        <span class="profile-name">{{ auth()->user()->username ?? auth()->user()->name ?? 'Guest' }}</span>
+        <span class="profile-role">{{ auth()->user()->position ?? 'User' }}</span>
     </a>
 
     <!-- Navigation Panels Container -->

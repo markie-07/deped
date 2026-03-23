@@ -33,6 +33,7 @@ class User extends Authenticatable
         'cover_offset_x',
         'cover_offset_y',
         'cover_zoom',
+        'face_descriptor',
         'email',
         'password',
         'is_active',

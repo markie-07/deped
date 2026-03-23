@@ -30,7 +30,7 @@
                             </svg>
                             Admin Dashboard
                         </div>
-                        <h1 class="hero-title">Welcome back, {{ Auth::user()->first_name ?? Auth::user()->username ?? 'Admin' }}</h1>
+                        <h1 class="hero-title">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->username ?? 'Admin' }}</h1>
                         <p class="hero-desc">Your system overview and activity at a glance. Manage leave records, employees, and more.</p>
                         <div class="hero-meta">
                             <div class="hero-meta-item">
@@ -95,13 +95,6 @@
                         <div class="sm-info">
                             <div class="sm-num" id="totalLeaveTypes">0</div>
                             <div class="sm-label">Leave Types</div>
-                        </div>
-                    </div>
-                    <div class="stat-mini stat-rose">
-                        <div class="sm-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg></div>
-                        <div class="sm-info">
-                            <div class="sm-num" id="totalRemarks">0</div>
-                            <div class="sm-label">Remarks</div>
                         </div>
                     </div>
                 </div>
@@ -207,10 +200,10 @@
             <!-- Left Panel -->
             <div class="modal-panel">
                 <div class="panel-avatar">
-                   @if(Auth::user() && Auth::user()->profile_image)
-                       <img src="/storage/{{ Auth::user()->profile_image }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                   @if(auth()->user() && auth()->user()->profile_image)
+                       <img src="/storage/{{ auth()->user()->profile_image }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                    @else
-                       {{ Auth::user() ? strtoupper(substr(Auth::user()->username ?? Auth::user()->name ?? 'A', 0, 1)) : 'A' }}
+                       {{ auth()->user() ? strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'A', 0, 1)) : 'A' }}
                    @endif
                 </div>
                 <h2 class="panel-name">System Activity</h2>
@@ -359,7 +352,7 @@
 .stat-row {
     grid-column: span 4;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
 }
 .stat-mini {
@@ -721,7 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
             cUp('totalSchools',d.total_schools);
             cUp('totalPositions',d.total_positions);
             cUp('totalLeaveTypes',d.total_types_of_leave);
-            cUp('totalRemarks',d.total_remarks);
         });
     }
     function cUp(id,end){

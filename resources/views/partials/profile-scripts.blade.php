@@ -611,3 +611,347 @@
         }
     }
 </script>
+
+<!-- Face Recognition -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+    let bioStream = null;
+    let bioModelsLoaded = false;
+    let bioDetectionInterval = null;
+    let bioAttempting = false;
+    let bioCurrentDescriptor = null;
+    let bioRecentDescriptors = [];
+    const REQUIRED_SAMPLES = 5;
+
+    // Modal Elements
+    const bioModalOverlay = document.getElementById('bioModalOverlay');
+    const bioModalClose = document.getElementById('bioModalClose');
+    const btnFaceRegTrigger = document.getElementById('btnFaceRegTrigger');
+    const btnScanFace = document.getElementById('btnScanFace');
+
+    // Math Panel Elements
+    const valDetection = document.getElementById('valDetection');
+    const barDetection = document.getElementById('barDetection');
+    const valDistance = document.getElementById('valDistance');
+    const distMarker = document.getElementById('distMarker');
+    const distMatchStatus = document.getElementById('distMatchStatus');
+    const valVectors = document.getElementById('valVectors');
+    const statSamples = document.getElementById('statSamples');
+    const statL2 = document.getElementById('statL2');
+    const statMin = document.getElementById('statMin');
+    const embeddingCanvas = document.getElementById('embeddingCanvas');
+    const hudScore = document.getElementById('hudScore');
+    const hudProgress = document.getElementById('hudProgress');
+    const bioAlert = document.getElementById('bioAlert');
+    const bioAlertText = document.getElementById('bioAlertText');
+    const btnScanText = document.getElementById('btnScanText');
+
+    function setPipeStatus(stepId, status) {
+        const el = document.getElementById(stepId);
+        if (!el) return;
+        el.classList.remove('active', 'done');
+        if (status) el.classList.add(status);
+    }
+
+    if (btnFaceRegTrigger) {
+        btnFaceRegTrigger.addEventListener('click', openBioModal);
+    }
+    if (bioModalClose) {
+        bioModalClose.addEventListener('click', closeBioModal);
+    }
+    if (btnScanFace) {
+        btnScanFace.addEventListener('click', startScanningProcess);
+    }
+
+    async function openBioModal() {
+        if (!document.getElementById('newPasswordSection') || document.getElementById('newPasswordSection').style.display !== 'block') {
+            showToast('Security Action Required', 'Please verify your current password first to manage biometric data.', 'error');
+            const passInput = document.getElementById('inputCurrentPassword');
+            if (passInput) {
+                passInput.focus();
+                passInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+        bioModalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('bioModalTitle').textContent = 'Register Biometric Data';
+        document.getElementById('bioModalSubtitle').textContent = 'Securely link your face to your account';
+        document.getElementById('btnScanText').textContent = 'Start Registration Scan';
+        await startBioCamera();
+    }
+
+    function closeBioModal() {
+        bioModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        stopBioCamera();
+    }
+
+    async function loadBioModels() {
+        if (bioModelsLoaded) return;
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+        await Promise.all([
+            faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        ]);
+        bioModelsLoaded = true;
+    }
+
+    /**
+     * Cross-browser / cross-context getUserMedia polyfill.
+     * Works on HTTP (mobile hotspot), older Android browsers, and modern browsers.
+     */
+    function getMediaStream(constraints) {
+        // Modern browsers with secure context
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            return navigator.mediaDevices.getUserMedia(constraints);
+        }
+        // Polyfill mediaDevices for HTTP contexts (non-secure origin)
+        const legacyGetUserMedia =
+            navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia ||
+            navigator.msGetUserMedia;
+
+        if (legacyGetUserMedia) {
+            return new Promise((resolve, reject) => {
+                legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+            });
+        }
+
+        return Promise.reject(new Error(
+            'Camera access is not available. Please open this page over HTTPS or use localhost.'
+        ));
+    }
+
+    async function startBioCamera() {
+        const statusText = document.getElementById('bioCamStatusText');
+        const video = document.getElementById('bioVideo');
+        
+        statusText.textContent = 'Loading models...';
+        try {
+            await loadBioModels();
+            statusText.textContent = 'Starting camera...';
+            
+            bioStream = await getMediaStream({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+            });
+            video.srcObject = bioStream;
+            await video.play();
+            
+            statusText.textContent = 'System Ready';
+            document.querySelector('.bio-cam-status').classList.add('active');
+            
+            startDetectionLoop();
+            setPipeStatus('stepDetect', 'active');
+            setPipeStatus('stepAlign', 'active');
+        } catch (err) {
+            console.error(err);
+            statusText.textContent = 'Camera Error';
+            let msg = err.message || 'Unknown error';
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                msg = 'Camera permission denied. Please allow camera access in your browser settings.';
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                msg = 'No camera found on this device.';
+            } else if (!navigator.mediaDevices) {
+                msg = 'Camera access requires a secure connection (HTTPS). Please contact your administrator.';
+            }
+            showBioAlert(msg, 'error');
+        }
+    }
+
+    function stopBioCamera() {
+        if (bioDetectionInterval) {
+            clearInterval(bioDetectionInterval);
+            bioDetectionInterval = null;
+        }
+        if (bioStream) {
+            bioStream.getTracks().forEach(t => t.stop());
+            bioStream = null;
+        }
+        const video = document.getElementById('bioVideo');
+        if (video) video.srcObject = null;
+        document.querySelector('.bio-cam-status').classList.remove('active');
+        bioAttempting = false;
+        document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active', 'done'));
+    }
+
+    function startDetectionLoop() {
+        const video = document.getElementById('bioVideo');
+        const canvas = document.getElementById('bioCanvas');
+        
+        bioDetectionInterval = setInterval(async () => {
+            if (!video.videoWidth) return;
+            
+            const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+            
+            const displaySize = { width: video.videoWidth, height: video.videoHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (detection) {
+                const resized = faceapi.resizeResults(detection, displaySize);
+                faceapi.draw.drawDetections(canvas, resized);
+                
+                bioCurrentDescriptor = detection.descriptor;
+                updateMathPanel(detection);
+                drawEmbedding(detection.descriptor);
+            } else {
+                bioCurrentDescriptor = null;
+                resetMathPanel();
+            }
+        }, 100);
+    }
+
+    function updateMathPanel(detection) {
+        const score = detection.detection.score;
+        valDetection.textContent = score.toFixed(4);
+        barDetection.style.width = (score * 100) + '%';
+        hudScore.textContent = `Score: ${Math.round(score * 100)}%`;
+        
+        if (score > 0.82) {
+            barDetection.style.background = '#10b981';
+            document.getElementById('bioScanFrame').classList.add('scanning');
+        } else {
+            barDetection.style.background = '#7c3aed';
+            document.getElementById('bioScanFrame').classList.remove('scanning');
+        }
+
+        const descriptor = detection.descriptor;
+        const l2Norm = Math.sqrt(descriptor.reduce((sum, val) => sum + val * val, 0));
+        statL2.textContent = l2Norm.toFixed(4);
+    }
+
+    function resetMathPanel() {
+        valDetection.textContent = '0.0000';
+        barDetection.style.width = '0%';
+        hudScore.textContent = 'Score: --%';
+        document.getElementById('bioScanFrame').classList.remove('scanning');
+        const ctx = embeddingCanvas.getContext('2d');
+        ctx.clearRect(0, 0, embeddingCanvas.width, embeddingCanvas.height);
+    }
+
+    function drawEmbedding(descriptor) {
+        const ctx = embeddingCanvas.getContext('2d');
+        const w = embeddingCanvas.width;
+        const h = embeddingCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+        const barWidth = w / 128;
+        for (let i = 0; i < 128; i++) {
+            const r = Math.floor((descriptor[i] + 0.5) * 255);
+            ctx.fillStyle = `rgb(${40}, ${r}, ${250})`;
+            ctx.fillRect(i * barWidth, 0, barWidth, h);
+        }
+    }
+
+    async function startScanningProcess() {
+        if (!bioCurrentDescriptor) {
+            showBioAlert('Please position your face clearly.', 'error');
+            return;
+        }
+        if (bioAttempting) return;
+        bioAttempting = true;
+        btnScanFace.disabled = true;
+        btnScanText.textContent = 'Scanning Vectors...';
+        setPipeStatus('stepDetect', 'done');
+        setPipeStatus('stepAlign', 'done');
+        setPipeStatus('stepExtract', 'active');
+        bioRecentDescriptors = [];
+        
+        let samplesTaken = 0;
+        const collectInterval = setInterval(async () => {
+            if (bioCurrentDescriptor) {
+                bioRecentDescriptors.push(Array.from(bioCurrentDescriptor));
+                samplesTaken++;
+                hudProgress.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
+                statSamples.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
+                if (samplesTaken >= REQUIRED_SAMPLES) {
+                    clearInterval(collectInterval);
+                    await performRegistration();
+                }
+            }
+        }, 300);
+    }
+
+    async function performRegistration() {
+        const statusText = document.getElementById('bioCamStatusText');
+        statusText.textContent = 'Saving Secure Descriptor...';
+        setPipeStatus('stepExtract', 'done');
+        setPipeStatus('stepMatch', 'active');
+        
+        const avgDescriptor = bioRecentDescriptors[0].map((_, i) => {
+            return bioRecentDescriptors.reduce((sum, d) => sum + d[i], 0) / bioRecentDescriptors.length;
+        });
+        
+        try {
+            const res = await fetch('{{ url("/api/face/register") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ descriptor: JSON.stringify(avgDescriptor) })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPipeStatus('stepMatch', 'done');
+                statusText.textContent = 'Registration Complete!';
+                document.getElementById('bioScanFrame').classList.add('success');
+                showBioAlert('Brilliant! Your face is now registered.', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showBioAlert(data.message || 'Registration failed.', 'error');
+                btnScanFace.disabled = false;
+                bioAttempting = false;
+            }
+        } catch (err) {
+            console.error(err);
+            showBioAlert('Server communication failed.', 'error');
+            btnScanFace.disabled = false;
+            bioAttempting = false;
+        }
+    }
+
+    async function removeFaceData() {
+        if (!document.getElementById('newPasswordSection') || document.getElementById('newPasswordSection').style.display !== 'block') {
+            showToast('Security Action Required', 'Please verify your current password first to remove biometric data.', 'error');
+            const passInput = document.getElementById('inputCurrentPassword');
+            if (passInput) {
+                passInput.focus();
+                passInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+        if (!confirm('Are you sure you want to remove your face recognition data?')) return;
+        try {
+            const res = await fetch('{{ url("/api/face/remove") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('Success', 'Face recognition data removed.');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast('Error', data.message || 'Failed to remove face data.', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showBioAlert('Server communication failed.', 'error');
+        }
+    }
+
+    function showBioAlert(msg, type) {
+        bioAlert.className = 'bio-alert show ' + type;
+        bioAlertText.textContent = msg;
+    }
+</script>

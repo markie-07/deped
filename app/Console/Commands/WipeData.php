@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class WipeData extends Command
 {
@@ -32,7 +34,7 @@ class WipeData extends Command
         $this->info('Wiping data...');
 
         // Disable foreign key checks for truncation
-        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         $tables = [
             'leave_records',
@@ -45,13 +47,13 @@ class WipeData extends Command
         ];
 
         foreach ($tables as $table) {
-            if (\Schema::hasTable($table)) {
-                \DB::table($table)->truncate();
+            if (Schema::hasTable($table)) {
+                DB::table($table)->truncate();
                 $this->line("Truncated: {$table}");
             }
         }
 
-        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->info('Operational data wiped successfully! User accounts were not affected.');
     }

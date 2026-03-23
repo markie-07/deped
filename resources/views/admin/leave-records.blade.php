@@ -319,16 +319,16 @@
         vertical-align: middle;
     }
     /* Fixed Column Widths for Desktop (Total 100%) */
-    .master-table th:nth-child(1), .master-table td:nth-child(1) { width: 3%; }  /* Checkbox */
-    .master-table th:nth-child(2), .master-table td:nth-child(2) { width: 3%; }  /* # Index */
-    .master-table th:nth-child(3), .master-table td:nth-child(3) { width: 12%; } /* Name */
-    .master-table th:nth-child(4), .master-table td:nth-child(4) { width: 8%; }  /* Position */
-    .master-table th:nth-child(5), .master-table td:nth-child(5) { width: 8%; }  /* School */
-    .master-table th:nth-child(6), .master-table td:nth-child(6) { width: 5%; }  /* Leave Type */
-    .master-table th:nth-child(7), .master-table td:nth-child(7) { width: 11%; } /* Inclusive Date */
+    .master-table th:nth-child(1), .master-table td:nth-child(1) { width: 3%; padding: 12px 5px !important; }  /* Checkbox */
+    .master-table th:nth-child(2), .master-table td:nth-child(2) { width: 3%; padding: 12px 5px !important; }  /* # Index */
+    .master-table th:nth-child(3), .master-table td:nth-child(3) { width: 10%; } /* Name */
+    .master-table th:nth-child(4), .master-table td:nth-child(4) { width: 7%; }  /* Position */
+    .master-table th:nth-child(5), .master-table td:nth-child(5) { width: 7%; }  /* School */
+    .master-table th:nth-child(6), .master-table td:nth-child(6) { width: 10%; } /* Leave Type */
+    .master-table th:nth-child(7), .master-table td:nth-child(7) { width: 12%; } /* Inclusive Date */
     .master-table th:nth-child(8), .master-table td:nth-child(8) { width: 14%; } /* Remarks */
-    .master-table th:nth-child(9), .master-table td:nth-child(9) { width: 11%; } /* Action Date */
-    .master-table th:nth-child(10), .master-table td:nth-child(10) { width: 10%; } /* Deduction */
+    .master-table th:nth-child(9), .master-table td:nth-child(9) { width: 10%; } /* Action Date */
+    .master-table th:nth-child(10), .master-table td:nth-child(10) { width: 9%; } /* Deduction */
     .master-table th:nth-child(11), .master-table td:nth-child(11) { width: 8%; }  /* Incharge */
     .master-table th:nth-child(12), .master-table td:nth-child(12) { width: 7%; }  /* Actions */
 
@@ -506,8 +506,11 @@
     .badge-leave {
         font-size: 0.7rem; font-weight: 600; padding: 4px 10px;
         border-radius: 6px; background: #eef2ff; color: #4f46e5;
-        display: inline-block; white-space: nowrap;
+        display: inline-block; white-space: normal;
+        word-break: break-all;
+        line-height: 1.2;
         letter-spacing: 0.01em;
+        max-width: 100%;
     }
     .remark-badge {
         font-size: 0.7rem; font-weight: 600; padding: 4px 10px;
@@ -1168,6 +1171,7 @@ function filterRecords() {
     let hasVisibleInGroup = false;
     let hasVisibleInBatch = false;
 
+    let visibleRowIndex = 0;
     rows.forEach(row => {
         if (row.classList.contains('batch-header-row')) {
             // Hide previous batch/group headers if no visible records
@@ -1202,7 +1206,9 @@ function filterRecords() {
             let matchesIncharge = true;
             if (inchargeFilter !== 'all') {
                 const rowIncharge = row.getAttribute('data-incharge') || '';
-                matchesIncharge = rowIncharge === inchargeFilter;
+                const selectedOpt = document.getElementById('inchargeFilter').selectedOptions[0];
+                const filterUsername = selectedOpt ? selectedOpt.getAttribute('data-username') : '';
+                matchesIncharge = (rowIncharge === inchargeFilter || (filterUsername && rowIncharge === filterUsername));
             }
             
             const isVisible = matchesSearch && matchesRemark && matchesIncharge;
@@ -1211,6 +1217,9 @@ function filterRecords() {
             if (isVisible) {
                 hasVisibleInGroup = true;
                 hasVisibleInBatch = true;
+                visibleRowIndex++;
+                const idxCell = row.querySelector('.cell-idx');
+                if (idxCell) idxCell.textContent = visibleRowIndex;
             }
         }
     });
@@ -1249,9 +1258,8 @@ function fetchMasterRecords(exportModeOverride = null) {
             const grouped = {};
             data.forEach(r => {
                 const batchId = r.batch_id || 1;
-                const incharge = r.incharge || 'System';
                 const forwarded = r.forwarded || '';
-                const groupKey = `${incharge}|${forwarded}`;
+                const groupKey = forwarded;
 
                 if (!grouped[batchId]) grouped[batchId] = { groupOrder: [], groups: {} };
                 if (!grouped[batchId].groups[groupKey]) {
@@ -1278,8 +1286,8 @@ function fetchMasterRecords(exportModeOverride = null) {
             let lastDept = null;
             let rowIndex = 0;
 
-            // Count unique logical batches (batch_id + incharge)
-            const uniqueLogicalBatches = [...new Set(data.map(r => `${r.batch_id || 1}|${r.incharge || ''}`))];
+            // Count unique batches
+            const uniqueLogicalBatches = [...new Set(data.map(r => `${r.batch_id || 1}`))];
             const showBatchHeaders = uniqueLogicalBatches.length > 1;
 
             const myRecords = data.filter(r => {
@@ -1296,8 +1304,8 @@ function fetchMasterRecords(exportModeOverride = null) {
                 const isMyRecord = inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
                 const shouldCheck = isExportMode && isMyRecord && batchId === myLatestBatch;
 
-                // Add batch separator when batch OR incharge changes
-                if (batchId !== lastBatchId || currentIncharge.toLowerCase().trim() !== (lastInchargeName || '').toLowerCase().trim()) {
+                // Add batch separator when batch_id changes
+                if (batchId !== lastBatchId) {
                     const isFirstBatch = lastBatchId === null;
                     lastDept = null; 
                     html += `
@@ -1326,7 +1334,7 @@ function fetchMasterRecords(exportModeOverride = null) {
 
                 const isProcessed = r.is_processed == 1 || r.is_processed === true;
 
-                const groupKey = `${r.incharge || 'System'}|${forwarded}`;
+                const groupKey = `${batchId}|${forwarded}`;
                 if (forwarded && forwarded !== 'No Forwarded' && groupKey !== lastDept) {
                     const groupDate = r.date_of_action ? formatDate(r.date_of_action) : '-';
                     html += `
@@ -1341,7 +1349,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                                         </svg>
                                         <span>${forwarded} ${!isProcessed ? ` - <span class="forwarded-incharge-name">(${r.incharge || 'Unknown'})</span>` : ''}</span>
                                     </div>
-                                    <div class="header-date-badge" style="margin-left: 10px; display: ${isProcessed ? 'flex' : 'none'}; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                                    <div class="header-date-badge" style="margin-left: 10px; display: none; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; color: #6366f1;">
                                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                          </svg>
@@ -1369,37 +1377,36 @@ function fetchMasterRecords(exportModeOverride = null) {
                 else if (rem.includes('pending')) remarkClass = 'yellow';
 
                 const remarkBadge = `<span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span>`;
-                const index = i;
 
                 html += `
                     <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                             <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${forwarded.replace(/'/g, "\\'")}', ${batchId})">
                         </td>
-                            <td class="cell-idx" style="font-weight: 600; font-family:monospace;">${index + 1}</td>
-                            <td class="cell-name" style="font-weight: 700;">${r.name}</td>
-                            <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
-                            <td class="cell-school">${r.school || '-'}</td>
-                            <td><span class="badge-leave">${r.type_of_leave}</span></td>
-                            <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
-                            <td>${remarkBadge}</td>
-                            <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
-                            <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
-                            <td>
-                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
-                                    <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
-                                        </svg>
-                                    </button>
-                                    <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
+                        <td class="cell-idx" style="font-weight: 600; font-family:monospace; text-align: center;">${rowIndex}</td>
+                        <td class="cell-name" style="font-weight: 700;">${r.name}</td>
+                        <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
+                        <td class="cell-school">${r.school || '-'}</td>
+                        <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                        <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
+                        <td>${remarkBadge}</td>
+                        <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
+                        <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
+                        <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
+                                <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                    </svg>
+                                </button>
+                                <button onclick="deleteRecord(${r.id})" class="btn-action btn-delete" title="Delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px; height:14px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
@@ -1419,7 +1426,9 @@ function fetchMasterRecords(exportModeOverride = null) {
                 data.forEach(i => {
                     const opt = document.createElement('option');
                     opt.value = i.incharge;
-                    opt.textContent = i.incharge;
+                    opt.textContent = i.username || i.incharge;
+                    if (i.username) opt.setAttribute('data-username', i.username);
+
                     inchargeSelect.appendChild(opt);
                 });
             });
@@ -1892,7 +1901,7 @@ function downloadSelectedExcel() {
 
     const rows = document.querySelectorAll('#masterTableBody tr');
     let counter = 1;
-    let lastExportedBatch = null;
+    let isFirstHeader = true;
     
     // Color mapping for consistent forwarded headers
     const forwardedColorMap = {};
@@ -1934,11 +1943,11 @@ function downloadSelectedExcel() {
                 next = next.nextElementSibling;
             }
             
-            // If it's not the first batch we are exporting and it has selected items, add a spacer row
-            if (hasSelected && lastExportedBatch !== null) {
+            // If it's not the first header we are exporting, add a spacer row
+            if (hasSelected && !isFirstHeader) {
                 html += `<tr class="batch-spacer"><td colspan="10" style="border:none; height:20px;"></td></tr>`;
             }
-            if (hasSelected) lastExportedBatch = batchId;
+            if (hasSelected) isFirstHeader = false;
 
         } else if (row.classList.contains('forwarded-header-row')) {
             const forwardedName = row.getAttribute('data-forwarded');
@@ -1954,8 +1963,17 @@ function downloadSelectedExcel() {
             }
             
             if (hasSelected) {
+                // Add a blank spacer row before every forwarded header unless we just added one for the batch
+                const prev = row.previousElementSibling;
+                const prevWasBatchHeader = prev && prev.classList.contains('batch-header-row');
+                
+                if (!isFirstHeader && !prevWasBatchHeader) {
+                    html += `<tr class="batch-spacer"><td colspan="10" style="border:none; height:15px;"></td></tr>`;
+                }
+                isFirstHeader = false;
+
                 const dateEl = row.querySelector('.header-date-badge');
-                const groupDate = (dateEl && dateEl.style.display !== 'none') ? dateEl.textContent.trim() : '';
+                const groupDate = dateEl ? dateEl.textContent.trim() : '';
                 const headerText = groupDate ? `${forwardedName}    -    ${groupDate}` : forwardedName;
                 const bgColor = getForwardedColor(forwardedName);
                 

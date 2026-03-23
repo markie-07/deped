@@ -101,20 +101,23 @@
             </div>
         </div>
 
+        <!-- Tab Navigation (Moved outside grid for better alignment) -->
+        <div class="tab-nav-container" style="margin: 0 24px 0 24px;">
+            <div class="tab-nav">
+                <button type="button" class="tab-btn active" onclick="switchTab('personal', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+                    Personal Details
+                </button>
+                <button type="button" class="tab-btn" onclick="switchTab('security', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 1.5h13.5c.621 0 1.125.504 1.125 1.125v6.75c0 .621-.504 1.125-1.125 1.125H5.25a1.125 1.125 0 0 1-1.125-1.125v-6.75c0-.621.504-1.125 1.125-1.125Z"/></svg>
+                    Security
+                </button>
+            </div>
+        </div>
+
         <!-- ═══ CONTENT GRID ═══ -->
         <div class="profile-grid">
             <div class="main-col">
-                <!-- Tab Navigation -->
-                <div class="tab-nav">
-                    <button type="button" class="tab-btn active" onclick="switchTab('personal', this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
-                        Personal Details
-                    </button>
-                    <button type="button" class="tab-btn" onclick="switchTab('security', this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 1.5h13.5c.621 0 1.125.504 1.125 1.125v6.75c0 .621-.504 1.125-1.125 1.125H5.25a1.125 1.125 0 0 1-1.125-1.125v-6.75c0-.621.504-1.125 1.125-1.125Z"/></svg>
-                        Security
-                    </button>
-                </div>
 
                 <!-- Personal Information Tab -->
                 <div id="personalTab" class="tab-pane active">
@@ -187,6 +190,45 @@
                                         <div class="field-error" id="err-password_confirmation"></div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Face Recognition -->
+                    <div class="bio-card-clean">
+                        <div class="bio-clean-row">
+                            <div class="bio-clean-icon {{ auth()->user()->face_descriptor ? 'active' : '' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33" />
+                                </svg>
+                            </div>
+                            <div class="bio-clean-info">
+                                <div class="bio-clean-title">
+                                    Face Recognition
+                                    @if(auth()->user()->face_descriptor)
+                                        <span class="bio-status-chip active">Active</span>
+                                    @else
+                                        <span class="bio-status-chip">Not Set</span>
+                                    @endif
+                                </div>
+                                <p class="bio-clean-desc">Secure your account with biometric login</p>
+                            </div>
+                            <div class="bio-clean-actions">
+                                @if(auth()->user()->face_descriptor)
+                                    <button type="button" class="bio-btn-clean primary" id="btnFaceRegTrigger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                                        Update
+                                    </button>
+                                    <button type="button" class="bio-btn-clean danger" onclick="removeFaceData()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                                        Remove
+                                    </button>
+                                @else
+                                    <button type="button" class="bio-btn-clean primary" id="btnFaceRegTrigger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                        Set Up
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>

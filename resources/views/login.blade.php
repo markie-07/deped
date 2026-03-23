@@ -1524,6 +1524,33 @@
                 font-size: 1.2rem;
             }
         }
+
+        /* ═══ FACE LOGIN ═══ */
+        .btn-face-login {
+            width: 100%;
+            padding: 13px 24px;
+            margin-top: 0.5rem;
+            background: rgba(124, 58, 237, 0.05);
+            border: 1.5px solid rgba(124, 58, 237, 0.2);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #7c3aed;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-face-login:hover {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+        .btn-face-login svg { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
@@ -1670,9 +1697,18 @@
                         <span id="alertText">{{ session('error') }}</span>
                     </div>
 
-                    <div class="separator anim-5"><span>Secured by DepEd</span></div>
+                    <div class="separator anim-5"><span>or sign in with</span></div>
 
-                    <div class="bottom-text anim-6">
+                    <div class="anim-5">
+                        <button type="button" class="btn-face-login" id="faceLoginBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                            </svg>
+                            <span>Face Recognition</span>
+                        </button>
+                    </div>
+
+                    <div class="bottom-text anim-6" style="margin-top: 1.25rem;">
                         <p>Don't have an account? <a href="#" id="showRegisterLink">Contact your admin</a></p>
                     </div>
                 </div>
@@ -1810,7 +1846,26 @@
                             </div>
                         </div>
 
+                        <div class="field">
+                            <div class="field-label">
+                                <label>Face Recognition (Optional)</label>
+                                <span id="faceCapturedStatus" style="font-size: 0.72rem; color: #10b981; font-weight: 600; display: none; align-items: center; gap: 4px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                    Face Captured
+                                </span>
+                            </div>
+                            <input type="hidden" name="face_descriptor" id="regFaceDescriptor">
+                            <button type="button" class="btn-face-login" id="regFaceBtn" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); color: #10b981; margin-bottom: 0.5rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                                </svg>
+                                <span id="regFaceBtnText">Setup Face Recognition</span>
+                            </button>
+                            <p style="font-size: 0.65rem; color: #8892a4; margin-top: -0.25rem;">Adding face data allows you to log in faster using your camera.</p>
+                        </div>
+
                         <button type="submit" class="btn-login" id="regSubmitBtn">
+
                             <span>Submit Registration</span>
                         </button>
                     </form>
@@ -1831,20 +1886,18 @@
                     </button>
 
                     <div class="otp-header">
-                        <div class="otp-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <div class="otp-icon" style="display: flex; margin: 0 auto 1.5rem auto;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 32px; height: 32px; color: #667eea;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                             </svg>
                         </div>
-                        <h2>Verify Your Identity</h2>
-                        <p class="otp-desc">
-                            Hello, <strong id="otpUserName"></strong>! Enter the 6-digit code to continue to your dashboard.
+                        <h2 style="margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 800; color: #0f0f23; letter-spacing: -0.03em;">Verify Your Identity</h2>
+                        <p class="otp-desc" style="font-size: 0.9rem; color: #8892a4; margin-bottom: 2rem;">
+                            Hello, <strong id="otpUserName" style="color: #667eea;"></strong>! Enter the 6-digit code to continue to your dashboard.
                         </p>
                     </div>
 
-
-
-                    <div class="otp-inputs" id="otpInputs">
+                    <div class="otp-inputs" id="otpInputs" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 1.5rem;">
                         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="otp-digit" data-index="0" autocomplete="one-time-code">
                         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="otp-digit" data-index="1">
                         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="otp-digit" data-index="2">
@@ -2029,6 +2082,7 @@
         const forgotView = document.getElementById('forgotView');
         const registerView = document.getElementById('registerView');
         const resetView = document.getElementById('resetView');
+        const faceLoginView = document.getElementById('faceLoginView');
         const formPanel = document.getElementById('formPanel');
         
         const showRegisterLink = document.getElementById('showRegisterLink');
@@ -2116,6 +2170,19 @@
             const text = document.getElementById('strengthText');
             if (meter) meter.style.display = 'none';
             if (text) text.textContent = '';
+            
+            // Reset Face recognition UI
+            const faceDesc = document.getElementById('regFaceDescriptor');
+            const faceStatus = document.getElementById('faceCapturedStatus');
+            const faceBtnText = document.getElementById('regFaceBtnText');
+            const faceBtn = document.getElementById('regFaceBtn');
+            if (faceDesc) faceDesc.value = '';
+            if (faceStatus) faceStatus.style.display = 'none';
+            if (faceBtnText) faceBtnText.textContent = 'Setup Face Recognition';
+            if (faceBtn) {
+                faceBtn.style.background = 'rgba(16, 185, 129, 0.05)';
+                faceBtn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+            }
         }
 
         registerForm.addEventListener('submit', async e => {
@@ -2130,6 +2197,13 @@
             try {
                 const formData = new FormData(registerForm);
                 formData.append('role', 'user');
+                
+                // Ensure face descriptor is included from hidden field
+                const faceDescriptor = document.getElementById('regFaceDescriptor').value;
+                if (faceDescriptor) {
+                    formData.append('face_descriptor', faceDescriptor);
+                }
+
                 const res = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'Accept': 'application/json' },
@@ -2413,6 +2487,12 @@
             forgotView.classList.remove('active');
             resetView.classList.remove('active');
             registerView.classList.remove('active');
+            if (faceLoginView) faceLoginView.classList.remove('active');
+
+            // Stop face login camera if switching away
+            if (view !== 'faceLogin' && typeof stopFaceLoginCamera === 'function') {
+                stopFaceLoginCamera();
+            }
 
             setTimeout(() => {
                 // Ensure all views are display:none except the target
@@ -2421,6 +2501,7 @@
                 forgotView.style.display = (view === 'forgot') ? 'block' : 'none';
                 resetView.style.display = (view === 'reset') ? 'block' : 'none';
                 registerView.style.display = (view === 'register') ? 'block' : 'none';
+                if (faceLoginView) faceLoginView.style.display = (view === 'faceLogin') ? 'block' : 'none';
 
                 // Activate the target view
                 if (view === 'otp') {
@@ -2435,6 +2516,9 @@
                     if(newPasswordInput) newPasswordInput.focus();
                 } else if (view === 'register') {
                     registerView.classList.add('active');
+                } else if (view === 'faceLogin') {
+                    faceLoginView.classList.add('active');
+                    startFaceLoginCamera();
                 } else {
                     loginView.classList.remove('hidden');
                 }
@@ -3115,6 +3199,483 @@
                 input.closest('.input-box').style.transform = 'scale(1)';
             });
         });
+    </script>
+
+    @include('partials.biometric-modal')
+
+    <!-- face-api.js -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        let bioStream = null;
+        let bioModelsLoaded = false;
+        let bioDetectionInterval = null;
+        let bioAttempting = false;
+        let bioCurrentDescriptor = null;
+        let bioRecentDescriptors = [];
+        let bioMode = 'login'; // 'login' or 'register'
+        const REQUIRED_SAMPLES = 5;
+
+        // Modal Elements
+        const bioModalOverlay = document.getElementById('bioModalOverlay');
+        const bioModalClose = document.getElementById('bioModalClose');
+        const btnFaceLoginTrigger = document.getElementById('faceLoginBtn');
+        const btnScanFace = document.getElementById('btnScanFace');
+
+        // Math Panel Elements
+        const valDetection = document.getElementById('valDetection');
+        const barDetection = document.getElementById('barDetection');
+        const valDistance = document.getElementById('valDistance');
+        const distMarker = document.getElementById('distMarker');
+        const distMatchStatus = document.getElementById('distMatchStatus');
+        const valVectors = document.getElementById('valVectors');
+        const statSamples = document.getElementById('statSamples');
+        const statL2 = document.getElementById('statL2');
+        const statMin = document.getElementById('statMin');
+        const embeddingCanvas = document.getElementById('embeddingCanvas');
+        const hudScore = document.getElementById('hudScore');
+        const hudProgress = document.getElementById('hudProgress');
+        const bioAlert = document.getElementById('bioAlert');
+        const bioAlertText = document.getElementById('bioAlertText');
+        const btnScanText = document.getElementById('btnScanText');
+
+        function setPipeStatus(stepId, status) {
+            const el = document.getElementById(stepId);
+            if (!el) return;
+            el.classList.remove('active', 'done');
+            if (status) el.classList.add(status);
+        }
+
+        if (btnFaceLoginTrigger) {
+            btnFaceLoginTrigger.addEventListener('click', () => openBioModal('login'));
+        }
+        const btnFaceRegTrigger = document.getElementById('regFaceBtn');
+        if (btnFaceRegTrigger) {
+            btnFaceRegTrigger.addEventListener('click', () => openBioModal('register'));
+        }
+        if (bioModalClose) {
+            bioModalClose.addEventListener('click', closeBioModal);
+        }
+        if (btnScanFace) {
+            btnScanFace.addEventListener('click', startScanningProcess);
+        }
+
+        async function openBioModal(mode = 'login') {
+            bioMode = mode;
+            bioModalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            if (mode === 'register') {
+                document.getElementById('bioModalTitle').textContent = 'Setup Face Recognition';
+                document.getElementById('bioModalSubtitle').textContent = 'Create a unique biometric profile for your account';
+                btnScanText.textContent = 'Capture Biometrics';
+                document.getElementById('stepMatch').querySelector('.pipe-label').textContent = '4. Profile Generation';
+            } else {
+                document.getElementById('bioModalTitle').textContent = 'Biometric Login';
+                document.getElementById('bioModalSubtitle').textContent = 'Verify your identity to continue';
+                btnScanText.textContent = 'Scan My Face';
+                document.getElementById('stepMatch').querySelector('.pipe-label').textContent = '4. Database Matching';
+            }
+            await startBioCamera();
+        }
+
+        function closeBioModal() {
+            bioModalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            stopBioCamera();
+        }
+
+        async function loadBioModels() {
+            if (bioModelsLoaded) return;
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+            ]);
+            bioModelsLoaded = true;
+        }
+
+        /**
+         * Cross-browser / cross-context getUserMedia polyfill.
+         * Works on HTTP (mobile hotspot), older Android browsers, and modern browsers.
+         */
+        function getMediaStream(constraints) {
+            // Modern browsers with secure context
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                return navigator.mediaDevices.getUserMedia(constraints);
+            }
+            // Polyfill mediaDevices for HTTP contexts (non-secure origin)
+            const legacyGetUserMedia =
+                navigator.getUserMedia ||
+                navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia;
+
+            if (legacyGetUserMedia) {
+                // Wrap callback-based API in a Promise
+                return new Promise((resolve, reject) => {
+                    legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+
+            // If still nothing available, give a helpful message
+            return Promise.reject(new Error(
+                'Camera access is not available. Please open this page over HTTPS or use localhost.'
+            ));
+        }
+
+        async function startBioCamera() {
+            const statusText = document.getElementById('bioCamStatusText');
+            const video = document.getElementById('bioVideo');
+            
+            statusText.textContent = 'Loading models...';
+            try {
+                await loadBioModels();
+                statusText.textContent = 'Starting camera...';
+                
+                bioStream = await getMediaStream({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+                });
+                video.srcObject = bioStream;
+                await video.play();
+                
+                statusText.textContent = 'System Ready';
+                document.querySelector('.bio-cam-status').classList.add('active');
+                
+                startDetectionLoop();
+                setPipeStatus('stepDetect', 'active');
+                setPipeStatus('stepAlign', 'active');
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = 'Camera Error';
+                let msg = err.message || 'Unknown error';
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    msg = 'Camera permission denied. Please allow camera access in your browser settings.';
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    msg = 'No camera found on this device.';
+                } else if (!navigator.mediaDevices) {
+                    msg = 'Camera access requires a secure connection (HTTPS). Please contact your administrator.';
+                }
+                showBioAlert(msg, 'error');
+            }
+        }
+
+        function stopBioCamera() {
+            if (bioDetectionInterval) {
+                clearInterval(bioDetectionInterval);
+                bioDetectionInterval = null;
+            }
+            if (bioStream) {
+                bioStream.getTracks().forEach(t => t.stop());
+                bioStream = null;
+            }
+            const video = document.getElementById('bioVideo');
+            if (video) video.srcObject = null;
+            document.querySelector('.bio-cam-status').classList.remove('active');
+            bioAttempting = false;
+            document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active', 'done'));
+        }
+
+        function startDetectionLoop() {
+            const video = document.getElementById('bioVideo');
+            const canvas = document.getElementById('bioCanvas');
+            
+            bioDetectionInterval = setInterval(async () => {
+                if (!video.videoWidth) return;
+                
+                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                
+                const displaySize = { width: video.videoWidth, height: video.videoHeight };
+                faceapi.matchDimensions(canvas, displaySize);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if (detection) {
+                    const resized = faceapi.resizeResults(detection, displaySize);
+                    faceapi.draw.drawDetections(canvas, resized);
+                    
+                    bioCurrentDescriptor = detection.descriptor;
+                    
+                    // Update Math Panel
+                    updateMathPanel(detection);
+                    drawEmbedding(detection.descriptor);
+                } else {
+                    bioCurrentDescriptor = null;
+                    resetMathPanel();
+                }
+            }, 100);
+        }
+
+        function updateMathPanel(detection) {
+            const score = detection.detection.score;
+            valDetection.textContent = score.toFixed(4);
+            barDetection.style.width = (score * 100) + '%';
+            hudScore.textContent = `Score: ${Math.round(score * 100)}%`;
+            
+            // Score based coloring
+            if (score > 0.82) {
+                barDetection.style.background = '#10b981';
+                document.getElementById('bioScanFrame').classList.add('scanning');
+            } else {
+                barDetection.style.background = '#7c3aed';
+                document.getElementById('bioScanFrame').classList.remove('scanning');
+            }
+
+            // Statistical calculations
+            const descriptor = detection.descriptor;
+            const l2Norm = Math.sqrt(descriptor.reduce((sum, val) => sum + val * val, 0));
+            statL2.textContent = l2Norm.toFixed(4);
+        }
+
+        function resetMathPanel() {
+            valDetection.textContent = '0.0000';
+            barDetection.style.width = '0%';
+            hudScore.textContent = 'Score: --%';
+            document.getElementById('bioScanFrame').classList.remove('scanning');
+            const ctx = embeddingCanvas.getContext('2d');
+            ctx.clearRect(0, 0, embeddingCanvas.width, embeddingCanvas.height);
+        }
+
+        function drawEmbedding(descriptor) {
+            const ctx = embeddingCanvas.getContext('2d');
+            const w = embeddingCanvas.width;
+            const h = embeddingCanvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            const barWidth = w / 128;
+            for (let i = 0; i < 128; i++) {
+                // Normalize float value for visualization
+                const val = (descriptor[i] + 0.1) * 5; // offset and scale
+                const color = Math.floor(Math.max(0, Math.min(255, val * 255)));
+                ctx.fillStyle = `rgb(${color}, ${124}, ${237})`;
+                // Use more variation
+                const r = Math.floor((descriptor[i] + 0.5) * 255);
+                ctx.fillStyle = `rgb(${40}, ${r}, ${250})`;
+                ctx.fillRect(i * barWidth, 0, barWidth, h);
+            }
+        }
+
+        async function startScanningProcess() {
+            if (!bioCurrentDescriptor) {
+                showBioAlert('Please position your face clearly in the frame.', 'error');
+                return;
+            }
+            
+            if (bioAttempting) return;
+            bioAttempting = true;
+            btnScanFace.disabled = true;
+            const originalText = btnScanText.textContent;
+            btnScanText.textContent = 'Scanning...';
+            setPipeStatus('stepDetect', 'done');
+            setPipeStatus('stepAlign', 'done');
+            setPipeStatus('stepExtract', 'active');
+            bioRecentDescriptors = [];
+            
+            // Collect samples
+            const statusText = document.getElementById('bioCamStatusText');
+            statusText.textContent = 'Collecting biometric samples...';
+            
+            let samplesTaken = 0;
+            const collectInterval = setInterval(async () => {
+                if (bioCurrentDescriptor) {
+                    bioRecentDescriptors.push(Array.from(bioCurrentDescriptor));
+                    samplesTaken++;
+                    hudProgress.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
+                    statSamples.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
+                    
+                    if (samplesTaken >= REQUIRED_SAMPLES) {
+                        clearInterval(collectInterval);
+                        await performAuthentication();
+                    }
+                }
+            }, 300);
+        }
+
+        async function performAuthentication() {
+            const statusText = document.getElementById('bioCamStatusText');
+            statusText.textContent = 'Analyzing vectors...';
+            setPipeStatus('stepExtract', 'done');
+            setPipeStatus('stepMatch', 'active');
+            
+            // Average the descriptors
+            const avgDescriptor = bioRecentDescriptors[0].map((_, i) => {
+                return bioRecentDescriptors.reduce((sum, d) => sum + d[i], 0) / bioRecentDescriptors.length;
+            });
+            
+            if (bioMode === 'register') {
+                // Handle Registration Mode locally
+                document.getElementById('regFaceDescriptor').value = JSON.stringify(avgDescriptor);
+                document.getElementById('faceCapturedStatus').style.display = 'inline-flex';
+                document.getElementById('regFaceBtnText').textContent = 'Face Data Captured ✓';
+                document.getElementById('regFaceBtn').style.background = 'rgba(16, 185, 129, 0.15)';
+                document.getElementById('regFaceBtn').style.borderColor = '#10b981';
+                
+                setPipeStatus('stepMatch', 'done');
+                statusText.textContent = 'Biometric Profile Generated!';
+                document.getElementById('bioScanFrame').classList.add('success');
+                showBioAlert('Success! Face data captured for your new account.', 'success');
+                
+                setTimeout(() => {
+                    closeBioModal();
+                }, 1500);
+                return;
+            }
+
+            const csrfToken = document.querySelector('input[name=_token]').value;
+            
+            try {
+                const res = await fetch('/api/face/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ descriptor: JSON.stringify(avgDescriptor) })
+                });
+
+                const data = await res.json();
+                
+                if (data.stats) {
+                    updateFinalStats(data.stats);
+                }
+
+                if (data.needs_selection) {
+                    setPipeStatus('stepMatch', 'active');
+                    statusText.textContent = 'Awaiting choice...';
+                    showAccountSelector(data.candidates);
+                    return;
+                }
+
+                if (data.success) {
+                    setPipeStatus('stepMatch', 'done');
+                    statusText.textContent = 'Identity Confirmed!';
+                    document.getElementById('bioScanFrame').classList.add('success');
+                    showBioAlert(`Success! Welcome back, ${data.user_name}.`, 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1500);
+                } else {
+                    // Face not recognized - show clear error feedback
+                    setPipeStatus('stepMatch', 'done'); // Mark pipeline as completed
+                    statusText.textContent = 'Not Recognized';
+                    
+                    // Visual failure state on scan frame
+                    const scanFrame = document.getElementById('bioScanFrame');
+                    scanFrame.classList.remove('scanning', 'success');
+                    scanFrame.classList.add('failed');
+                    
+                    showBioAlert(data.message || 'Face not recognized. No matching account found.', 'error');
+                    
+                    btnScanFace.disabled = false;
+                    btnScanText.textContent = 'Try Again';
+                    bioAttempting = false;
+                    hudProgress.textContent = '0 / 5';
+                    
+                    // Reset scan frame after a delay
+                    setTimeout(() => {
+                        scanFrame.classList.remove('failed');
+                    }, 4000);
+                }
+
+            } catch (err) {
+                console.error(err);
+                showBioAlert('Server communication error.', 'error');
+                btnScanFace.disabled = false;
+                bioAttempting = false;
+            }
+        }
+
+        function updateFinalStats(stats) {
+            valVectors.textContent = stats.registered_users;
+            valDistance.textContent = stats.best_distance !== null ? stats.best_distance.toFixed(4) : 'N/A';
+            
+            if (stats.best_distance !== null) {
+                // Euclidean distance usually ranges from 0 to 1.5
+                const percent = Math.min(100, (stats.best_distance / 1.5) * 100);
+                distMarker.style.left = percent + '%';
+                statMin.textContent = stats.best_distance.toFixed(4);
+                
+                if (stats.best_distance < 0.6) {
+                    distMatchStatus.textContent = `MATCH! Distance ${stats.best_distance.toFixed(3)} < 0.6`;
+                    distMatchStatus.style.color = '#10b981';
+                } else {
+                    distMatchStatus.textContent = `MISMATCH: Distance ${stats.best_distance.toFixed(3)} > 0.6`;
+                    distMatchStatus.style.color = '#ef4444';
+                }
+            }
+        }
+
+        function showAccountSelector(candidates) {
+            const area = document.getElementById('bioSelectArea');
+            const list = document.getElementById('candidateList');
+            if (!area || !list) return;
+
+            list.innerHTML = '';
+            candidates.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'candidate-item';
+                item.onclick = () => confirmLogin(c.id);
+                
+                const avatar = c.avatar 
+                    ? `<img src="${c.avatar}" class="cand-avatar">` 
+                    : `<div class="cand-avatar">${c.initial}</div>`;
+
+                item.innerHTML = `
+                    ${avatar}
+                    <div class="cand-info">
+                        <div class="cand-name">${c.username || c.name}</div>
+                        <div style="font-size: 0.6rem; color: rgba(255,255,255,0.4)">Match Distance: ${c.distance}</div>
+                    </div>
+                    <span class="cand-role ${c.role}">${c.role}</span>
+                `;
+                list.appendChild(item);
+            });
+
+            area.classList.add('active');
+            // Hide camera viewport to focus on selection? No, just show overlap.
+            document.getElementById('bioScanFrame').style.opacity = '0.3';
+        }
+
+        async function confirmLogin(userId) {
+            const statusText = document.getElementById('bioCamStatusText');
+            statusText.textContent = 'Finalizing login...';
+            
+            try {
+                const res = await fetch('/api/face/confirm-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setPipeStatus('stepMatch', 'done');
+                    statusText.textContent = 'Access Granted!';
+                    showBioAlert(`Success! Redirecting to ${data.redirect}...`, 'success');
+                    setTimeout(() => window.location.href = data.redirect, 1000);
+                } else {
+                    showBioAlert(data.message || 'Login failed.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showBioAlert('Login confirmation failed.', 'error');
+            }
+        }
+
+        function showBioAlert(msg, type) {
+            bioAlert.className = 'bio-alert show ' + type;
+            bioAlertText.textContent = msg;
+            if (type === 'error') {
+                setTimeout(() => bioAlert.classList.remove('show'), 8000);
+            }
+        }
     </script>
 </body>
 </html>

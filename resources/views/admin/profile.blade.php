@@ -13,6 +13,7 @@
         </div>
     </main>
 
+    @include('partials.biometric-modal')
     @include('partials.profile-scripts')
 </body>
 </html>

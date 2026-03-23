@@ -129,7 +129,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                         </svg>
-                        <input type="date" id="modalFilterDate" onchange="fetchEmployeeRecords()">
+                        <input type="date" id="modalFilterDate" value="{{ date('Y-m-d') }}" onchange="fetchEmployeeRecords()">
                     </div>
                 </div>
                 <button class="panel-close-btn" onclick="closeEmployeeModal()">
@@ -1151,6 +1151,13 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingSkeleton.style.display = 'none';
             grid.style.display = 'grid';
             renderEmployees();
+
+            // Check if we should open a modal on load
+            const urlParams = new URLSearchParams(window.location.search);
+            const openModal = urlParams.get('openModal');
+            if (openModal) {
+                openEmployeeModal(openModal);
+            }
         })
         .catch(err => {
             console.error('Error:', err);
@@ -1277,7 +1284,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modalEmployeeAvatar').textContent = getInitials(name);
         document.getElementById('modalEmployeeAvatar').style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
         document.getElementById('modalSearch').value = '';
-        document.getElementById('modalFilterDate').value = new Date().toLocaleDateString('en-CA');
+        // Set the date filter to today's date by default
+        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
         
         fetchEmployeeRecords();
     };
@@ -1350,7 +1358,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     window.editRecord = function(id) {
-        window.location.href = "{{ url('/user/form') }}?edit=" + id;
+        const url = "{{ url('/user/form') }}?edit=" + id + "&source=employee&employeeName=" + encodeURIComponent(currentEmployeeForModal);
+        window.location.href = url;
     };
 
     window.deleteRecord = function(id) {

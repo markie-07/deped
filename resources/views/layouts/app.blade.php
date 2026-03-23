@@ -161,9 +161,9 @@
 <body>
 
     {{-- Sidebar (admin or user version based on role) --}}
-    @if(Auth::check() && Auth::user()->role === 'admin')
+    @if(auth()->check() && auth()->user()->role === 'admin')
         @include('partials.sidebar')
-    @elseif(Auth::check())
+    @elseif(auth()->check())
         @include('partials.user-sidebar')
     @endif
 

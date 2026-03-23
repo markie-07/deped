@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ['email' => 'markpisngot47@gmail.com'],
             [
                 'name' => 'Mark Pisngot',
-                'username' => 'MarkUser',
+                'username' => 'James',
                 'first_name' => 'Mark',
                 'last_name' => 'Pisngot',
                 'position' => 'User',

@@ -73,16 +73,16 @@
 
         <!-- User Dropdown -->
         <div class="navbar-user" id="navbarUserBtn">
-            @if(Auth::user() && Auth::user()->profile_image)
-                <img src="/storage/{{ Auth::user()->profile_image }}" class="navbar-user-avatar" style="object-fit: cover;">
+            @if(auth()->user() && auth()->user()->profile_image)
+                <img src="/storage/{{ auth()->user()->profile_image }}" class="navbar-user-avatar" style="object-fit: cover;">
             @else
                 <div class="navbar-user-avatar">
-                    {{ Auth::user() ? strtoupper(substr(Auth::user()->username ?? Auth::user()->name ?? 'G', 0, 1)) : 'G' }}
+                    {{ auth()->user() ? strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'G', 0, 1)) : 'G' }}
                 </div>
             @endif
             <div class="navbar-user-info">
-                <span class="navbar-user-name">{{ Auth::user() ? (Auth::user()->username ?? Auth::user()->name) : 'Guest' }}</span>
-                <span class="navbar-user-role">{{ Auth::user() ? (Auth::user()->position ?? 'User') : 'Guest' }}</span>
+                <span class="navbar-user-name">{{ auth()->user() ? (auth()->user()->username ?? auth()->user()->name) : 'Guest' }}</span>
+                <span class="navbar-user-role">{{ auth()->user() ? (auth()->user()->position ?? 'User') : 'Guest' }}</span>
             </div>
             <svg class="navbar-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />

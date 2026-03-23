@@ -9,7 +9,10 @@ use App\Http\Controllers\LeaveRecordController;
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use App\Models\AuditLog;
+use App\Models\FaceRecognitionLog;
 use Illuminate\Support\Str;
 
 Route::get('/', function () {
@@ -17,12 +20,12 @@ Route::get('/', function () {
         return redirect(Auth::user()->role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
     }
     return view('login');
-});
+})->name('login');
 
 // Role-based route protection groups
 Route::middleware(['auth'])->group(function () {
     // Admin Routes
-    Route::prefix('admin')->group(function () {
+    Route::group(['prefix' => 'admin'], function () {
         Route::get('/dashboard', function () {
             if (Auth::user()->role !== 'admin') return redirect('/user/dashboard');
             return view('admin.dashboard');
@@ -64,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // User Routes
-    Route::prefix('user')->group(function () {
+    Route::group(['prefix' => 'user'], function () {
         Route::get('/dashboard', function () {
             if (Auth::user()->role === 'admin') return redirect('/admin/dashboard');
             return view('user.dashboard');
@@ -229,6 +232,7 @@ Route::post('/api/register', function (Request $request) {
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role,
+        'face_descriptor' => $request->face_descriptor,
         'is_active' => true,
         'is_approved' => false, // Requires admin approval
     ];
@@ -272,8 +276,8 @@ Route::delete('/api/user-accounts/{id}', function ($id) {
     $user = User::findOrFail($id);
     
     // Optional: Delete profile image if exists
-    if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
-        \Storage::disk('public')->delete($user->profile_image);
+    if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+        Storage::disk('public')->delete($user->profile_image);
     }
     
     AuditLog::logAction('Deleted user account (Rejected request)', $user);
@@ -313,8 +317,8 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
     }
 
     if ($request->hasFile('profile_image')) {
-        if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
-            \Storage::disk('public')->delete($user->profile_image);
+        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+            Storage::disk('public')->delete($user->profile_image);
         }
         $path = $request->file('profile_image')->store('profile-images', 'public');
         $user->profile_image = $path;
@@ -389,16 +393,16 @@ Route::post('/api/profile/update', function (Request $request) {
     if ($request->has('cover_zoom')) $user->cover_zoom = $request->cover_zoom;
 
     if ($request->hasFile('profile_image')) {
-        if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
-            \Storage::disk('public')->delete($user->profile_image);
+        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+            Storage::disk('public')->delete($user->profile_image);
         }
         $path = $request->file('profile_image')->store('profile-images', 'public');
         $user->profile_image = $path;
     }
 
     if ($request->hasFile('cover_image')) {
-        if ($user->cover_image && \Storage::disk('public')->exists($user->cover_image)) {
-            \Storage::disk('public')->delete($user->cover_image);
+        if ($user->cover_image && Storage::disk('public')->exists($user->cover_image)) {
+            Storage::disk('public')->delete($user->cover_image);
         }
         $path = $request->file('cover_image')->store('cover-images', 'public');
         $user->cover_image = $path;
@@ -434,6 +438,227 @@ Route::delete('/api/user-accounts/{id}', function ($id) {
     return response()->json(['success' => true, 'message' => 'Account deleted successfully.']);
 });
 */
+
+// ═══ FACE RECOGNITION API ═══
+Route::post('/api/face/register', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    }
+    $request->validate(['descriptor' => 'required|string']);
+    $user = Auth::user();
+    $user->face_descriptor = $request->descriptor;
+    $user->save();
+    AuditLog::logAction('Registered face recognition', $user);
+    return response()->json(['success' => true, 'message' => 'Face registered successfully.']);
+});
+
+Route::post('/api/face/remove', function () {
+    if (!Auth::check()) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    }
+    $user = Auth::user();
+    $user->face_descriptor = null;
+    $user->save();
+    AuditLog::logAction('Removed face recognition', $user);
+    return response()->json(['success' => true, 'message' => 'Face data removed.']);
+});
+
+Route::post('/api/face/login', function (Request $request) {
+    $request->validate(['descriptor' => 'required|string']);
+    $submitted = json_decode($request->descriptor, true);
+    if (!is_array($submitted)) {
+        return response()->json(['success' => false, 'message' => 'Invalid face data.'], 400);
+    }
+
+    $users = User::whereNotNull('face_descriptor')->where('is_active', true)->where('is_approved', true)->get();
+    $candidates = [];
+    $submittedLen = count($submitted);
+    $bestDistanceOverall = null;
+
+    if ($users->isEmpty()) {
+        // No users have registered face data at all
+        FaceRecognitionLog::create([
+            'user_id' => null,
+            'distance' => 0,
+            'confidence' => 0,
+            'status' => 'no_registered_faces',
+            'metadata' => ['error' => 'No registered face data in system'],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'No registered faces found in the system. Please register your face first or sign in with email and password.',
+        ]);
+    }
+
+    foreach ($users as $u) {
+        $stored = json_decode($u->face_descriptor, true);
+        if (!is_array($stored)) continue;
+
+        $storedLen = count($stored);
+        if ($storedLen !== $submittedLen) continue;
+
+        $sum = 0;
+        for ($i = 0; $i < $submittedLen; $i++) {
+            $diff = $submitted[$i] - $stored[$i];
+            $sum += $diff * $diff;
+        }
+        $distance = sqrt($sum);
+
+        // Track the best distance regardless of threshold
+        if ($bestDistanceOverall === null || $distance < $bestDistanceOverall) {
+            $bestDistanceOverall = $distance;
+        }
+
+        if ($distance < 0.5) { // Match threshold — 0.5 for reliable identity matching
+            $candidates[] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'username' => $u->username,
+                'role' => $u->role,
+                'distance' => round($distance, 4),
+                'avatar' => $u->profile_image ? url('/storage/' . $u->profile_image) : null,
+                'initial' => strtoupper(substr($u->username ?? $u->name, 0, 1)),
+            ];
+        }
+    }
+
+    // Sort candidates by distance (closest first)
+    usort($candidates, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+    if (count($candidates) === 0) {
+        // Log the failed attempt
+        FaceRecognitionLog::create([
+            'user_id' => null,
+            'distance' => $bestDistanceOverall ? round($bestDistanceOverall, 4) : 0,
+            'confidence' => $bestDistanceOverall ? max(0, round((1 - $bestDistanceOverall / 1.5) * 100, 1)) : 0,
+            'status' => 'no_match',
+            'metadata' => [
+                'registered_users' => $users->count(),
+                'best_distance' => $bestDistanceOverall ? round($bestDistanceOverall, 4) : 0,
+                'threshold' => 0.5,
+            ],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Face not recognized. Your face does not match any registered account. Please sign in with your email and password, or register your face from your profile.',
+        ]);
+    }
+
+    $bestMatch = $candidates[0];
+    $distance = $bestMatch['distance'];
+    $confidence = max(0, round((1 - $distance / 1.5) * 100, 1));
+
+    FaceRecognitionLog::create([
+        'user_id' => $bestMatch['id'],
+        'distance' => $distance,
+        'confidence' => $confidence,
+        'status' => 'match',
+        'metadata' => ['candidates_count' => count($candidates)],
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+    ]);
+
+    if (count($candidates) > 1) {
+        $first = $candidates[0];
+        $second = $candidates[1];
+        $gap = $second['distance'] - $first['distance'];
+
+        // AMBIGUOUS REJECTION:
+        // If ALL candidates have weak match distances (> 0.42) and they're all 
+        // close to each other (gap < 0.06), this is likely a false positive from 
+        // an unregistered face that weakly matches multiple people.
+        // But if the best distance is strong (< 0.42), at least one account 
+        // genuinely has this face registered — show the selector.
+        if ($first['distance'] > 0.42 && $gap < 0.06) {
+            FaceRecognitionLog::create([
+                'user_id' => null,
+                'distance' => round($first['distance'], 4),
+                'confidence' => max(0, round((1 - $first['distance'] / 1.5) * 100, 1)),
+                'status' => 'ambiguous_reject',
+                'metadata' => [
+                    'candidates' => count($candidates),
+                    'best_distance' => $first['distance'],
+                    'gap' => round($gap, 4),
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Face not recognized. No confident match found. Please sign in with your email and password.',
+            ]);
+        }
+
+        // SMART AUTOSELECT:
+        // If the best match is very strong (< 0.3) AND clearly better than the 
+        // runner-up (gap > 0.12), auto-login without showing the selector.
+        if ($first['distance'] < 0.3 && $gap > 0.12) {
+            $user = User::findOrFail($first['id']);
+            Auth::login($user);
+            session(['authenticated' => true, 'user_id' => $user->id]);
+            AuditLog::logAction('Logged in via face recognition (Smart Autoselect)', $user);
+            
+            return response()->json([
+                'success' => true,
+                'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
+                'user_name' => $user->name,
+            ]);
+        }
+
+        // MULTIPLE MATCHES — show account selector
+        // This happens when the same face is registered on multiple accounts  
+        // (both have strong matches with similar distances)
+        session(['face_login_candidates' => array_column($candidates, 'id')]);
+        return response()->json([
+            'success' => true,
+            'needs_selection' => true,
+            'candidates' => $candidates
+        ]);
+    }
+
+    // Auto-login single match
+    $user = User::findOrFail($bestMatch['id']);
+    Auth::login($user);
+    session(['authenticated' => true, 'user_id' => $user->id]);
+    AuditLog::logAction('Logged in via face recognition', $user);
+
+    return response()->json([
+        'success' => true,
+        'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
+        'user_name' => $user->name,
+    ]);
+});
+
+Route::post('/api/face/confirm-login', function (Request $request) {
+    if (!session()->has('face_login_candidates')) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+    }
+
+    $userId = $request->input('user_id');
+    $allowedIds = session('face_login_candidates');
+
+    if (!in_array($userId, $allowedIds)) {
+        return response()->json(['success' => false, 'message' => 'Security mismatch.'], 403);
+    }
+
+    $user = User::findOrFail($userId);
+    Auth::login($user);
+    session()->forget('face_login_candidates');
+    session(['authenticated' => true, 'user_id' => $user->id]);
+    AuditLog::logAction('Logged in via face recognition (selected)', $user);
+
+    return response()->json([
+        'success' => true,
+        'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
+        'user_name' => $user->name,
+    ]);
+});
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
@@ -525,7 +750,7 @@ Route::post('/forgot-password', function (Request $request) {
     if (!$user) return response()->json(['success' => true, 'message' => 'Email sent if exists.']);
     
     $token = Str::random(64);
-    \DB::table('password_reset_tokens')->updateOrInsert(
+    DB::table('password_reset_tokens')->updateOrInsert(
         ['email' => $email],
         ['token' => Hash::make($token), 'created_at' => now()]
     );

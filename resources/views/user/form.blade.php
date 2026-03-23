@@ -195,7 +195,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                                                 </svg>
                                             </div>
-                                            <input type="text" id="remarksInput" class="form-input has-icon" placeholder="Search or type remarks" autocomplete="off">
+                                            <input type="text" id="remarksInput" class="form-input has-icon" placeholder="Search or type remarks" autocomplete="off" required>
                                             <span class="ghost-text" id="remarksGhost"></span>
                                             <input type="hidden" id="remarks" name="remarks">
                                             <button type="button" class="combobox-toggle" tabindex="-1">
@@ -1314,6 +1314,7 @@
         width: 50px;
         text-align: center !important;
         padding: 0 !important;
+        vertical-align: middle !important;
     }
 
     .custom-checkbox {
@@ -1395,6 +1396,21 @@
     }
     .forwarded-header-row:hover .forwarded-badge svg {
         color: #6366f1;
+    }
+
+    .empty-registry-message {
+        text-align: center;
+        padding: 80px 40px !important;
+        color: #94a3b8;
+        background: #f8fafc !important;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: none !important;
+    }
+
+    body.dark-mode .empty-registry-message {
+        background: #1e293b !important;
+        color: #64748b;
     }
 
     /* ── Badges ── */
@@ -2056,6 +2072,12 @@
     const presetForwarded = urlParams.get('forwarded');
     const presetBatch = urlParams.get('batch');
     const presetSource = urlParams.get('source');
+    const presetEmployeeName = urlParams.get('employeeName');
+    const presetSchoolName = urlParams.get('schoolName');
+    const presetPositionName = urlParams.get('positionName');
+    const presetTypeName = urlParams.get('typeName');
+    const presetRemarkName = urlParams.get('remarkName');
+    const presetInchargeName = urlParams.get('inchargeName');
 
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
@@ -2102,6 +2124,41 @@
             .catch(() => {});
     }
 
+    // ── Enter to Next Navigation ──
+    const entryFields = [
+        'forwardedInput',
+        'nameInput',
+        'positionInput',
+        'schoolInput',
+        'leaveInput',
+        'remarksInput',
+        'inclusiveDates',
+        'dateOfAction',
+        'deductionRemarks',
+        'submitBtn'
+    ];
+
+    function focusNextField(currentId) {
+        const idx = entryFields.indexOf(currentId);
+        if (idx > -1 && idx < entryFields.length - 1) {
+            const nextEl = document.getElementById(entryFields[idx + 1]);
+            if (nextEl) nextEl.focus();
+        }
+    }
+
+    // Add enter listener to non-combobox fields
+    ['inclusiveDates', 'dateOfAction', 'deductionRemarks'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    focusNextField(this.id);
+                }
+            });
+        }
+    });
+
     // ── Form submission via AJAX ──
     document.getElementById('leaveForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -2134,6 +2191,18 @@
             date_of_action: document.getElementById('dateOfAction').value,
             deduction_remarks: document.getElementById('deductionRemarks').value,
         };
+
+        if (!record.remarks) {
+            showToast('Please provide a remark.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Save Record
+            `;
+            return;
+        }
 
         // If coming from Leave Records page, include batch/source info
         if (presetSource) {
@@ -2169,16 +2238,65 @@
                 `;
                 return;
             }
-            if (data.success) {
+             if (data.success) {
                 showToast(data.message);
                 updateRecordCount();
                 loadDropdownData();
+                
+                // CRITICAL: Capture the name BEFORE resetForm() clears it
+                const finalName = document.getElementById('employeeName').value || presetEmployeeName;
+                
+                // Also capture school name in case it changed
+                if (schoolCombo) schoolCombo.sync();
+                const finalSchoolName = document.getElementById('school').value || presetSchoolName;
+
+                // Also capture position name in case it changed
+                if (posCombo) posCombo.sync();
+                const finalPositionName = document.getElementById('position').value || presetPositionName;
+
+                // Also capture leave type in case it changed
+                if (leaveCombo) leaveCombo.sync();
+                const finalTypeName = document.getElementById('typeOfLeave').value || presetTypeName;
+
+                // Also capture remark in case it changed
+                if (remarksCombo) remarksCombo.sync();
+                const finalRemarkName = document.getElementById('remarks').value || presetRemarkName;
+                
                 resetForm();
                 
-                // If coming from Leave Records, redirect back after a brief delay
+                // Redirect logic
                 if (presetSource === 'leave-records') {
                     setTimeout(() => {
                         window.location.href = '/leave-records';
+                    }, 1000);
+                } else if (presetSource === 'employee') {
+                    setTimeout(() => {
+                        const baseUrl = "{{ auth()->user()->role === 'admin' ? '/admin/employee' : '/user/employee' }}";
+                        window.location.href = baseUrl + "?openModal=" + encodeURIComponent(finalName || '');
+                    }, 1000);
+                } else if (presetSource === 'school') {
+                    setTimeout(() => {
+                        const baseUrl = "{{ auth()->user()->role === 'admin' ? '/admin/school' : '/user/school' }}";
+                        window.location.href = baseUrl + "?openModal=" + encodeURIComponent(finalSchoolName || '');
+                    }, 1000);
+                } else if (presetSource === 'position') {
+                    setTimeout(() => {
+                        const baseUrl = "{{ auth()->user()->role === 'admin' ? '/admin/position' : '/user/position' }}";
+                        window.location.href = baseUrl + "?openModal=" + encodeURIComponent(finalPositionName || '');
+                    }, 1000);
+                } else if (presetSource === 'types-of-leave') {
+                    setTimeout(() => {
+                        const baseUrl = "{{ auth()->user()->role === 'admin' ? '/admin/types-of-leave' : '/user/types-of-leave' }}";
+                        window.location.href = baseUrl + "?openModal=" + encodeURIComponent(finalTypeName || '');
+                    }, 1000);
+                } else if (presetSource === 'remarks') {
+                    setTimeout(() => {
+                        const baseUrl = "{{ auth()->user()->role === 'admin' ? '/admin/remarks' : '/user/remarks' }}";
+                        window.location.href = baseUrl + "?openModal=" + encodeURIComponent(finalRemarkName || '');
+                    }, 1000);
+                } else if (presetSource === 'incharge') {
+                    setTimeout(() => {
+                        window.location.href = "/admin/incharge?openModal=" + encodeURIComponent(presetInchargeName || '');
                     }, 1000);
                 }
             } else {
@@ -2250,10 +2368,44 @@
             });
         }
 
+        function applyValue(v) {
+            if (isMulti) {
+                if (!selectedValues.includes(v)) {
+                    selectedValues.push(v);
+                    updateTags();
+                }
+                input.value = '';
+                hidden.value = selectedValues.join(', ');
+                if (opts.onSelect) opts.onSelect(selectedValues);
+            } else {
+                input.value = v;
+                hidden.value = v;
+                if (opts.onSelect) opts.onSelect(v);
+            }
+        }
+
+        let highlightedIndex = -1;
+
+        function highlightOption(index) {
+            const options = dropdown.querySelectorAll('.combobox-option');
+            if (options.length === 0) return;
+            
+            options.forEach((opt, i) => {
+                if (i === index) {
+                    opt.classList.add('highlighted');
+                    opt.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } else {
+                    opt.classList.remove('highlighted');
+                }
+            });
+            highlightedIndex = index;
+        }
+
         function render(filter = '') {
             const q = filter.toLowerCase();
             let html = '';
             let hasResults = false;
+            highlightedIndex = -1; // Reset on new search
 
             if (grouped && Object.keys(groupedItems).length > 0) {
                 Object.entries(groupedItems).forEach(([group, list]) => {
@@ -2284,25 +2436,15 @@
 
             dropdown.innerHTML = html;
 
-            dropdown.querySelectorAll('.combobox-option').forEach(opt => {
+            dropdown.querySelectorAll('.combobox-option').forEach((opt, idx) => {
                 opt.addEventListener('mousedown', function(e) {
                     e.preventDefault();
-                    const val = this.getAttribute('data-value');
-                    
-                    if (isMulti) {
-                        if (!selectedValues.includes(val)) {
-                            selectedValues.push(val);
-                            updateTags();
-                        }
-                        input.value = '';
-                        hidden.value = selectedValues.join(', ');
-                        if (opts.onSelect) opts.onSelect(selectedValues);
-                    } else {
-                        input.value = val;
-                        hidden.value = val;
-                        if (opts.onSelect) opts.onSelect(val);
-                    }
+                    applyValue(this.getAttribute('data-value'));
                     close();
+                });
+                // Update highlighted on hover for feedback
+                opt.addEventListener('mouseenter', () => {
+                    highlightOption(idx);
                 });
             });
         }
@@ -2316,6 +2458,7 @@
         function close() {
             dropdown.classList.remove('show');
             toggle.classList.remove('open');
+            highlightedIndex = -1;
         }
 
         // Ghost text element
@@ -2341,73 +2484,67 @@
 
         input.addEventListener('focus', open);
         input.addEventListener('input', function() {
-            // Auto Title Case
-            const pos = this.selectionStart;
-            this.value = this.value.replace(/\b\w/g, c => c.toUpperCase());
-            this.setSelectionRange(pos, pos);
             if (!isMulti) hidden.value = this.value;
             if (opts.onInput) opts.onInput(this.value);
             updateGhost();
             open();
         });
 
-        // Accept ghost suggestion
+        // Accept ghost suggestion or navigate dropdown
         input.addEventListener('keydown', function(e) {
             if ((e.key === 'Tab' || e.key === 'ArrowRight') && ghost && ghost.innerHTML) {
                 const suggestionEl = ghost.querySelector('.ghost-suggestion');
                 if (suggestionEl && suggestionEl.textContent) {
                     e.preventDefault();
                     const fullText = input.value + suggestionEl.textContent;
-                    if (isMulti) {
-                        if (!selectedValues.includes(fullText)) {
-                            selectedValues.push(fullText);
-                            updateTags();
-                        }
-                        input.value = '';
-                        hidden.value = selectedValues.join(', ');
-                    } else {
-                        input.value = fullText;
-                        hidden.value = fullText;
-                    }
-                    if (opts.onInput) opts.onInput(fullText);
+                    applyValue(fullText);
                     ghost.innerHTML = '';
                     close();
+                    focusNextField(input.id);
                 }
-            } else if (e.key === 'Enter' && input.value.trim() !== '') {
+            } else if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                const val = input.value.trim();
-                const match = allItems.find(s => s.toLowerCase() === val.toLowerCase());
+                if (!dropdown.classList.contains('show')) open();
+                const options = dropdown.querySelectorAll('.combobox-option');
+                let next = highlightedIndex + 1;
+                if (next >= options.length) next = 0;
+                highlightOption(next);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const options = dropdown.querySelectorAll('.combobox-option');
+                let prev = highlightedIndex - 1;
+                if (prev < 0) prev = options.length - 1;
+                highlightOption(prev);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const options = dropdown.querySelectorAll('.combobox-option');
                 
-                if (strict && !match) {
-                    // In strict mode, if no exact match, try to use ghost suggestion
-                    const ghostSuggestion = ghost && ghost.querySelector('.ghost-suggestion');
-                    if (ghostSuggestion) {
-                        const fullText = val + ghostSuggestion.textContent;
-                        applyValue(fullText);
-                    } else {
-                        input.value = ''; // Clear if invalid
-                    }
-                    return;
-                }
-
-                const finalVal = match || val;
-
-                function applyValue(v) {
-                    if (isMulti) {
-                        if (!selectedValues.includes(v)) {
-                            selectedValues.push(v);
-                            updateTags();
+                // If something is highlighted with arrows, use that!
+                if (highlightedIndex > -1 && options[highlightedIndex]) {
+                    applyValue(options[highlightedIndex].getAttribute('data-value'));
+                } else {
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        const match = allItems.find(s => s.toLowerCase() === val.toLowerCase());
+                        if (strict && !match) {
+                            const ghostSuggestion = ghost && ghost.querySelector('.ghost-suggestion');
+                            if (ghostSuggestion) {
+                                applyValue(val + ghostSuggestion.textContent);
+                            } else {
+                                input.value = '';
+                            }
+                        } else {
+                            applyValue(match || val);
                         }
-                        input.value = '';
-                        hidden.value = selectedValues.join(', ');
-                    } else {
-                        input.value = v;
-                        hidden.value = v;
+                        
+                        if (isMulti) {
+                            if (ghost) ghost.innerHTML = '';
+                            return; 
+                        }
                     }
                 }
-
-                applyValue(finalVal);
                 close();
+                focusNextField(input.id);
             }
         });
 
@@ -2633,13 +2770,6 @@
                     <button class="btn-panel btn-panel-primary" onclick="executeExport()">Download .xls</button>
                     <button class="btn-panel btn-panel-secondary" onclick="togglePrintMode()">Cancel</button>
                 </div>
-                <!-- Done Button -->
-                <button id="doneBtn" class="btn-panel btn-panel-primary" onclick="completeRegistryAction()" style="background: #10b981; border: none; color: white;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
-                    <span>Finish Session</span>
-                </button>
                 
                 <button class="btn-panel btn-panel-danger" onclick="closeRecordsModal()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
@@ -2681,7 +2811,7 @@
                         </tr>
                     </thead>
                     <tbody id="recordsTableBody">
-                        <tr><td colspan="11" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">Loading registry records...</td></tr>
+                        <tr><td colspan="12" class="empty-registry-message">Loading registry records...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -2763,10 +2893,10 @@
             if (!existingNoResults) {
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.id = 'noResultsRow';
-                noResultsRow.innerHTML = `<td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
+                noResultsRow.innerHTML = `<td colspan="12" class="empty-registry-message">${noResultsMsg}</td>`;
                 tbody.appendChild(noResultsRow);
             } else {
-                existingNoResults.innerHTML = `<td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem;">${noResultsMsg}</td>`;
+                existingNoResults.innerHTML = `<td colspan="12" class="empty-registry-message">${noResultsMsg}</td>`;
                 existingNoResults.style.display = '';
             }
         } else if (existingNoResults) {
@@ -2822,7 +2952,7 @@
                 if (modalTotalEl) modalTotalEl.textContent = data.length;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94a3b8;">No records found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="12" class="empty-registry-message">No records found.</td></tr>';
                     return;
                 }
 
@@ -3165,7 +3295,7 @@
                     <tbody>
         `;
 
-        let lastDept = null;
+        let isFirstGroup = true;
         let counter = 1;
 
         // Color mapping for consistent forwarded headers (matches Leave Records page)
@@ -3257,8 +3387,70 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
+        // Extract IDs of exported records BEFORE clearing selection mode
+        const exportedRows = document.querySelectorAll('#recordsTableBody tr.record-row.selected-row');
+        const exportedIds = Array.from(exportedRows).map(row => row.getAttribute('data-id')).filter(id => id);
+
         showToast('Excel file generated successfully.');
-        togglePrintMode(); // Exit excel mode
+        togglePrintMode(); // Exit excel mode (this clears selected-row classes)
+        
+        if (exportedIds.length > 0) {
+            processRecordsInRegistry(exportedIds, 'Exported records marked as processed.');
+        }
+    }
+
+    function processRecordsInRegistry(ids, successMessage = 'Registry cleared successfully.') {
+        const tbody = document.getElementById('recordsTableBody');
+        
+        // Add a clearing animation
+        tbody.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        tbody.style.opacity = '0.5';
+        tbody.style.transform = 'translateY(10px)';
+
+        // Call API to mark as processed
+        fetch('/leave-records/bulk-process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                setTimeout(() => {
+                    // Update: Re-fetching the list is safer than just clearing HTML manually, 
+                    // but for smooth UI we clear/hide the rows first
+                    if (ids.length >= tbody.querySelectorAll('.record-row').length) {
+                        tbody.innerHTML = '<tr><td colspan="12" class="empty-registry-message">All records processed and removed from registry.</td></tr>';
+                    } else {
+                        // Just re-fetch if partial export was done
+                        fetchRecordsList();
+                    }
+                    
+                    tbody.style.opacity = '1';
+                    tbody.style.transform = 'translateY(0)';
+                    
+                    showToast(successMessage);
+                    updateRecordCount(); // Refresh the counter on the form
+                    
+                    if (ids.length >= tbody.querySelectorAll('.record-row').length) {
+                        setTimeout(closeRecordsModal, 800);
+                    }
+                }, 400);
+            } else {
+                tbody.style.opacity = '1';
+                tbody.style.transform = 'translateY(0)';
+                showToast('Error processing records', 'error');
+            }
+        })
+        .catch(() => {
+            tbody.style.opacity = '1';
+            tbody.style.transform = 'translateY(0)';
+            showToast('Connection error', 'error');
+        });
     }
 
     function completeRegistryAction() {
@@ -3278,45 +3470,7 @@
             return;
         }
 
-        // Add a clearing animation
-        tbody.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        tbody.style.opacity = '0';
-        tbody.style.transform = 'translateY(10px)';
-
-        // Call API to mark as processed
-        fetch('/leave-records/bulk-process', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ ids: ids })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                setTimeout(() => {
-                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 60px; color: #94a3b8; font-size: 0.9rem; background: #f8fafc;">All records processed and removed from registry.</td></tr>';
-                    tbody.style.opacity = '1';
-                    tbody.style.transform = 'translateY(0)';
-                    
-                    showToast('Registry cleared successfully.');
-                    updateRecordCount(); // Refresh the counter on the form
-                    
-                    setTimeout(closeRecordsModal, 800);
-                }, 400);
-            } else {
-                tbody.style.opacity = '1';
-                tbody.style.transform = 'translateY(0)';
-                showToast('Error clearing registry', 'error');
-            }
-        })
-        .catch(() => {
-            tbody.style.opacity = '1';
-            tbody.style.transform = 'translateY(0)';
-            showToast('Connection error', 'error');
-        });
+        processRecordsInRegistry(ids, 'Registry cleared successfully.');
     }
 </script>
 </body>

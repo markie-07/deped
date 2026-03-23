@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmployeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-use App\Http\Controllers\EmployeeController;
 
 // ─── Authentication ───
 Route::post('/login', function (Request $request) {
@@ -44,13 +44,13 @@ Route::get('/dashboard/stats', function () {
 });
 
 // ─── Employees ───
-Route::prefix('employees')->group(function () {
+Route::group(['prefix' => 'employees'], function () {
     Route::get('/', [EmployeeController::class, 'getEmployees']);
     Route::get('/records', [EmployeeController::class, 'getRecordsByEmployee']);
 });
 
 // ─── Departments ───
-Route::prefix('departments')->group(function () {
+Route::group(['prefix' => 'departments'], function () {
     Route::get('/', function () {
         return response()->json(['message' => 'List departments'], 200);
     });
@@ -61,7 +61,7 @@ Route::prefix('departments')->group(function () {
 });
 
 // ─── Attendance ───
-Route::prefix('attendance')->group(function () {
+Route::group(['prefix' => 'attendance'], function () {
     Route::get('/', function () {
         return response()->json(['message' => 'List attendance records'], 200);
     });

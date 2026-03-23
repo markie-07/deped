@@ -128,7 +128,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                         </svg>
-                        <input type="date" id="modalFilterDate" onchange="fetchRemarkRecords()">
+                        <input type="date" id="modalFilterDate" value="{{ date('Y-m-d') }}" onchange="fetchRemarkRecords()">
                     </div>
                 </div>
                 <button class="panel-close-btn" onclick="closeRemarkModal()">
@@ -921,7 +921,11 @@ document.addEventListener('DOMContentLoaded', function() {
         avatarEl.textContent = getInitials(remarkText);
         avatarEl.style.background = colours.avatar;
         document.getElementById('modalSearch').value = '';
-        document.getElementById('modalFilterDate').value = new Date().toLocaleDateString('en-CA');
+        
+        // Clear the date filter to show all records by default
+        // Set the date filter to today's date by default
+        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        
         fetchRemarkRecords();
     };
 
@@ -1009,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('modalSearch').addEventListener('input', filterModalRecords);
 
     window.editRecord = function(id) {
-        window.location.href = "{{ url('/admin/form') }}?edit=" + id;
+        window.location.href = "{{ url('/admin/form') }}?edit=" + id + "&source=remarks&remarkName=" + encodeURIComponent(currentRemarkForModal);
     };
 
 
@@ -1048,6 +1052,18 @@ document.addEventListener('DOMContentLoaded', function() {
             closeRemarkModal();
         }
     });
+
+    // Check for openModal URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const openModal = urlParams.get('openModal');
+    if (openModal) {
+        const checkInterval = setInterval(() => {
+            if (allRemarks.length > 0) {
+                clearInterval(checkInterval);
+                openRemarkModal(openModal);
+            }
+        }, 100);
+    }
 });
 </script>
 

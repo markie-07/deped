@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Employee;
 use App\Models\LeaveRecord;
 
 class EmployeeController extends Controller
@@ -17,16 +18,25 @@ class EmployeeController extends Controller
 
     public function getEmployees()
     {
-        // Get unique employees from LeaveRecord table
-        $employees = LeaveRecord::whereNotNull('name')
+        // Get unique employees from Employee directory table
+        // This ensures employees added via bulk import or previous records are visible
+        $employees = Employee::whereNotNull('name')
             ->where('name', '!=', '')
             ->select('name')
             ->selectRaw('MAX(position) as position')
             ->selectRaw('MAX(school) as school')
-            ->selectRaw('COUNT(*) as record_count')
+            ->selectRaw('COUNT(id) as record_count') // This might show 1 if each Employee row is a record
             ->groupBy('name')
             ->orderBy('name')
             ->get();
+
+        // Calculate real-time counts from LeaveRecord table
+        $employees = $employees->map(function ($employee) {
+            $employee->record_count = LeaveRecord::where('name', $employee->name)->count();
+            return $employee;
+        })->filter(function ($employee) {
+            return $employee->record_count > 0;
+        })->values();
             
         return response()->json($employees);
     }

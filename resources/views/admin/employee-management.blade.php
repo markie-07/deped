@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let allAccounts = [];
     let currentRoleTab = 'user';
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    const currentUserId = parseInt('{{ Auth::id() }}') || null;
+    const currentUserId = parseInt('{{ auth()->id() }}') || null;
 
     window.setRoleFilter = function(role) {
         currentRoleTab = role;

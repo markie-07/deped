@@ -154,7 +154,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                         </svg>
-                        <input type="date" id="modalFilterDate" onchange="fetchInchargeRecords()">
+                        <input type="date" id="modalFilterDate" value="{{ date('Y-m-d') }}" onchange="fetchInchargeRecords()">
                     </div>
                 </div>
                 <button class="panel-close-btn" onclick="closeInchargeModal()">
@@ -1336,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="card-badge">${i.leave_count} Record${i.leave_count !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="card-main">
-                    <h3 class="card-name" title="${i.incharge}">${i.incharge}</h3>
+                    <h3 class="card-name" title="${i.incharge}">${i.username || i.incharge}</h3>
                     <div class="card-details">
                         <div class="detail-row" title="${position}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -1400,11 +1400,14 @@ document.addEventListener('DOMContentLoaded', function () {
             panelAvatar.innerHTML = getInitials(name);
             panelAvatar.style.background = PALETTE[ci].avatar;
         }
-        document.getElementById('panelName').textContent = name;
+        // Use username for display name if available
+        document.getElementById('panelName').textContent = (matchedIncharge && matchedIncharge.username) ? matchedIncharge.username : name;
         document.getElementById('modalSearch').value = '';
+        // Set the date filter to today's date by default
         const now = new Date();
         const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
         document.getElementById('modalFilterDate').value = today;
+        
         modal.classList.add('open');
         fetchInchargeRecords();
     };
@@ -1487,7 +1490,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    window.editRecord = function(id) { window.location.href = "{{ url('/admin/form') }}?edit=" + id; };
+    window.editRecord = function(id) { 
+        window.location.href = "{{ url('/admin/form') }}?edit=" + id + "&source=incharge&inchargeName=" + encodeURIComponent(currentIncharge); 
+    };
 
     window.deleteRecord = function(id) {
         if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) return;
@@ -1516,6 +1521,23 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(() => alert('Error deleting record.'));
     };
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+            closeInchargeModal();
+        }
+    });
+
+    // Check for openModal URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const openModal = urlParams.get('openModal');
+    if (openModal) {
+        const checkInterval = setInterval(() => {
+            if (allIncharges.length > 0) {
+                clearInterval(checkInterval);
+                openInchargeModal(openModal);
+            }
+        }, 100);
+    }
 });
 </script>
 
