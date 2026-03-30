@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,9 +17,11 @@ class CheckUserActive
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && !auth()->user()->is_active) {
-            Log::warning('Deactivating session for user: ' . auth()->id());
-            auth()->logout();
+        if (Auth::check() && !Auth::user()->is_active) {
+            Log::warning('Deactivating session for user: ' . Auth::id());
+            /** @var \Illuminate\Auth\SessionGuard $guard */
+            $guard = Auth::guard();
+            $guard->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             
