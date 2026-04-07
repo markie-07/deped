@@ -85,7 +85,7 @@
                 cBtn.style.display = 'none';
             }
         } else {
-            sBtn.style.display = 'flex';
+            sBtn.style.display = 'none';
             vBtn.style.display = 'none';
             cBtn.style.display = 'none';
         }
@@ -276,7 +276,6 @@
         fd.append('_token', document.querySelector('meta[name="csrf-token"]').content);
         fd.append(fieldName, file);
         // Also send required fields from the form so validation passes
-        fd.append('username', document.getElementById('inputUsername').value);
         fd.append('first_name', document.getElementById('inputFirstName').value);
         fd.append('last_name', document.getElementById('inputLastName').value);
         fd.append('email', document.getElementById('inputEmail').value);
@@ -344,11 +343,7 @@
             return;
         }
 
-        const usernameInput = document.getElementById('inputUsername');
-        const wasDisabled = usernameInput.disabled;
-        if (wasDisabled) usernameInput.disabled = false;
         const currentFd = new FormData(this);
-        if (wasDisabled) usernameInput.disabled = true;
 
         // Check if anything actually changed
         let isDirty = false;
@@ -373,7 +368,6 @@
         if (pw && !cpw) { showFieldError('current_password','Current password is required to change password.'); err = true; }
         if (pw && pw.length < 8) { showFieldError('password','Password must be at least 8 characters.'); err = true; }
         if (pw && pw !== pwc) { showFieldError('password_confirmation','Passwords do not match.'); err = true; }
-        if (!document.getElementById('inputUsername').value.trim()) { showFieldError('username','Username is required.'); err = true; }
         if (!document.getElementById('inputFirstName').value.trim()) { showFieldError('first_name','First name is required.'); err = true; }
         if (!document.getElementById('inputLastName').value.trim()) { showFieldError('last_name','Last name is required.'); err = true; }
         if (!document.getElementById('inputEmail').value.trim()) { showFieldError('email','Email is required.'); err = true; }
@@ -387,15 +381,15 @@
             if (data.success) {
                 showToast('Success','Profile updated successfully!');
                 const fn = data.user.first_name||'', ln = data.user.last_name||'';
-                document.getElementById('heroNameDisplay').textContent = (fn+' '+ln).trim() || data.user.username;
+                document.getElementById('heroNameDisplay').textContent = (fn+' '+ln).trim() || data.user.name;
                 const sn = document.querySelector('.sidebar .profile-name'), sr = document.querySelector('.sidebar .profile-role');
                 const nn = document.querySelector('.navbar-user-name'), nr = document.querySelector('.navbar-user-role');
-                if (sn) sn.textContent = data.user.username || data.user.name;
+                if (sn) sn.textContent = data.user.first_name || data.user.name;
                 if (sr) sr.textContent = data.user.position || 'User';
-                if (nn) nn.textContent = data.user.username || data.user.name;
+                if (nn) nn.textContent = data.user.first_name || data.user.name;
                 if (nr) nr.textContent = data.user.position || 'User';
                 if (!data.user.profile_image) {
-                    const init = (data.user.username||data.user.name||'U').charAt(0).toUpperCase();
+                    const init = (data.user.first_name||data.user.name||'U').charAt(0).toUpperCase();
                     const sa = document.querySelector('.sidebar .profile-avatar:not(img)'), na = document.querySelector('.navbar-user-avatar:not(img)');
                     if (sa && !sa.tagName.match(/img/i)) sa.textContent = init;
                     if (na && !na.tagName.match(/img/i)) na.textContent = init;
@@ -423,11 +417,27 @@
         }
     });
 
-    document.querySelectorAll('#profileForm input').forEach(input => {
+    document.querySelectorAll('#profileForm input, #profileForm select').forEach(input => {
         input.addEventListener('input', function() {
             const w = this.closest('.f-input-wrap'), e = document.getElementById('err-'+this.name);
             if (w) w.classList.remove('error');
             if (e) { e.classList.remove('visible'); e.textContent = ''; }
+        });
+
+        // Add Enter key trigger
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Find and click the visible primary action button
+                const saveBtn = document.getElementById('saveBtn');
+                const verifyBtn = document.getElementById('verifyBtn');
+                
+                if (verifyBtn && window.getComputedStyle(verifyBtn).display !== 'none' && !verifyBtn.disabled) {
+                    verifyBtn.click();
+                } else if (saveBtn && window.getComputedStyle(saveBtn).display !== 'none' && !saveBtn.disabled) {
+                    saveBtn.click();
+                }
+            }
         });
     });
     // ═══ REPOSITION LOGIC ═══
@@ -569,7 +579,6 @@
 
         const fd = new FormData();
         fd.append('_token', document.querySelector('meta[name="csrf-token"]').content);
-        fd.append('username', document.getElementById('inputUsername').value);
         fd.append('first_name', document.getElementById('inputFirstName').value);
         fd.append('last_name', document.getElementById('inputLastName').value);
         fd.append('email', document.getElementById('inputEmail').value);
@@ -646,11 +655,35 @@
     const bioAlertText = document.getElementById('bioAlertText');
     const btnScanText = document.getElementById('btnScanText');
 
+    // Progress Bar Helper
+    function setBioProgress(percent, statusText, stateClass) {
+        const fill = document.getElementById('bioProgressFill');
+        const glow = document.getElementById('bioProgressGlow');
+        const statusEl = document.getElementById('bioProgressStatus');
+        const percentEl = document.getElementById('bioProgressPercent');
+        if (!fill || !glow || !statusEl || !percentEl) return;
+        
+        fill.style.width = percent + '%';
+        glow.style.width = percent + '%';
+        fill.classList.remove('success', 'error');
+        statusEl.classList.remove('active', 'success', 'error');
+        percentEl.style.color = '#6366f1';
+        
+        if (stateClass) {
+            fill.classList.add(stateClass);
+            statusEl.classList.add(stateClass);
+            if (stateClass === 'success') percentEl.style.color = '#10b981';
+            if (stateClass === 'error') percentEl.style.color = '#ef4444';
+        } else if (percent > 0) {
+            statusEl.classList.add('active');
+        }
+        
+        statusEl.textContent = statusText || 'Ready to scan';
+        percentEl.textContent = Math.round(percent) + '%';
+    }
+
     function setPipeStatus(stepId, status) {
-        const el = document.getElementById(stepId);
-        if (!el) return;
-        el.classList.remove('active', 'done');
-        if (status) el.classList.add(status);
+        // No-op: steps replaced by progress bar
     }
 
     if (btnFaceRegTrigger) {
@@ -678,6 +711,7 @@
         document.getElementById('bioModalTitle').textContent = 'Register Biometric Data';
         document.getElementById('bioModalSubtitle').textContent = 'Securely link your face to your account';
         document.getElementById('btnScanText').textContent = 'Start Registration Scan';
+        setBioProgress(0, 'Initializing...');
         await startBioCamera();
     }
 
@@ -685,6 +719,7 @@
         bioModalOverlay.classList.remove('active');
         document.body.style.overflow = '';
         stopBioCamera();
+        setBioProgress(0, 'Ready to scan');
     }
 
     async function loadBioModels() {
@@ -730,8 +765,12 @@
         const video = document.getElementById('bioVideo');
         
         statusText.textContent = 'Loading models...';
+        setBioProgress(10, 'Loading AI models...');
+        document.getElementById('bioLoaderOverlay').classList.remove('hidden');
+        btnScanFace.disabled = true;
         try {
             await loadBioModels();
+            setBioProgress(30, 'Starting camera...');
             statusText.textContent = 'Starting camera...';
             
             bioStream = await getMediaStream({
@@ -742,13 +781,13 @@
             
             statusText.textContent = 'System Ready';
             document.querySelector('.bio-cam-status').classList.add('active');
+            setBioProgress(40, 'Camera ready — press scan');
             
             startDetectionLoop();
-            setPipeStatus('stepDetect', 'active');
-            setPipeStatus('stepAlign', 'active');
         } catch (err) {
             console.error(err);
             statusText.textContent = 'Camera Error';
+            setBioProgress(0, 'Camera error', 'error');
             let msg = err.message || 'Unknown error';
             if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                 msg = 'Camera permission denied. Please allow camera access in your browser settings.';
@@ -793,9 +832,16 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Hide loader on first detection attempt (once analyzer starts returning)
+            const loader = document.getElementById('bioLoaderOverlay');
+            if (loader && !loader.classList.contains('hidden')) {
+                loader.classList.add('hidden');
+                btnScanFace.disabled = false;
+            }
+            
             if (detection) {
                 const resized = faceapi.resizeResults(detection, displaySize);
-                faceapi.draw.drawDetections(canvas, resized);
+                drawFaceHUD(ctx, resized);
                 
                 bioCurrentDescriptor = detection.descriptor;
                 updateMathPanel(detection);
@@ -806,6 +852,69 @@
             }
         }, 100);
     }
+
+        function drawFaceHUD(ctx, detection) {
+            if (!detection.landmarks) return;
+            
+            const points = detection.landmarks.positions;
+            const score = detection.detection.score;
+            const hubColor = '#ffffff'; // Pure white
+            const meshColor = 'rgba(255, 255, 255, 0.5)'; 
+            const lineColor = 'rgba(255, 255, 255, 0.15)'; 
+
+            // 1. Draw Face-Fitted Contour (The "Oval")
+            ctx.beginPath();
+            ctx.strokeStyle = hubColor;
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([8, 5]);
+
+            // Jawline
+            points.slice(0, 17).forEach((p, i) => {
+                if (i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            });
+
+            // Forehead Arc
+            const jawLeft = points[0];
+            const jawRight = points[16];
+            const chin = points[8];
+            const eyeAvgY = (points[36].y + points[45].y) / 2;
+            const headHeight = chin.y - eyeAvgY;
+            const foreheadTopY = eyeAvgY - (headHeight * 0.75); 
+            
+            ctx.bezierCurveTo(jawRight.x, foreheadTopY, jawLeft.x, foreheadTopY, jawLeft.x, jawLeft.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Yellow Landmark Mesh
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = meshColor;
+            const features = [
+                [17,18,19,20,21], [22,23,24,25,26], 
+                [27,28,29,30], [31,32,33,34,35,31], 
+                [36,37,38,39,40,41,36], [42,43,44,45,46,47,42], 
+                [48,49,50,51,52,53,54,55,56,57,58,59,48], 
+                [60,61,62,63,64,65,66,67,60], 
+            ];
+            features.forEach(path => {
+                ctx.beginPath();
+                path.forEach((idx, i) => i === 0 ? ctx.moveTo(points[idx].x, points[idx].y) : ctx.lineTo(points[idx].x, points[idx].y));
+                ctx.stroke();
+            });
+
+            const triangulation = [
+                [19, 27, 24], [21, 27, 22], [39, 27, 42], 
+                [31, 48, 4, 2], [35, 54, 12, 14], 
+                [19, 36], [24, 45], [33, 51, 62], [33, 66, 57],
+            ];
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = lineColor;
+            triangulation.forEach(path => {
+                ctx.beginPath();
+                path.forEach((idx, i) => i === 0 ? ctx.moveTo(points[idx].x, points[idx].y) : ctx.lineTo(points[idx].x, points[idx].y));
+                ctx.stroke();
+            });
+        }
 
     function updateMathPanel(detection) {
         const score = detection.detection.score;
@@ -857,9 +966,7 @@
         bioAttempting = true;
         btnScanFace.disabled = true;
         btnScanText.textContent = 'Scanning Vectors...';
-        setPipeStatus('stepDetect', 'done');
-        setPipeStatus('stepAlign', 'done');
-        setPipeStatus('stepExtract', 'active');
+        setBioProgress(50, 'Collecting biometric samples...');
         bioRecentDescriptors = [];
         
         let samplesTaken = 0;
@@ -869,8 +976,14 @@
                 samplesTaken++;
                 hudProgress.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
                 statSamples.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
+                
+                // Update progress bar proportionally (50% to 80%)
+                const samplePercent = 50 + (samplesTaken / REQUIRED_SAMPLES) * 30;
+                setBioProgress(samplePercent, `Sample ${samplesTaken} of ${REQUIRED_SAMPLES}...`);
+                
                 if (samplesTaken >= REQUIRED_SAMPLES) {
                     clearInterval(collectInterval);
+                    setBioProgress(85, 'Analyzing face data...');
                     await performRegistration();
                 }
             }
@@ -880,8 +993,7 @@
     async function performRegistration() {
         const statusText = document.getElementById('bioCamStatusText');
         statusText.textContent = 'Saving Secure Descriptor...';
-        setPipeStatus('stepExtract', 'done');
-        setPipeStatus('stepMatch', 'active');
+        setBioProgress(90, 'Registering face data...');
         
         const avgDescriptor = bioRecentDescriptors[0].map((_, i) => {
             return bioRecentDescriptors.reduce((sum, d) => sum + d[i], 0) / bioRecentDescriptors.length;
@@ -899,7 +1011,7 @@
             });
             const data = await res.json();
             if (data.success) {
-                setPipeStatus('stepMatch', 'done');
+                setBioProgress(100, 'Registration complete!', 'success');
                 statusText.textContent = 'Registration Complete!';
                 document.getElementById('bioScanFrame').classList.add('success');
                 showBioAlert('Brilliant! Your face is now registered.', 'success');

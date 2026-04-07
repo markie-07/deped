@@ -78,14 +78,17 @@
                             </button>
                         </div>
                         
-                        <!-- Alphabet Filter -->
+
+
                         <div class="hero-filter">
                             <div class="filter-select-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                                 </svg>
-                                <select id="alphaSelect" onchange="filterByLetter(this.value)">
-                                    <option value="ALL">All Letters</option>
+                                <select id="assignedFilter">
+                                    <option value="all">All Assignments</option>
+                                    <option value="national">National</option>
+                                    <option value="city">City</option>
                                 </select>
                             </div>
                         </div>
@@ -1199,7 +1202,13 @@ body.dark-mode .sk-line { background: linear-gradient(90deg, #334155 25%, #47556
 </style>
 
 <script>
+const USER_ASSIGNED = "{{ auth()->user()->assigned ?? '' }}";
+
 document.addEventListener('DOMContentLoaded', function () {
+    const assignedFilter = document.getElementById('assignedFilter');
+    if (assignedFilter && USER_ASSIGNED) {
+        assignedFilter.value = USER_ASSIGNED.toLowerCase();
+    }
 
     // ── Colour palette for cards (cycles) ──
     const PALETTE = [
@@ -1212,14 +1221,12 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     let allIncharges = [];
-    let currentLetter = 'ALL';
     let currentView = localStorage.getItem('inchargeView') || 'grid';
 
     const grid      = document.getElementById('personnelGrid');
     const skeleton  = document.getElementById('skeletonGrid');
     const emptyEl   = document.getElementById('emptyState');
     const countEl   = document.getElementById('inchargeCount');
-    const alphaSelect = document.getElementById('alphaSelect');
     const searchInput  = document.getElementById('inchargeSearch');
     const searchClearBtn = document.getElementById('searchClearBtn');
 
@@ -1258,7 +1265,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(r => r.json())
         .then(data => {
             allIncharges = data;
-            buildAlphaBar(data);
             skeleton.style.display = 'none';
             grid.style.display = 'grid';
             // Populate banner total records stat
@@ -1268,21 +1274,7 @@ document.addEventListener('DOMContentLoaded', function () {
             renderGrid();
         });
 
-    function buildAlphaBar(data) {
-        const letters = [...new Set(data.map(i => i.incharge[0].toUpperCase()))].sort();
-        letters.forEach(l => {
-            const opt = document.createElement('option');
-            opt.value = l;
-            opt.textContent = l;
-            alphaSelect.appendChild(opt);
-        });
-    }
 
-    window.filterByLetter = function(letter) {
-        currentLetter = letter;
-        alphaSelect.value = letter;
-        renderGrid(searchInput.value);
-    };
 
     window.setView = function(view) {
         currentView = view;
@@ -1296,8 +1288,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderGrid(filter = '') {
         let list = allIncharges;
 
-        if (currentLetter !== 'ALL') {
-            list = list.filter(i => i.incharge[0].toUpperCase() === currentLetter);
+        const assignedVal = document.getElementById('assignedFilter').value;
+        if (assignedVal !== 'all') {
+            list = list.filter(i => (i.assigned || '').toLowerCase() === assignedVal.toLowerCase());
         }
         if (filter.trim()) {
             list = list.filter(i => i.incharge.toLowerCase().includes(filter.toLowerCase()));
@@ -1336,8 +1329,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="card-badge">${i.leave_count} Record${i.leave_count !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="card-main">
-                    <h3 class="card-name" title="${i.incharge}">${i.username || i.incharge}</h3>
+                    <h3 class="card-name" title="${i.incharge}">${i.first_name || i.incharge}</h3>
                     <div class="card-details">
+                        <div class="detail-row" title="Assignment">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                            </svg>
+                            <span class="detail-text" style="text-transform: capitalize;">${i.assigned || 'National'}</span>
+                        </div>
                         <div class="detail-row" title="${position}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .414-.336.75-.75.75H4.5a.75.75 0 0 1-.75-.75v-4.25m16.5 0a3 3 0 0 0-3-3H6.75a3 3 0 0 0-3 3m16.5 0V9a2.25 2.25 0 0 0-2.25-2.25H16.5V4.5a2.25 2.25 0 0 0-2.25-2.25h-4.5A2.25 2.25 0 0 0 7.5 4.5v2.25H5.25A2.25 2.25 0 0 0 3 9v5.15" />
@@ -1368,6 +1367,12 @@ document.addEventListener('DOMContentLoaded', function () {
         renderGrid(e.target.value);
         searchClearBtn.style.display = e.target.value ? 'flex' : 'none';
     });
+
+    if (assignedFilter) {
+        assignedFilter.addEventListener('change', () => {
+            renderGrid(searchInput.value);
+        });
+    }
 
     window.clearSearch = function() {
         searchInput.value = '';
@@ -1400,8 +1405,8 @@ document.addEventListener('DOMContentLoaded', function () {
             panelAvatar.innerHTML = getInitials(name);
             panelAvatar.style.background = PALETTE[ci].avatar;
         }
-        // Use username for display name if available
-        document.getElementById('panelName').textContent = (matchedIncharge && matchedIncharge.username) ? matchedIncharge.username : name;
+        // Use first_name for display name if available
+        document.getElementById('panelName').textContent = (matchedIncharge && matchedIncharge.first_name) ? matchedIncharge.first_name : name;
         document.getElementById('modalSearch').value = '';
         // Set the date filter to today's date by default
         const now = new Date();
@@ -1438,7 +1443,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(data => {
                 document.getElementById('panelRecordCount').textContent = data.length;
-                document.getElementById('panelName').textContent = currentIncharge;
+                const displayName = (data.length > 0 && data[0].first_name) ? data[0].first_name : currentIncharge;
+                document.getElementById('panelName').textContent = displayName;
 
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="10" class="table-loading">No records found for this filter.</td></tr>';

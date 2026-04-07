@@ -1092,6 +1092,19 @@
         transform: translateY(-2px);
     }
 
+    .btn-panel-done {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: #fff;
+        border: none;
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-panel-done:hover {
+        background: linear-gradient(135deg, #047857, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
     .btn-panel-secondary {
         background: #fff;
         color: #4338ca;
@@ -2668,6 +2681,13 @@
             </div>
 
             <div class="panel-actions">
+                <button class="btn-panel btn-panel-done" onclick="doneAction()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <span>Done</span>
+                </button>
+
                 <button id="excelModeBtn" class="btn-panel btn-panel-secondary" onclick="togglePrintMode()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -3004,7 +3024,7 @@
                             <td>${remarkBadge}</td>
                             <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
                             <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.first_name || r.incharge || '-'}</td>
                             <td>
                                 <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                     <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -3431,6 +3451,27 @@
         }
 
         processRecordsInRegistry(ids, 'Registry cleared successfully.');
+    }
+
+    function doneAction() {
+        const tbody = document.getElementById('recordsTableBody');
+        const rows = tbody.querySelectorAll('.record-row');
+        
+        if (rows.length > 0) {
+            const ids = Array.from(rows).map(row => row.getAttribute('data-id')).filter(id => id);
+            if (ids.length > 0) {
+                // Process them first
+                processRecordsInRegistry(ids, 'Finalizing registry...');
+                // Wait a bit for processing to complete then redirect
+                setTimeout(() => {
+                    window.location.href = '/admin/leave-records';
+                }, 1200);
+                return;
+            }
+        }
+        
+        // If no records, just go to history
+        window.location.href = '/admin/leave-records';
     }
 </script>
 </body>

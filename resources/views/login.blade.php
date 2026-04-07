@@ -468,7 +468,8 @@
             position: relative;
         }
 
-        .input-box input {
+        .input-box input,
+        .input-box select {
             width: 100%;
             padding: 13px 16px 13px 46px;
             background: #fff;
@@ -481,6 +482,15 @@
             outline: none;
             transition: all 0.25s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            appearance: none; /* Hide default arrow */
+        }
+
+        .input-box select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23b0b9c8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
         }
 
         .input-box input::placeholder { color: #b0b9c8; }
@@ -489,7 +499,8 @@
             border-color: #c5ccda;
         }
 
-        .input-box input:focus {
+        .input-box input:focus,
+        .input-box select:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 2px 8px rgba(102, 126, 234, 0.08);
         }
@@ -1551,6 +1562,141 @@
             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
         }
         .btn-face-login svg { width: 20px; height: 20px; }
+
+        /* ═══ VERIFICATION CHOOSER VIEW ═══ */
+        .chooser-view {
+            opacity: 0;
+            transform: translateX(40px);
+            position: absolute;
+            pointer-events: none;
+            visibility: hidden;
+            width: 100%;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chooser-view.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            pointer-events: auto;
+            visibility: visible;
+        }
+        .chooser-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .chooser-icon {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.12));
+            border-radius: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+        .chooser-icon svg {
+            width: 32px; height: 32px;
+            color: #667eea;
+        }
+        .chooser-header h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f0f23;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+        .chooser-header p {
+            font-size: 0.88rem;
+            color: #8892a4;
+            line-height: 1.6;
+        }
+        .chooser-header .chooser-name { font-weight: 600; color: #667eea; }
+        .chooser-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+        .chooser-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            background: #fff;
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            width: 100%;
+            text-align: left;
+        }
+        .chooser-option:not(:disabled):hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.03);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.12);
+        }
+        .chooser-option:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .chooser-option:disabled .chooser-option-arrow {
+            opacity: 0.3;
+        }
+        .chooser-option:disabled:hover {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+        }
+        .chooser-option:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .chooser-option-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .chooser-option-icon svg {
+            width: 24px; height: 24px;
+        }
+        .chooser-option-icon.otp-icon {
+            background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.12));
+            color: #667eea;
+        }
+        .chooser-option-icon.face-icon {
+            background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(139,92,246,0.12));
+            color: #7c3aed;
+        }
+        .chooser-option-text {
+            flex: 1;
+        }
+        .chooser-option-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f0f23;
+            margin-bottom: 2px;
+        }
+        .chooser-option-desc {
+            font-size: 0.78rem;
+            color: #8892a4;
+            line-height: 1.4;
+        }
+        .chooser-option-arrow {
+            width: 20px; height: 20px;
+            color: #c0c7d6;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .chooser-option:hover .chooser-option-arrow {
+            color: #667eea;
+            transform: translateX(3px);
+        }
     </style>
 </head>
 <body>
@@ -1697,18 +1843,7 @@
                         <span id="alertText">{{ session('error') }}</span>
                     </div>
 
-                    <div class="separator anim-5"><span>or sign in with</span></div>
-
-                    <div class="anim-5">
-                        <button type="button" class="btn-face-login" id="faceLoginBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
-                            </svg>
-                            <span>Face Recognition</span>
-                        </button>
-                    </div>
-
-                    <div class="bottom-text anim-6" style="margin-top: 1.25rem;">
+                    <div class="bottom-text anim-5" style="margin-top: 1.25rem;">
                         <p>Don't have an account? <a href="#" id="showRegisterLink">Contact your admin</a></p>
                     </div>
                 </div>
@@ -1738,16 +1873,8 @@
                             </div>
                         </div>
 
-                        <div class="form-grid">
-                            <div class="field">
-                                <div class="field-label"><label>Username</label></div>
-                                <div class="input-box">
-                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                    </svg>
-                                    <input type="text" name="username" placeholder="jdelacruz" required>
-                                </div>
-                            </div>
+                        <div class="form-grid span-2">
+
                             <div class="field">
                                 <div class="field-label"><label>Email Address</label></div>
                                 <div class="input-box">
@@ -1801,13 +1928,28 @@
                             </div>
                         </div>
 
-                        <div class="field">
-                            <div class="field-label"><label>Position</label></div>
-                            <div class="input-box">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
-                                </svg>
-                                <input type="text" name="position" placeholder="e.g. Teacher I" required>
+                        <div class="form-grid">
+                            <div class="field">
+                                <div class="field-label"><label>Position</label></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+                                    </svg>
+                                    <input type="text" name="position" placeholder="e.g. Teacher I" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="field-label"><label>Assign</label></div>
+                                <div class="input-box">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                    </svg>
+                                    <select name="assigned">
+                                        <option value="national">National</option>
+                                        <option value="city">City</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -1873,6 +2015,68 @@
                     <div class="login-alert" id="regAlert" style="margin-top:1rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
                         <span id="regAlertText"></span>
+                    </div>
+                </div>
+
+                <!-- ═══ VERIFICATION CHOOSER VIEW ═══ -->
+                <div class="chooser-view" id="chooserView">
+                    <button class="otp-back-btn" id="chooserBackBtn" title="Go back to login">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                        Back to login
+                    </button>
+
+                    <div class="chooser-header">
+                        <div class="chooser-icon" style="display: flex; margin: 0 auto 1.25rem auto;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                            </svg>
+                        </div>
+                        <h2>Verify Your Identity</h2>
+                        <p>Hello, <span class="chooser-name" id="chooserUserName"></span>! Choose how you'd like to verify.</p>
+                    </div>
+
+                    <div class="chooser-options">
+                        <!-- Email OTP Option -->
+                        <button type="button" class="chooser-option" id="chooseOtpBtn">
+                            <div class="chooser-option-icon otp-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                </svg>
+                            </div>
+                            <div class="chooser-option-text">
+                                <div class="chooser-option-title">Email OTP Code</div>
+                                <div class="chooser-option-desc">We'll send a 6-digit code to your email</div>
+                            </div>
+                            <svg class="chooser-option-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+
+                        <!-- Face Recognition Option -->
+                        <button type="button" class="chooser-option" id="chooseFaceBtn">
+                            <div class="chooser-option-icon face-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                                </svg>
+                            </div>
+                            <div class="chooser-option-text">
+                                <div class="chooser-option-title">Face Recognition</div>
+                                <div class="chooser-option-desc">Use your camera to verify your identity</div>
+                            </div>
+                            <svg class="chooser-option-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Chooser Alert -->
+                    <div class="login-alert" id="chooserAlert" style="margin-bottom: 1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" id="chooserAlertIcon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                        <span id="chooserAlertText"></span>
                     </div>
                 </div>
 
@@ -2082,6 +2286,7 @@
         const forgotView = document.getElementById('forgotView');
         const registerView = document.getElementById('registerView');
         const resetView = document.getElementById('resetView');
+        const chooserView = document.getElementById('chooserView');
         const faceLoginView = document.getElementById('faceLoginView');
         const formPanel = document.getElementById('formPanel');
         
@@ -2094,6 +2299,15 @@
         const alertText = document.getElementById('alertText');
         const alertIcon = document.getElementById('alertIcon');
         const submitBtn = document.getElementById('submitBtn');
+
+        // Chooser elements
+        const chooserBackBtn = document.getElementById('chooserBackBtn');
+        const chooserUserName = document.getElementById('chooserUserName');
+        const chooseOtpBtn = document.getElementById('chooseOtpBtn');
+        const chooseFaceBtn = document.getElementById('chooseFaceBtn');
+        const chooserAlert = document.getElementById('chooserAlert');
+        const chooserAlertText = document.getElementById('chooserAlertText');
+        const chooserAlertIcon = document.getElementById('chooserAlertIcon');
 
         // Forgot and OTP elements
         const forgotForm = document.getElementById('forgotForm');
@@ -2487,6 +2701,7 @@
             forgotView.classList.remove('active');
             resetView.classList.remove('active');
             registerView.classList.remove('active');
+            if (chooserView) chooserView.classList.remove('active');
             if (faceLoginView) faceLoginView.classList.remove('active');
 
             // Stop face login camera if switching away
@@ -2501,12 +2716,15 @@
                 forgotView.style.display = (view === 'forgot') ? 'block' : 'none';
                 resetView.style.display = (view === 'reset') ? 'block' : 'none';
                 registerView.style.display = (view === 'register') ? 'block' : 'none';
+                if (chooserView) chooserView.style.display = (view === 'chooser') ? 'block' : 'none';
                 if (faceLoginView) faceLoginView.style.display = (view === 'faceLogin') ? 'block' : 'none';
 
                 // Activate the target view
                 if (view === 'otp') {
                     otpView.classList.add('active');
                     otpDigits[0].focus();
+                } else if (view === 'chooser') {
+                    chooserView.classList.add('active');
                 } else if (view === 'forgot') {
                     forgotView.classList.add('active');
                     const emailInput = document.getElementById('forgotEmail');
@@ -2535,7 +2753,7 @@
 
             // Show loading state
             submitBtn.disabled = true;
-            submitBtn.querySelector('span').textContent = 'Sending OTP...';
+            submitBtn.querySelector('span').textContent = 'Verifying...';
             submitBtn.querySelector('svg').style.display = 'none';
 
             try {
@@ -2554,21 +2772,44 @@
                 if (contentType && contentType.indexOf('application/json') !== -1) {
                     const data = await res.json();
                     if (data.success) {
-                        // Update OTP view data
-                        otpUserName.textContent = data.user_name || 'User';
-                        if(data.otp_code) {
-                             // OTP code handled via backend
+                        // Store user data for chooser
+                        const userName = data.user_name || 'User';
+                        chooserUserName.textContent = userName;
+                        otpUserName.textContent = userName;
+
+                        // Disable Face Recognition if not registered OR locked
+                        if (chooseFaceBtn) {
+                            if (!data.has_face) {
+                                chooseFaceBtn.disabled = true;
+                                chooseFaceBtn.querySelector('.chooser-option-desc').textContent = 'Face not registered for this account';
+                                chooseFaceBtn.querySelector('.chooser-option-title').textContent = 'Face Recognition';
+                            } else if (data.face_locked) {
+                                chooseFaceBtn.disabled = true;
+                                // Calculate remaining time
+                                let lockMsg = 'Locked — too many failed attempts';
+                                if (data.face_locked_until) {
+                                    const lockedUntil = new Date(data.face_locked_until);
+                                    const now = new Date();
+                                    const diffMs = lockedUntil - now;
+                                    if (diffMs > 0) {
+                                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                        const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                                        lockMsg = diffHours > 0 
+                                            ? `Locked — try again in ${diffHours}h ${diffMins}m`
+                                            : `Locked — try again in ${diffMins} minute(s)`;
+                                    }
+                                }
+                                chooseFaceBtn.querySelector('.chooser-option-desc').textContent = lockMsg;
+                                chooseFaceBtn.querySelector('.chooser-option-title').textContent = 'Face Recognition (Locked)';
+                            } else {
+                                chooseFaceBtn.disabled = false;
+                                chooseFaceBtn.querySelector('.chooser-option-desc').textContent = 'Use your camera to verify your identity';
+                                chooseFaceBtn.querySelector('.chooser-option-title').textContent = 'Face Recognition';
+                            }
                         }
 
-                        // Switch views
-                        switchView('otp');
-                        startCountdown();
-
-                        if (!data.email_sent) {
-                            showAlert(otpAlert, otpAlertText, otpAlertIcon, 'Email delivery failed. Use the code above.', 'success');
-                        } else {
-                             showAlert(otpAlert, otpAlertText, otpAlertIcon, 'OTP sent to your email!', 'success');
-                        }
+                        // Show verification chooser
+                        switchView('chooser');
                     } else {
                         showAlert(loginAlert, alertText, alertIcon, data.message || 'Login failed', 'error');
                     }
@@ -2585,6 +2826,56 @@
                 submitBtn.querySelector('span').textContent = 'Sign In';
                 submitBtn.querySelector('svg').style.display = '';
             }
+        });
+
+        // ─── Chooser: Back Button ───
+        chooserBackBtn.addEventListener('click', () => {
+            switchView('login');
+            hideAlert(chooserAlert);
+        });
+
+        // ─── Chooser: Email OTP Option ───
+        chooseOtpBtn.addEventListener('click', async () => {
+            // Disable buttons to prevent double-click
+            chooseOtpBtn.disabled = true;
+            chooseFaceBtn.disabled = true;
+            const origTitle = chooseOtpBtn.querySelector('.chooser-option-title');
+            origTitle.textContent = 'Sending OTP...';
+
+            try {
+                const csrfToken = document.querySelector('input[name=_token]').value;
+                const res = await fetch('/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    switchView('otp');
+                    startCountdown();
+                    if (!data.email_sent) {
+                        showAlert(otpAlert, otpAlertText, otpAlertIcon, 'Email delivery failed. Use the code above.', 'success');
+                    } else {
+                        showAlert(otpAlert, otpAlertText, otpAlertIcon, 'OTP sent to your email!', 'success');
+                    }
+                } else {
+                    showAlert(chooserAlert, chooserAlertText, chooserAlertIcon, data.message || 'Failed to send OTP.', 'error');
+                }
+            } catch (err) {
+                showAlert(chooserAlert, chooserAlertText, chooserAlertIcon, 'Network error. Please try again.', 'error');
+            } finally {
+                chooseOtpBtn.disabled = false;
+                chooseFaceBtn.disabled = false;
+                origTitle.textContent = 'Email OTP Code';
+            }
+        });
+
+        // ─── Chooser: Face Recognition Option ───
+        chooseFaceBtn.addEventListener('click', () => {
+            openBioModal('login');
         });
 
         // ─── OTP Input Handling ───
@@ -2718,7 +3009,7 @@
 
         // ─── Back Button ───
         otpBackBtn.addEventListener('click', () => {
-             switchView('login');
+             switchView('chooser');
              clearInterval(countdownInterval);
              otpDigits.forEach(d => { d.value = ''; d.classList.remove('filled', 'error'); });
              hideAlert(otpAlert);
@@ -3238,16 +3529,37 @@
         const bioAlertText = document.getElementById('bioAlertText');
         const btnScanText = document.getElementById('btnScanText');
 
-        function setPipeStatus(stepId, status) {
-            const el = document.getElementById(stepId);
-            if (!el) return;
-            el.classList.remove('active', 'done');
-            if (status) el.classList.add(status);
+        // Progress Bar Helper
+        function setBioProgress(percent, statusText, stateClass) {
+            const fill = document.getElementById('bioProgressFill');
+            const glow = document.getElementById('bioProgressGlow');
+            const statusEl = document.getElementById('bioProgressStatus');
+            const percentEl = document.getElementById('bioProgressPercent');
+            
+            fill.style.width = percent + '%';
+            glow.style.width = percent + '%';
+            fill.classList.remove('success', 'error');
+            statusEl.classList.remove('active', 'success', 'error');
+            percentEl.style.color = '#6366f1';
+            
+            if (stateClass) {
+                fill.classList.add(stateClass);
+                statusEl.classList.add(stateClass);
+                if (stateClass === 'success') percentEl.style.color = '#10b981';
+                if (stateClass === 'error') percentEl.style.color = '#ef4444';
+            } else if (percent > 0) {
+                statusEl.classList.add('active');
+            }
+            
+            statusEl.textContent = statusText || 'Ready to scan';
+            percentEl.textContent = Math.round(percent) + '%';
         }
 
-        if (btnFaceLoginTrigger) {
-            btnFaceLoginTrigger.addEventListener('click', () => openBioModal('login'));
+        // Compatibility shim for old setPipeStatus calls
+        function setPipeStatus(stepId, status) {
+            // No-op: steps replaced by progress bar
         }
+
         const btnFaceRegTrigger = document.getElementById('regFaceBtn');
         if (btnFaceRegTrigger) {
             btnFaceRegTrigger.addEventListener('click', () => openBioModal('register'));
@@ -3264,16 +3576,17 @@
             bioModalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             
+            // Reset progress bar
+            setBioProgress(0, 'Initializing...');
+            
             if (mode === 'register') {
                 document.getElementById('bioModalTitle').textContent = 'Setup Face Recognition';
                 document.getElementById('bioModalSubtitle').textContent = 'Create a unique biometric profile for your account';
                 btnScanText.textContent = 'Capture Biometrics';
-                document.getElementById('stepMatch').querySelector('.pipe-label').textContent = '4. Profile Generation';
             } else {
                 document.getElementById('bioModalTitle').textContent = 'Biometric Login';
                 document.getElementById('bioModalSubtitle').textContent = 'Verify your identity to continue';
                 btnScanText.textContent = 'Scan My Face';
-                document.getElementById('stepMatch').querySelector('.pipe-label').textContent = '4. Database Matching';
             }
             await startBioCamera();
         }
@@ -3282,6 +3595,7 @@
             bioModalOverlay.classList.remove('active');
             document.body.style.overflow = '';
             stopBioCamera();
+            setBioProgress(0, 'Ready to scan');
         }
 
         async function loadBioModels() {
@@ -3329,8 +3643,12 @@
             const video = document.getElementById('bioVideo');
             
             statusText.textContent = 'Loading models...';
+            setBioProgress(10, 'Loading AI models...');
+            document.getElementById('bioLoaderOverlay').classList.remove('hidden');
+            btnScanFace.disabled = true;
             try {
                 await loadBioModels();
+                setBioProgress(30, 'Starting camera...');
                 statusText.textContent = 'Starting camera...';
                 
                 bioStream = await getMediaStream({
@@ -3341,13 +3659,13 @@
                 
                 statusText.textContent = 'System Ready';
                 document.querySelector('.bio-cam-status').classList.add('active');
+                setBioProgress(40, 'Camera ready — press scan');
                 
                 startDetectionLoop();
-                setPipeStatus('stepDetect', 'active');
-                setPipeStatus('stepAlign', 'active');
             } catch (err) {
                 console.error(err);
                 statusText.textContent = 'Camera Error';
+                setBioProgress(0, 'Camera error', 'error');
                 let msg = err.message || 'Unknown error';
                 if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                     msg = 'Camera permission denied. Please allow camera access in your browser settings.';
@@ -3376,6 +3694,81 @@
             document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active', 'done'));
         }
 
+        function drawFaceHUD(ctx, detection) {
+            if (!detection.landmarks) return;
+            
+            const points = detection.landmarks.positions;
+            const score = detection.detection.score;
+            const hubColor = '#ffffff'; // Pure white contour
+            const meshColor = 'rgba(255, 255, 255, 0.5)'; // Durable white features
+            const lineColor = 'rgba(255, 255, 255, 0.15)'; // Faint white mesh triangulation
+
+            // 1. Draw Face-Fitted Contour (The "Oval")
+            // This follows the jawline and estimates the top of the head
+            ctx.beginPath();
+            ctx.strokeStyle = hubColor;
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([8, 5]);
+
+            // Jaw points (0-16)
+            points.slice(0, 17).forEach((p, i) => {
+                if (i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            });
+
+            // Forehead Arc Estimation
+            const jawLeft = points[0];
+            const jawRight = points[16];
+            const chin = points[8];
+            
+            // Calculate eye-level to determine forehead height
+            const eyeAvgY = (points[36].y + points[45].y) / 2;
+            const headHeight = chin.y - eyeAvgY;
+            const foreheadTopY = eyeAvgY - (headHeight * 0.75); // Standard facial proportions
+            
+            // Close the shape with a curve for the forehead
+            ctx.bezierCurveTo(jawRight.x, foreheadTopY, jawLeft.x, foreheadTopY, jawLeft.x, jawLeft.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Clearer Landmark Mesh (Yellow)
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = meshColor;
+            
+            const features = [
+                // Interior features
+                [17,18,19,20,21], [22,23,24,25,26], // Brows
+                [27,28,29,30], [31,32,33,34,35,31], // Nose
+                [36,37,38,39,40,41,36], [42,43,44,45,46,47,42], // Eyes
+                [48,49,50,51,52,53,54,55,56,57,58,59,48], // Mouth Outer
+                [60,61,62,63,64,65,66,67,60], // Mouth Inner
+            ];
+
+            features.forEach(path => {
+                ctx.beginPath();
+                path.forEach((idx, i) => i === 0 ? ctx.moveTo(points[idx].x, points[idx].y) : ctx.lineTo(points[idx].x, points[idx].y));
+                ctx.stroke();
+            });
+
+            // Triangulated connecting lines (Mesh)
+            const triangulation = [
+                [19, 27, 24], [21, 27, 22], // Brows to nose bridge
+                [39, 27, 42], // Inner eyes to bridge
+                [31, 48, 4, 2], [35, 54, 12, 14], // Nose base to mouth and jaw
+                [19, 36], [24, 45], // Brows to outer eyes
+                [33, 51, 62], [33, 66, 57], // Nose to lips
+                [51, 33, 48], [51, 33, 54] // bridge-mouth connections
+            ];
+
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = lineColor;
+            triangulation.forEach(path => {
+                ctx.beginPath();
+                path.forEach((idx, i) => i === 0 ? ctx.moveTo(points[idx].x, points[idx].y) : ctx.lineTo(points[idx].x, points[idx].y));
+                ctx.stroke();
+            });
+        }
+
         function startDetectionLoop() {
             const video = document.getElementById('bioVideo');
             const canvas = document.getElementById('bioCanvas');
@@ -3392,9 +3785,16 @@
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
+                // Hide loader on first detection attempt (once analyzer starts returning)
+                const loader = document.getElementById('bioLoaderOverlay');
+                if (loader && !loader.classList.contains('hidden')) {
+                    loader.classList.add('hidden');
+                    btnScanFace.disabled = false;
+                }
+                
                 if (detection) {
                     const resized = faceapi.resizeResults(detection, displaySize);
-                    faceapi.draw.drawDetections(canvas, resized);
+                    drawFaceHUD(ctx, resized);
                     
                     bioCurrentDescriptor = detection.descriptor;
                     
@@ -3468,9 +3868,7 @@
             btnScanFace.disabled = true;
             const originalText = btnScanText.textContent;
             btnScanText.textContent = 'Scanning...';
-            setPipeStatus('stepDetect', 'done');
-            setPipeStatus('stepAlign', 'done');
-            setPipeStatus('stepExtract', 'active');
+            setBioProgress(50, 'Collecting biometric samples...');
             bioRecentDescriptors = [];
             
             // Collect samples
@@ -3485,8 +3883,13 @@
                     hudProgress.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
                     statSamples.textContent = `${samplesTaken} / ${REQUIRED_SAMPLES}`;
                     
+                    // Update progress bar proportionally (50% to 80%)
+                    const samplePercent = 50 + (samplesTaken / REQUIRED_SAMPLES) * 30;
+                    setBioProgress(samplePercent, `Sample ${samplesTaken} of ${REQUIRED_SAMPLES}...`);
+                    
                     if (samplesTaken >= REQUIRED_SAMPLES) {
                         clearInterval(collectInterval);
+                        setBioProgress(85, 'Analyzing face data...');
                         await performAuthentication();
                     }
                 }
@@ -3496,8 +3899,7 @@
         async function performAuthentication() {
             const statusText = document.getElementById('bioCamStatusText');
             statusText.textContent = 'Analyzing vectors...';
-            setPipeStatus('stepExtract', 'done');
-            setPipeStatus('stepMatch', 'active');
+            setBioProgress(90, 'Matching face data...');
             
             // Average the descriptors
             const avgDescriptor = bioRecentDescriptors[0].map((_, i) => {
@@ -3512,7 +3914,7 @@
                 document.getElementById('regFaceBtn').style.background = 'rgba(16, 185, 129, 0.15)';
                 document.getElementById('regFaceBtn').style.borderColor = '#10b981';
                 
-                setPipeStatus('stepMatch', 'done');
+                setBioProgress(100, 'Profile generated!', 'success');
                 statusText.textContent = 'Biometric Profile Generated!';
                 document.getElementById('bioScanFrame').classList.add('success');
                 showBioAlert('Success! Face data captured for your new account.', 'success');
@@ -3521,6 +3923,24 @@
                     closeBioModal();
                 }, 1500);
                 return;
+            }
+
+            // Capture snapshot for security auditing
+            const video = document.getElementById('bioVideo');
+            let snapshot = null;
+            
+            // Wait for video dimensions to be valid (if necessary)
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                const snapCanvas = document.createElement('canvas');
+                snapCanvas.width = video.videoWidth;
+                snapCanvas.height = video.videoHeight;
+                const snapCtx = snapCanvas.getContext('2d');
+                snapCtx.drawImage(video, 0, 0, snapCanvas.width, snapCanvas.height);
+                // Switch to PNG as requested for quality
+                snapshot = snapCanvas.toDataURL('image/png');
+                console.log('Biometric audit snapshot captured. Size: ' + Math.round(snapshot.length / 1024) + ' KB');
+            } else {
+                console.warn('Face capture failed: video dimensions are zero.');
             }
 
             const csrfToken = document.querySelector('input[name=_token]').value;
@@ -3533,7 +3953,10 @@
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ descriptor: JSON.stringify(avgDescriptor) })
+                    body: JSON.stringify({ 
+                        descriptor: JSON.stringify(avgDescriptor),
+                        snapshot: snapshot
+                    })
                 });
 
                 const data = await res.json();
@@ -3542,15 +3965,10 @@
                     updateFinalStats(data.stats);
                 }
 
-                if (data.needs_selection) {
-                    setPipeStatus('stepMatch', 'active');
-                    statusText.textContent = 'Awaiting choice...';
-                    showAccountSelector(data.candidates);
-                    return;
-                }
+
 
                 if (data.success) {
-                    setPipeStatus('stepMatch', 'done');
+                    setBioProgress(100, 'Identity confirmed!', 'success');
                     statusText.textContent = 'Identity Confirmed!';
                     document.getElementById('bioScanFrame').classList.add('success');
                     showBioAlert(`Success! Welcome back, ${data.user_name}.`, 'success');
@@ -3560,7 +3978,7 @@
                     }, 1500);
                 } else {
                     // Face not recognized - show clear error feedback
-                    setPipeStatus('stepMatch', 'done'); // Mark pipeline as completed
+                    setBioProgress(100, 'Not recognized', 'error');
                     statusText.textContent = 'Not Recognized';
                     
                     // Visual failure state on scan frame
@@ -3569,16 +3987,54 @@
                     scanFrame.classList.add('failed');
                     
                     showBioAlert(data.message || 'Face not recognized. No matching account found.', 'error');
-                    
-                    btnScanFace.disabled = false;
-                    btnScanText.textContent = 'Try Again';
-                    bioAttempting = false;
-                    hudProgress.textContent = '0 / 5';
-                    
-                    // Reset scan frame after a delay
-                    setTimeout(() => {
-                        scanFrame.classList.remove('failed');
-                    }, 4000);
+
+                    // If locked after 3 attempts, close modal and disable face option
+                    if (data.locked) {
+                        setTimeout(() => {
+                            closeBioModal();
+                            // Disable Face Recognition on the chooser screen
+                            const faceBtn = document.getElementById('chooseFaceBtn');
+                            if (faceBtn) {
+                                let lockMsg = 'Locked for 24 hours. Use Email OTP.';
+                                if (data.locked_until) {
+                                    const lockedUntil = new Date(data.locked_until);
+                                    const now = new Date();
+                                    const diffMs = lockedUntil - now;
+                                    if (diffMs > 0) {
+                                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                        const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                                        lockMsg = diffHours > 0 
+                                            ? `Locked — try again in ${diffHours}h ${diffMins}m`
+                                            : `Locked — try again in ${diffMins} minute(s)`;
+                                    }
+                                }
+                                faceBtn.disabled = true;
+                                faceBtn.querySelector('.chooser-option-desc').textContent = lockMsg;
+                                faceBtn.querySelector('.chooser-option-title').textContent = 'Face Recognition (Locked)';
+                            }
+                            // Show alert on the chooser view
+                            const chooserAlert = document.getElementById('chooserAlert');
+                            const chooserAlertText = document.getElementById('chooserAlertText');
+                            const chooserAlertIcon = document.getElementById('chooserAlertIcon');
+                            if (chooserAlert) {
+                                showAlert(chooserAlert, chooserAlertText, chooserAlertIcon, 
+                                    'Face recognition locked for 24 hours after 3 failed attempts. Please use Email OTP.', 'error');
+                            }
+                        }, 2500);
+                    } else {
+                        // Show attempts remaining
+                        const attemptsLeft = data.attempts_left !== undefined ? data.attempts_left : '?';
+                        btnScanFace.disabled = false;
+                        btnScanText.textContent = `Try Again (${attemptsLeft} left)`;
+                        bioAttempting = false;
+                        hudProgress.textContent = '0 / 5';
+                        
+                        // Reset scan frame and progress after a delay
+                        setTimeout(() => {
+                            scanFrame.classList.remove('failed');
+                            setBioProgress(40, `Camera ready — ${attemptsLeft} attempt(s) left`);
+                        }, 4000);
+                    }
                 }
 
             } catch (err) {
@@ -3609,65 +4065,7 @@
             }
         }
 
-        function showAccountSelector(candidates) {
-            const area = document.getElementById('bioSelectArea');
-            const list = document.getElementById('candidateList');
-            if (!area || !list) return;
 
-            list.innerHTML = '';
-            candidates.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'candidate-item';
-                item.onclick = () => confirmLogin(c.id);
-                
-                const avatar = c.avatar 
-                    ? `<img src="${c.avatar}" class="cand-avatar">` 
-                    : `<div class="cand-avatar">${c.initial}</div>`;
-
-                item.innerHTML = `
-                    ${avatar}
-                    <div class="cand-info">
-                        <div class="cand-name">${c.username || c.name}</div>
-                        <div style="font-size: 0.6rem; color: rgba(255,255,255,0.4)">Match Distance: ${c.distance}</div>
-                    </div>
-                    <span class="cand-role ${c.role}">${c.role}</span>
-                `;
-                list.appendChild(item);
-            });
-
-            area.classList.add('active');
-            // Hide camera viewport to focus on selection? No, just show overlap.
-            document.getElementById('bioScanFrame').style.opacity = '0.3';
-        }
-
-        async function confirmLogin(userId) {
-            const statusText = document.getElementById('bioCamStatusText');
-            statusText.textContent = 'Finalizing login...';
-            
-            try {
-                const res = await fetch('/api/face/confirm-login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ user_id: userId })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setPipeStatus('stepMatch', 'done');
-                    statusText.textContent = 'Access Granted!';
-                    showBioAlert(`Success! Redirecting to ${data.redirect}...`, 'success');
-                    setTimeout(() => window.location.href = data.redirect, 1000);
-                } else {
-                    showBioAlert(data.message || 'Login failed.', 'error');
-                }
-            } catch (err) {
-                console.error(err);
-                showBioAlert('Login confirmation failed.', 'error');
-            }
-        }
 
         function showBioAlert(msg, type) {
             bioAlert.className = 'bio-alert show ' + type;

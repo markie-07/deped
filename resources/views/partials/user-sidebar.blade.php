@@ -14,12 +14,12 @@
             <img src="/storage/{{ auth()->user()->profile_image }}" class="profile-avatar" style="object-fit: cover; border: 3px solid #e2e8f0;">
         @elseif(auth()->user())
             <div class="profile-avatar">
-                {{ strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'U', 0, 1)) }}
+                {{ strtoupper(substr(auth()->user()->first_name ?? auth()->user()->name ?? 'U', 0, 1)) }}
             </div>
         @else
             <div class="profile-avatar">G</div>
         @endif
-        <span class="profile-name">{{ auth()->user()->username ?? auth()->user()->name ?? 'Guest' }}</span>
+        <span class="profile-name">{{ auth()->user()->first_name ?? auth()->user()->name ?? 'Guest' }}</span>
         <span class="profile-role">{{ auth()->user()->position ?? 'User' }}</span>
     </a>
 

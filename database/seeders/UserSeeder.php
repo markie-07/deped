@@ -10,32 +10,24 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $email = 'markjamesp11770@gmail.com';
+        $emailHash = hash('sha256', strtolower($email));
+
+        // 1. Main Admin Account - Use email_hash for unique lookup
         User::updateOrCreate(
-            ['email' => 'markjamesp11770@gmail.com'],
+            ['email_hash' => $emailHash],
             [
+                'email' => $email,
                 'name' => 'Mark James Gabriel Pisngot',
-                'username' => 'Mark',
                 'first_name' => 'Mark James',
                 'last_name' => 'Pisngot',
                 'middle_name' => 'Gabriel',
                 'position' => 'ADMIN',
                 'role' => 'admin',
                 'is_active' => true,
-                'password' => Hash::make('deped123'),
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'markpisngot47@gmail.com'],
-            [
-                'name' => 'Mark Pisngot',
-                'username' => 'James',
-                'first_name' => 'Mark',
-                'last_name' => 'Pisngot',
-                'position' => 'User',
-                'role' => 'user',
-                'is_active' => true,
-                'password' => Hash::make('deped123'),
+                'is_approved' => true,
+                'email_verified_at' => now(),
+                'password' => Hash::make('deped321'),
             ]
         );
     }

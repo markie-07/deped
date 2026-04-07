@@ -15,6 +15,7 @@ class FaceRecognitionLog extends Model
         'distance',
         'confidence',
         'status',
+        'attempt_image',
         'metadata',
         'ip_address',
         'user_agent',
@@ -22,9 +23,11 @@ class FaceRecognitionLog extends Model
 
     protected $casts = [
         'metadata' => 'json',
-        'distance' => 'float',
-        'confidence' => 'float',
+        'distance' => 'encrypted',
+        'confidence' => 'encrypted',
     ];
+
+
 
     public function user()
     {

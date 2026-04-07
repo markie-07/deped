@@ -37,7 +37,7 @@
                             @if($user && $user->profile_image)
                                 <img src="{{ url('/storage/' . $user->profile_image) }}" id="avatarPreview" style="transform: translate({{ $user->profile_offset_x }}px, {{ $user->profile_offset_y }}px) scale({{ $user->profile_zoom }});">
                             @elseif($user)
-                                <span class="avatar-initial" id="avatarPlaceholder">{{ strtoupper(substr($user->username ?? $user->name ?? 'U', 0, 1)) }}</span>
+                                <span class="avatar-initial" id="avatarPlaceholder">{{ strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1)) }}</span>
                                 <img src="" id="avatarPreview" style="display:none; width:100%; height:100%; object-fit:cover; transform: translate({{ $user->profile_offset_x }}px, {{ $user->profile_offset_y }}px) scale({{ $user->profile_zoom }});">
                             @else
                                 <span class="avatar-initial">G</span>
@@ -71,7 +71,7 @@
                         @if($user && ($user->first_name || $user->last_name))
                             {{ $user->first_name }} {{ $user->last_name }}
                         @else
-                            {{ $user?->username ?? 'Guest' }}
+                            {{ $user?->name ?? 'Guest' }}
                         @endif
                     </h1>
                     <p class="phc-meta">
@@ -96,8 +96,8 @@
             </div>
             <div class="phc-stats">
                 <div class="phc-stat"><span class="phc-stat-num">{{ $user && $user->created_at ? $user->created_at->format('M d, Y') : 'N/A' }}</span><span class="phc-stat-label">Member Since</span></div>
-                <div class="phc-stat"><span class="phc-stat-num">{{ $user?->username ?? '—' }}</span><span class="phc-stat-label">Username</span></div>
                 <div class="phc-stat"><span class="phc-stat-num">{{ $user?->position ?? '—' }}</span><span class="phc-stat-label">Position</span></div>
+                <div class="phc-stat"><span class="phc-stat-num">{{ ucfirst($user?->assigned ?? 'National') }}</span><span class="phc-stat-label">Assignment</span></div>
             </div>
         </div>
 
@@ -127,13 +127,21 @@
                             <div><div class="pro-card-ttl">Personal Information</div><div class="pro-card-sub">Update your personal details and identity</div></div>
                         </div>
                         <div class="form-grid">
-                            <div class="form-group"><label class="f-label">Username</label><div class="f-input-wrap"><input type="text" name="username" id="inputUsername" value="{{ $user?->username }}" placeholder="Enter username" readonly style="cursor: not-allowed;"></div><div class="field-error" id="err-username"></div></div>
-                            <div class="form-group"><label class="f-label">Position</label><div class="f-input-wrap"><input type="text" name="position" id="inputPosition" value="{{ $user?->position }}" placeholder="Enter position"></div></div>
-                            <div class="form-group"><label class="f-label">First Name</label><div class="f-input-wrap"><input type="text" name="first_name" id="inputFirstName" value="{{ $user?->first_name }}" placeholder="Enter first name" required></div><div class="field-error" id="err-first_name"></div></div>
-                            <div class="form-group"><label class="f-label">Last Name</label><div class="f-input-wrap"><input type="text" name="last_name" id="inputLastName" value="{{ $user?->last_name }}" placeholder="Enter last name" required></div><div class="field-error" id="err-last_name"></div></div>
-                            <div class="form-group"><label class="f-label">Middle Name</label><div class="f-input-wrap"><input type="text" name="middle_name" id="inputMiddleName" value="{{ $user?->middle_name }}" placeholder="Optional"></div></div>
-                            <div class="form-group"><label class="f-label">Suffix</label><div class="f-input-wrap"><input type="text" name="suffix" id="inputSuffix" value="{{ $user?->suffix }}" placeholder="e.g. Jr, III"></div></div>
-                            <div class="form-group full"><label class="f-label">Email Address</label><div class="f-input-wrap"><input type="email" name="email" id="inputEmail" value="{{ $user?->email }}" placeholder="Enter email address" required></div><div class="field-error" id="err-email"></div></div>
+                            <div class="form-group"><label class="f-label">Position</label><div class="f-input-wrap"><input type="text" name="position" id="inputPosition" value="{{ $user?->position }}" placeholder="Enter position" readonly></div></div>
+                            <div class="form-group"><label class="f-label">First Name</label><div class="f-input-wrap"><input type="text" name="first_name" id="inputFirstName" value="{{ $user?->first_name }}" placeholder="Enter first name" required readonly></div><div class="field-error" id="err-first_name"></div></div>
+                            <div class="form-group"><label class="f-label">Last Name</label><div class="f-input-wrap"><input type="text" name="last_name" id="inputLastName" value="{{ $user?->last_name }}" placeholder="Enter last name" required readonly></div><div class="field-error" id="err-last_name"></div></div>
+                            <div class="form-group"><label class="f-label">Middle Name</label><div class="f-input-wrap"><input type="text" name="middle_name" id="inputMiddleName" value="{{ $user?->middle_name }}" placeholder="Optional" readonly></div></div>
+                            <div class="form-group"><label class="f-label">Suffix</label><div class="f-input-wrap"><input type="text" name="suffix" id="inputSuffix" value="{{ $user?->suffix }}" placeholder="e.g. Jr, III" readonly></div></div>
+                            <div class="form-group">
+                                <label class="f-label">Assign</label>
+                                <div class="f-input-wrap">
+                                    <select name="assigned" id="inputAssigned" class="f-select-profile" disabled>
+                                        <option value="national" {{ ($user?->assigned ?? 'national') === 'national' ? 'selected' : '' }}>National</option>
+                                        <option value="city" {{ ($user?->assigned ?? 'national') === 'city' ? 'selected' : '' }}>City</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group full"><label class="f-label">Email Address</label><div class="f-input-wrap"><input type="email" name="email" id="inputEmail" value="{{ $user?->email }}" placeholder="Enter email address" required readonly></div><div class="field-error" id="err-email"></div></div>
                         </div>
                     </div>
                 </div>
@@ -240,11 +248,11 @@
                         Cancel
                     </button>
 
-                    <button type="button" class="btn-save" id="verifyBtn" style="display: none;" onclick="verifyCurrentPassword()">
+                    <button type="submit" class="btn-save" id="verifyBtn" style="display: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
                         Verify Identity
                     </button>
-                    <button type="submit" class="btn-save" id="saveBtn">
+                    <button type="submit" class="btn-save" id="saveBtn" style="display: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                         Save Changes
                     </button>
@@ -258,13 +266,14 @@
                         <div class="pro-card-ico ico-amber"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg></div>
                         <div><div class="pro-card-ttl">Account Details</div></div>
                     </div>
+
                     <div class="info-row">
-                        <div class="ir-ico ir-green"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg></div>
-                        <div class="ir-text"><div class="ir-label">Username</div><div class="ir-value">{{ $user?->username ?? '—' }}</div></div>
+                        <div class="ir-ico ir-purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008z"/></svg></div>
+                        <div class="ir-text"><div class="ir-label">Position</div><div class="ir-value">{{ $user?->position ?? '—' }}</div></div>
                     </div>
                     <div class="info-row">
-                        <div class="ir-ico ir-purple"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z"/></svg></div>
-                        <div class="ir-text"><div class="ir-label">Position</div><div class="ir-value">{{ $user?->position ?? '—' }}</div></div>
+                        <div class="ir-ico ir-indigo"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg></div>
+                        <div class="ir-text"><div class="ir-label">Assignment</div><div class="ir-value">{{ ucfirst($user?->assigned ?? 'National') }}</div></div>
                     </div>
                     <div class="info-row">
                         <div class="ir-ico ir-blue"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg></div>

@@ -19,7 +19,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'username',
         'last_name',
         'first_name',
         'middle_name',
@@ -34,11 +33,15 @@ class User extends Authenticatable
         'cover_offset_y',
         'cover_zoom',
         'face_descriptor',
+        'face_attempts',
+        'face_locked_until',
         'email',
         'password',
         'is_active',
         'is_approved',
         'role',
+        'assigned',
+        'email_hash',
     ];
 
     /**
@@ -59,10 +62,28 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'email' => 'encrypted',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
             'is_approved' => 'boolean',
+            'face_descriptor' => 'encrypted:json',
+            'face_locked_until' => 'datetime',
+            'profile_image' => 'encrypted',
+            'cover_image' => 'encrypted',
         ];
     }
+    /**
+     * Boot the model to handle automatic email hashing.
+     */
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            if ($user->isDirty('email')) {
+                // Generate a blind index hash for encrypted email lookup
+                $user->email_hash = hash('sha256', strtolower($user->email));
+            }
+        });
+    }
+
 }

@@ -79,9 +79,18 @@
                                 </div>
                             </div>
                             <div class="filter-item">
+                                <label>Assignment</label>
+                                <div class="filter-select-wrap">
+                                    <select id="assignedFilter" onchange="handleAssignmentChange()">
+                                        <option value="national">National</option>
+                                        <option value="city">City</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-item">
                                 <label>Records Incharge</label>
                                 <div class="filter-select-wrap">
-                                    <select id="inchargeFilter" onchange="fetchMasterRecords()">
+                                    <select id="inchargeFilter" onchange="handleInchargeChange()">
                                         <option value="">All Incharge</option>
                                     </select>
                                 </div>
@@ -249,8 +258,7 @@
     .btn-export { background: #fff; color: #6366f1; border: 1.5px solid #e0e7ff; }
     .btn-export:hover { border-color: #6366f1; background: #f8faff; }
 
-    /* Full-width incharge filter */
-    .hero-filters-grid .filter-item:last-child { grid-column: span 2; }
+    .hero-filters-grid .filter-item { grid-column: span 1; }
 
     /* ═══════════════════════════════════════
        FILTER BAR
@@ -1139,15 +1147,21 @@
 
 <script>
 const AUTH_USER_ID = "{{ auth()->id() }}";
-const AUTH_USERNAME = "{{ auth()->user()->username ?? '' }}";
 const AUTH_NAME = "{{ auth()->user()->name ?? '' }}";
+let firstInchargeLoad = true;
 document.addEventListener('DOMContentLoaded', function() {
     // Set today's date as default for date filter
     const now = new Date();
     const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const USER_ASSIGNED = "{{ auth()->user()->assigned ?? '' }}";
     document.getElementById('dateFilter').value = today;
+    const assignedFilter = document.getElementById('assignedFilter');
+    if (assignedFilter && USER_ASSIGNED) {
+        assignedFilter.value = USER_ASSIGNED.toLowerCase();
+    }
 
     fetchMasterRecords();
+    populateIncharges();
     setupStickyObserver();
 
     document.getElementById('masterSearch').addEventListener('input', filterRecords);
@@ -1204,11 +1218,19 @@ function filterRecords() {
             }
             
             let matchesIncharge = true;
-            if (inchargeFilter !== 'all') {
-                const rowIncharge = row.getAttribute('data-incharge') || '';
+            if (inchargeFilter !== '' && inchargeFilter !== 'all') {
+                const rowIncharge = (row.getAttribute('data-incharge') || '').toLowerCase();
+                const rowUserId = row.getAttribute('data-user-id') || '';
+                const rowFirstName = (row.getAttribute('data-first-name') || '').toLowerCase();
+                
                 const selectedOpt = document.getElementById('inchargeFilter').selectedOptions[0];
-                const filterUsername = selectedOpt ? selectedOpt.getAttribute('data-username') : '';
-                matchesIncharge = (rowIncharge === inchargeFilter || (filterUsername && rowIncharge === filterUsername));
+                const filterUserId = selectedOpt ? selectedOpt.getAttribute('data-user-id') : '';
+                const filterVal = inchargeFilter.toLowerCase();
+
+                matchesIncharge = (rowIncharge === filterVal || 
+                                   (filterUserId && rowUserId === filterUserId) || 
+                                   rowFirstName === filterVal ||
+                                   rowIncharge.includes(filterVal));
             }
             
             const isVisible = matchesSearch && matchesRemark && matchesIncharge;
@@ -1233,10 +1255,12 @@ function fetchMasterRecords(exportModeOverride = null) {
     const tbody = document.getElementById('masterTableBody');
     const dateFilter = document.getElementById('dateFilter').value;
     const inchargeFilter = document.getElementById('inchargeFilter').value;
+    const assignedFilter = document.getElementById('assignedFilter').value;
     const baseUrl = '{{ url("/leave-records") }}';
     const params = [];
     if (dateFilter) params.push(`date=${encodeURIComponent(dateFilter)}`);
     if (inchargeFilter) params.push(`incharge=${encodeURIComponent(inchargeFilter)}`);
+    if (assignedFilter) params.push(`assigned=${encodeURIComponent(assignedFilter)}`);
     const finalUrl = baseUrl + (params.length ? '?' + params.join('&') : '');
 
     fetch(finalUrl, {
@@ -1291,17 +1315,14 @@ function fetchMasterRecords(exportModeOverride = null) {
             const showBatchHeaders = uniqueLogicalBatches.length > 1;
 
             const myRecords = data.filter(r => {
-                const inc = (r.incharge || '').toLowerCase();
-                return inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
+                return (r.user_id && r.user_id == AUTH_USER_ID) || (r.incharge && r.incharge.toLowerCase() === AUTH_NAME.toLowerCase());
             });
             const myLatestBatch = myRecords.length > 0 ? Math.max(...myRecords.map(r => r.batch_id || 1)) : -1;
-
             data.forEach((r, i) => {
                 const batchId = r.batch_id || 1;
                 const currentIncharge = r.incharge || 'System';
                 const forwarded = r.forwarded || '';
-                const inc = (r.incharge || '').toLowerCase();
-                const isMyRecord = inc === AUTH_USERNAME.toLowerCase() || inc === AUTH_NAME.toLowerCase();
+                const isMyRecord = (r.user_id && r.user_id == AUTH_USER_ID) || (r.incharge && r.incharge.toLowerCase() === AUTH_NAME.toLowerCase());
                 const shouldCheck = isExportMode && isMyRecord && batchId === myLatestBatch;
 
                 // Add batch separator when batch_id changes
@@ -1347,7 +1368,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
                                         </svg>
-                                        <span>${forwarded} ${!isProcessed ? ` - <span class="forwarded-incharge-name">(${r.incharge || 'Unknown'})</span>` : ''}</span>
+                                        <span>${forwarded} ${!isProcessed ? ` - <span class="forwarded-incharge-name">(${r.first_name || r.incharge || 'Unknown'})</span>` : ''}</span>
                                     </div>
                                     <div class="header-date-badge" style="margin-left: 10px; display: none; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 13px; height: 13px; color: #6366f1;">
@@ -1379,7 +1400,7 @@ function fetchMasterRecords(exportModeOverride = null) {
                 const remarkBadge = `<span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span>`;
 
                 html += `
-                    <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}">
+                    <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}" data-user-id="${r.user_id || ''}" data-first-name="${(r.first_name || '').toLowerCase()}">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
                             <input type="checkbox" class="row-checkbox" ${shouldCheck ? 'checked' : ''} onchange="onRowCheckboxChange('${forwarded.replace(/'/g, "\\'")}', ${batchId})">
                         </td>
@@ -1390,9 +1411,9 @@ function fetchMasterRecords(exportModeOverride = null) {
                         <td><span class="badge-leave">${r.type_of_leave}</span></td>
                         <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
                         <td>${remarkBadge}</td>
-                        <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
+<td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
                         <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                        <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.incharge || '-'}</td>
+                        <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.first_name || r.incharge || '-'}</td>
                         <td>
                             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                 <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -1416,23 +1437,83 @@ function fetchMasterRecords(exportModeOverride = null) {
             filterRecords();
             updateSelectionCount();
         });
+}
 
-    // Populate Incharge filter once
+function handleAssignmentChange() {
+    // When assignment filter changes, repopulate
+    populateIncharges();
+    fetchMasterRecords();
+}
+
+function handleInchargeChange() {
     const inchargeSelect = document.getElementById('inchargeFilter');
-    if (inchargeSelect && inchargeSelect.options.length <= 1) {
-        fetch('{{ url("/leave-records/incharges") }}')
+    const selectedOpt = inchargeSelect.selectedOptions[0];
+    
+    if (selectedOpt && selectedOpt.value !== '') {
+        const assigned = selectedOpt.getAttribute('data-assigned');
+        if (assigned) {
+            const assignedSelect = document.getElementById('assignedFilter');
+            // Update assignment filter if it's currently different or set to 'all'
+            if (assignedSelect.value !== assigned) {
+                assignedSelect.value = assigned;
+            }
+        }
+    }
+    
+    fetchMasterRecords();
+}
+
+function populateIncharges() {
+    const inchargeSelect = document.getElementById('inchargeFilter');
+    if (inchargeSelect) {
+        const assignedVal = document.getElementById('assignedFilter')?.value || 'all';
+        const currentSelection = inchargeSelect.value;
+        
+        // Re-inject "All Incharge" to ensure it's always the first option
+        inchargeSelect.innerHTML = '<option value="">All Incharge</option>';
+        
+        return fetch(`{{ url("/leave-records/incharges") }}?assigned=${assignedVal}`)
             .then(res => res.json())
             .then(data => {
+                let selectionFound = false;
                 data.forEach(i => {
                     const opt = document.createElement('option');
                     opt.value = i.incharge;
-                    opt.textContent = i.username || i.incharge;
-                    if (i.username) opt.setAttribute('data-username', i.username);
-
+                    opt.textContent = i.first_name || i.incharge;
+                    if (i.id) opt.setAttribute('data-user-id', i.id);
+                    if (i.assigned) {
+                        opt.setAttribute('data-assigned', i.assigned.toLowerCase());
+                    }
+                    
+                    // Restore selection IF it exists in the new list
+                    if (currentSelection && i.incharge === currentSelection) {
+                        opt.selected = true;
+                        selectionFound = true;
+                    } 
+                    // Only set default to current user on VERY FIRST LOAD of the page
+                    else if (firstInchargeLoad && (i.incharge === AUTH_NAME || (i.id && i.id == AUTH_USER_ID))) {
+                        opt.selected = true;
+                        selectionFound = true;
+                    }
+                    
                     inchargeSelect.appendChild(opt);
                 });
+                
+                // If we were trying to keep 'All Incharge' (""), selectionFound will be false
+                // because currentSelection ("") doesn't match any i.incharge.
+                // In that case, index 0 (All Incharge) will be correctly used by default.
+                
+                if (!selectionFound) {
+                    inchargeSelect.selectedIndex = 0;
+                }
+                
+                firstInchargeLoad = false;
+                
+                // Trigger client-side search update
+                filterRecords();
             });
     }
+    return Promise.resolve();
 }
 
 function editRecord(id) {

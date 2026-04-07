@@ -172,6 +172,18 @@
     .f-input-wrap input:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,0.08); background: #fff; }
     .f-input-wrap input[type="password"] { padding-right: 44px; }
     .f-input-wrap input::placeholder { color: #c0c7d6; }
+    .f-select-profile {
+        width: 100%; padding: 12px 16px; border-radius: 14px;
+        border: 1.5px solid #e2e8f0; background: #fafbfc; font-family: inherit;
+        font-size: 0.88rem; font-weight: 500; color: #1e293b;
+        outline: none; transition: all 0.25s ease; cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 16px;
+    }
+    .f-select-profile:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,0.08); background: #fff; }
 
     .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; padding: 3px; display: flex; transition: color 0.2s; z-index: 2; }
     .pw-toggle:hover { color: #6366f1; }
@@ -255,6 +267,7 @@
     .ir-ico svg { width: 16px; height: 16px; }
     .ir-green { background: #ecfdf5; color: #10b981; } .ir-amber { background: #fffbeb; color: #f59e0b; }
     .ir-blue { background: #eff6ff; color: #3b82f6; } .ir-purple { background: #f5f3ff; color: #8b5cf6; }
+    .ir-indigo { background: #eef2ff; color: #6366f1; }
     .ir-text { flex: 1; min-width: 0; }
     .ir-label { font-size: 0.68rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
     .ir-value { font-size: 0.82rem; color: #0f172a; font-weight: 700; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -339,6 +352,14 @@
     body.dark-mode .f-input-wrap input { background: #0f172a; border: 1.5px solid #334155; color: #f1f5f9; }
     body.dark-mode .f-input-wrap input:focus { border-color: #6366f1; background: #050812; box-shadow: 0 0 0 4px rgba(99,102,241,0.15); }
     body.dark-mode .f-input-wrap input::placeholder { color: #334155; }
+    body.dark-mode .f-select-profile { 
+        background-color: #0f172a; 
+        border: 1.5px solid #334155; 
+        color: #f1f5f9; 
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+    }
+    body.dark-mode .f-select-profile:focus { border-color: #6366f1; background: #050812; box-shadow: 0 0 0 4px rgba(99,102,241,0.15); }
+    body.dark-mode .f-select-profile option { background: #1e293b; color: #f1f5f9; }
     body.dark-mode .f-input-wrap input[readonly] { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
     
     body.dark-mode .pw-bar { background: #334155; }

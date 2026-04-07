@@ -30,6 +30,12 @@
                 <video id="bioVideo" autoplay muted playsinline></video>
                 <canvas id="bioCanvas"></canvas>
 
+                <!-- Loading Overlay -->
+                <div class="bio-loader-overlay" id="bioLoaderOverlay">
+                    <div class="bio-loader-spinner"></div>
+                    <p>Initializing Analyzer...</p>
+                </div>
+
                 <!-- Scan Frame -->
                 <div class="bio-scan-frame" id="bioScanFrame">
                     <div class="corner tl"></div>
@@ -47,15 +53,16 @@
             </div>
         </div>
 
-        <!-- Progress Ring -->
-        <div class="bio-progress-row">
-            <div class="bio-step pipe-step" id="stepDetect"><span class="step-num">1</span><span class="step-text pipe-label">Detect</span></div>
-            <div class="bio-step-line"></div>
-            <div class="bio-step pipe-step" id="stepAlign"><span class="step-num">2</span><span class="step-text pipe-label">Align</span></div>
-            <div class="bio-step-line"></div>
-            <div class="bio-step pipe-step" id="stepExtract"><span class="step-num">3</span><span class="step-text pipe-label">Extract</span></div>
-            <div class="bio-step-line"></div>
-            <div class="bio-step pipe-step" id="stepMatch"><span class="step-num">4</span><span class="step-text pipe-label">Match</span></div>
+        <!-- Loading Progress Bar (replaces step indicators) -->
+        <div class="bio-progress-bar-wrap" id="bioProgressWrap">
+            <div class="bio-progress-bar-track">
+                <div class="bio-progress-bar-fill" id="bioProgressFill"></div>
+                <div class="bio-progress-bar-glow" id="bioProgressGlow"></div>
+            </div>
+            <div class="bio-progress-info">
+                <span class="bio-progress-status" id="bioProgressStatus">Ready to scan</span>
+                <span class="bio-progress-percent" id="bioProgressPercent">0%</span>
+            </div>
         </div>
 
         <!-- Scan Button -->
@@ -73,15 +80,7 @@
             <span id="bioAlertText"></span>
         </div>
 
-        <!-- Account Selection -->
-        <div class="bio-select-area" id="bioSelectArea">
-            <div class="select-header">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
-                Multiple Matches Found
-            </div>
-            <p class="select-sub">Select your account to continue:</p>
-            <div class="select-list" id="candidateList"></div>
-        </div>
+
 
         <!-- Footer Hint -->
         <div class="bio-footer-hint">
@@ -313,56 +312,117 @@
 }
 @keyframes dotPulse { 0%{opacity:.4;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} 100%{opacity:.4;transform:scale(.8)} }
 
-/* ─── Progress Steps ─── */
-.bio-progress-row {
+/* ─── Loading Overlay ─── */
+.bio-loader-overlay {
+    position: absolute; inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 100; gap: 15px; opacity: 1; transition: opacity 0.4s ease;
+    backdrop-filter: blur(8px);
+}
+.bio-loader-overlay.hidden { opacity: 0; pointer-events: none; }
+.bio-loader-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: bioSpinnerRotate 1s linear infinite;
+}
+.bio-loader-overlay p {
+    color: #fff; font-size: 0.82rem; font-weight: 600;
+    letter-spacing: 0.05em; margin: 0;
+}
+@keyframes bioSpinnerRotate { to { transform: rotate(360deg); } }
+
+/* ─── Loading Progress Bar (replaces step indicators) ─── */
+.bio-progress-bar-wrap {
     position: relative; z-index: 1;
-    display: flex; align-items: center; justify-content: center;
-    gap: 0; margin-bottom: 20px;
-    padding: 12px 16px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     border-radius: 16px; border: 1px solid rgba(99, 102, 241, 0.08);
 }
 
-.bio-step {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 10px; border-radius: 10px;
-    transition: all 0.3s ease;
-}
-.step-num {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #e2e8f0; color: #94a3b8;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; font-weight: 800;
-    transition: all 0.3s ease;
-}
-.step-text {
-    font-size: 0.68rem; font-weight: 700; color: #94a3b8;
-    letter-spacing: 0.02em; transition: all 0.3s ease;
-}
-.bio-step-line {
-    width: 20px; height: 2px; background: #e2e8f0;
-    margin: 0 2px; border-radius: 1px;
-    transition: all 0.3s ease;
+.bio-progress-bar-track {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    overflow: hidden;
 }
 
-/* Active & Done states */
-.bio-step.active .step-num {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
-    box-shadow: 0 2px 10px rgba(99,102,241,0.3);
-    animation: stepPulse 1.2s infinite;
+.bio-progress-bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+    background-size: 200% 100%;
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: progressShimmer 2s ease infinite;
 }
-.bio-step.active .step-text { color: #6366f1; }
 
-.bio-step.done .step-num {
-    background: linear-gradient(135deg, #10b981, #34d399); color: #fff;
-    box-shadow: 0 2px 10px rgba(16,185,129,0.3);
+.bio-progress-bar-fill.success {
+    background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+    background-size: 200% 100%;
 }
-.bio-step.done .step-text { color: #10b981; }
 
-@keyframes stepPulse {
-    0%,100% { box-shadow: 0 2px 10px rgba(99,102,241,0.3); }
-    50% { box-shadow: 0 2px 20px rgba(99,102,241,0.5); }
+.bio-progress-bar-fill.error {
+    background: linear-gradient(90deg, #ef4444, #f87171, #fca5a5);
+    background-size: 200% 100%;
+}
+
+@keyframes progressShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.bio-progress-bar-glow {
+    position: absolute;
+    left: 0; top: -4px; bottom: -4px;
+    width: 0%;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: blur(6px);
+    pointer-events: none;
+}
+
+.bio-progress-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.bio-progress-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+.bio-progress-status.active {
+    color: #6366f1;
+}
+
+.bio-progress-status.success {
+    color: #10b981;
+}
+
+.bio-progress-status.error {
+    color: #ef4444;
+}
+
+.bio-progress-percent {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #6366f1;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s ease;
 }
 
 /* ─── Scan Button ─── */
@@ -412,50 +472,7 @@
 }
 @keyframes alertPop { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
 
-/* ─── Account Selection ─── */
-.bio-select-area {
-    display: none; flex-direction: column; gap: 12px;
-    position: relative; z-index: 1; margin-bottom: 12px;
-    padding: 20px; border-radius: 20px;
-    background: linear-gradient(135deg, #ffffff, #f8f7ff);
-    border: 1.5px solid rgba(99, 102, 241, 0.15);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
-    animation: alertPop 0.4s ease;
-}
-.bio-select-area.active { display: flex; }
-.select-header {
-    font-size: 0.95rem; font-weight: 800; color: #1e1b4b;
-    display: flex; align-items: center; gap: 8px;
-}
-.select-header svg { width: 20px; height: 20px; color: #6366f1; }
-.select-sub { font-size: 0.75rem; color: #64748b; margin-bottom: 4px; }
-.select-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
 
-.candidate-item {
-    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-    background: #fff; border: 1.5px solid #e2e8f0;
-    border-radius: 16px; cursor: pointer; transition: all 0.25s ease;
-}
-.candidate-item:hover {
-    background: #f5f3ff; border-color: #c7d2fe;
-    transform: translateX(4px);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
-}
-.cand-avatar {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; color: #fff; font-size: 0.85rem; object-fit: cover;
-}
-img.cand-avatar { border-radius: 12px; }
-.cand-info { flex: 1; }
-.cand-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; }
-.cand-role {
-    font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 8px;
-}
-.cand-role.admin { background: #fef3c7; color: #92400e; }
-.cand-role.user { background: #ecfdf5; color: #065f46; }
 
 /* ─── Footer Hint ─── */
 .bio-footer-hint {
@@ -465,9 +482,6 @@ img.cand-avatar { border-radius: 12px; }
     padding-top: 6px;
 }
 .bio-footer-hint svg { width: 14px; height: 14px; color: #10b981; flex-shrink: 0; }
-
-/* ─── Pipe-step compat (alias for bio-step) ─── */
-/* The JS uses .pipe-step class references, so we alias */
 
 /* ═══ RESPONSIVE ═══ */
 @media (max-width: 560px) {
@@ -479,9 +493,7 @@ img.cand-avatar { border-radius: 12px; }
     .bio-hero h2 { font-size: 1.25rem; }
     .bio-icon-bubble { width: 52px; height: 52px; border-radius: 18px; }
     .bio-icon-bubble svg { width: 24px; height: 24px; }
-    .step-text { display: none; }
-    .bio-step-line { width: 24px; }
-    .bio-progress-row { padding: 10px 20px; }
+    .bio-progress-bar-wrap { padding: 12px 16px; }
 }
 
 /* ═══ DARK MODE SUPPORT ═══ */
@@ -499,36 +511,20 @@ body.dark-mode .bio-close {
 body.dark-mode .bio-close:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239,68,68,0.2); }
 body.dark-mode .bio-hero h2 { color: #f1f5f9; }
 body.dark-mode .bio-hero p { color: #818cf8; }
-body.dark-mode .bio-progress-row {
+body.dark-mode .bio-progress-bar-wrap {
     background: rgba(30, 27, 75, 0.5);
     border-color: rgba(99, 102, 241, 0.1);
 }
-body.dark-mode .step-num { background: #334155; color: #64748b; }
-body.dark-mode .step-text { color: #64748b; }
-body.dark-mode .bio-step-line { background: #334155; }
-body.dark-mode .bio-step.active .step-text { color: #818cf8; }
-body.dark-mode .bio-step.done .step-text { color: #34d399; }
+body.dark-mode .bio-progress-bar-track { background: #334155; }
+body.dark-mode .bio-progress-status { color: #94a3b8; }
+body.dark-mode .bio-progress-percent { color: #818cf8; }
 body.dark-mode .bio-alert.error {
     background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239,68,68,0.2);
 }
 body.dark-mode .bio-alert.success {
     background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16,185,129,0.2);
 }
-body.dark-mode .bio-select-area {
-    background: linear-gradient(135deg, #1e1b4b, #0f172a);
-    border-color: rgba(99, 102, 241, 0.2);
-}
-body.dark-mode .select-header { color: #f1f5f9; }
-body.dark-mode .select-sub { color: #94a3b8; }
-body.dark-mode .candidate-item {
-    background: rgba(30, 27, 75, 0.5); border-color: rgba(99, 102, 241, 0.1);
-}
-body.dark-mode .candidate-item:hover {
-    background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3);
-}
-body.dark-mode .cand-name { color: #f1f5f9; }
-body.dark-mode .cand-role.admin { background: rgba(239,68,68,0.15); color: #f87171; }
-body.dark-mode .cand-role.user { background: rgba(16,185,129,0.15); color: #34d399; }
+
 body.dark-mode .bio-footer-hint { color: #64748b; }
 body.dark-mode .bio-blob-1 { background: radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%); }
 body.dark-mode .bio-blob-2 { background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%); }

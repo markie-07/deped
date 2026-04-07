@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\LeaveRecord;
 
+use App\Models\User;
+
 class EmployeeController extends Controller
 {
     public function index()
@@ -16,27 +18,25 @@ class EmployeeController extends Controller
         return view('user.employee');
     }
 
-    public function getEmployees()
+    public function getEmployees(Request $request)
     {
-        // Get unique employees from Employee directory table
-        // This ensures employees added via bulk import or previous records are visible
-        $employees = Employee::whereNotNull('name')
-            ->where('name', '!=', '')
-            ->select('name')
+        $assigned = $request->query('assigned');
+        
+        // Get employees with at least one leave record, filtering by creator's assignment
+        $query = LeaveRecord::whereNotNull('name')->where('name', '!=', '');
+
+        if ($assigned && $assigned !== 'all') {
+            $userIds = User::where('assigned', $assigned)->pluck('id');
+            $query->whereIn('user_id', $userIds);
+        }
+        
+        $employees = $query->select('name')
             ->selectRaw('MAX(position) as position')
             ->selectRaw('MAX(school) as school')
-            ->selectRaw('COUNT(id) as record_count') // This might show 1 if each Employee row is a record
+            ->selectRaw('COUNT(id) as record_count')
             ->groupBy('name')
             ->orderBy('name')
             ->get();
-
-        // Calculate real-time counts from LeaveRecord table
-        $employees = $employees->map(function ($employee) {
-            $employee->record_count = LeaveRecord::where('name', $employee->name)->count();
-            return $employee;
-        })->filter(function ($employee) {
-            return $employee->record_count > 0;
-        })->values();
             
         return response()->json($employees);
     }
@@ -44,16 +44,27 @@ class EmployeeController extends Controller
     public function getRecordsByEmployee(Request $request)
     {
         $name = $request->input('name');
-        $query = LeaveRecord::where('name', $name);
+        $assigned = $request->query('assigned');
+        $records = LeaveRecord::leftJoin('users', function($join) {
+                $join->on('leave_records.user_id', '=', 'users.id')
+                     ->orOn('leave_records.incharge', '=', 'users.name');
+            })
+            ->select('leave_records.*', 'users.first_name')
+            ->where('leave_records.name', $name);
 
-        if ($request->has('date') && $request->date) {
-            $query->whereDate('date_of_action', $request->date);
+        if ($assigned) {
+            $userIds = User::where('assigned', $assigned)->pluck('id');
+            $records->whereIn('leave_records.user_id', $userIds);
         }
 
-        $records = $query->orderBy('date_of_action', 'desc')
-            ->orderBy('created_at', 'desc')
+        if ($request->has('date') && $request->date) {
+            $records->whereDate('leave_records.date_of_action', $request->date);
+        }
+
+        $result = $records->orderBy('leave_records.date_of_action', 'desc')
+            ->orderBy('leave_records.created_at', 'desc')
             ->get();
             
-        return response()->json($records);
+        return response()->json($result);
     }
 }

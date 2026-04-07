@@ -26,6 +26,14 @@ class AuditLog extends Model
      */
     public static function logAction($action, $model = null, $details = null)
     {
+        // Don't log login/logout related actions as per policy
+        $forbidden = ['Logged in', 'Logged out', 'Login'];
+        foreach ($forbidden as $word) {
+            if (stripos($action, $word) !== false) {
+                return null;
+            }
+        }
+
         return self::create([
             'user_id' => auth()->id(),
             'action' => $action,

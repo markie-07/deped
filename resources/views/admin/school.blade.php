@@ -74,6 +74,17 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="hero-filter">
+                            <div class="filter-select-wrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                </svg>
+                                <select id="assignedFilter" onchange="fetchAndRenderSchools()">
+                                    <option value="national">National</option>
+                                    <option value="city">City</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="hsc-toggles">
                             <button class="view-btn active" id="viewGrid" onclick="setView('grid')" title="Grid">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
@@ -1241,10 +1252,11 @@
         body.dark-mode .modal-panel { border-bottom-color: #1e293b !important; }
         body.dark-mode .hero-right { border-top-color: #334155; }
     }
-    }
 </style>
 
 <script>
+const USER_ASSIGNED = "{{ auth()->user()->assigned ?? '' }}";
+
 document.addEventListener('DOMContentLoaded', function() {
     let allSchools = [];
 
@@ -1261,25 +1273,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('schoolModal');
     const loadingSkeleton = document.getElementById('loadingSkeleton');
 
-    // Fetch schools from API
-    fetch('{{ url("/leave-records/schools") }}')
-        .then(res => res.json())
-        .then(data => {
-            console.log('Fetched schools:', data);
-            allSchools = Array.isArray(data) ? data : [];
-            if (countEl) countEl.textContent = allSchools.length;
-            loadingSkeleton.style.display = 'none';
-            renderSchools();
-        })
-        .catch(err => {
-            console.error('Error fetching schools:', err);
-            loadingSkeleton.style.display = 'none';
-            allSchools = [];
-            renderSchools();
-            const errorMsg = '<p style="text-align:center; color:#ef4444; grid-column: 1/-1; padding: 40px; background:white; border-radius:12px; border:1px solid #fee2e2;">Error loading school data. Please try refreshing the page.</p>';
-            highSchoolGrid.innerHTML = errorMsg;
-            highSchoolSection.style.display = 'block';
-        });
+    // Initialize Assigned Filter
+    const assignedFilter = document.getElementById('assignedFilter');
+    if (assignedFilter && USER_ASSIGNED) {
+        assignedFilter.value = USER_ASSIGNED.toLowerCase();
+    }
+
+    window.fetchAndRenderSchools = function() {
+        if (loadingSkeleton) loadingSkeleton.style.display = 'grid';
+        if (emptyState) emptyState.style.display = 'none';
+        
+        const assigned = document.getElementById('assignedFilter').value;
+        const apiPath = assigned === 'all' 
+            ? '{{ url("/leave-records/schools") }}' 
+            : `{{ url("/leave-records/schools") }}?assigned=${assigned}`;
+        
+        fetch(apiPath)
+            .then(res => res.json())
+            .then(data => {
+                allSchools = Array.isArray(data) ? data : [];
+                if (countEl) countEl.textContent = allSchools.length;
+                if (loadingSkeleton) loadingSkeleton.style.display = 'none';
+                renderSchools();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                if (loadingSkeleton) loadingSkeleton.style.display = 'none';
+            });
+    };
+
+    if (assignedFilter) {
+        assignedFilter.addEventListener('change', fetchAndRenderSchools);
+    }
+    fetchAndRenderSchools();
 
 
     function formatDate(dateStr) {
@@ -1552,7 +1578,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td>${remarkBadge}</td>
                         <td class="cell-meta" style="font-family:monospace;font-size:0.75rem;">${formatDate(r.date_of_action)}</td>
                         <td class="cell-subtext" style="font-size:0.8rem;">${r.deduction_remarks || '-'}</td>
-                        <td class="cell-incharge" style="font-weight:500;">${r.incharge || '-'}</td>
+                        <td class="cell-incharge" style="font-weight:500;">${r.first_name || r.incharge || '-'}</td>
                         <td>
                             <div class="btn-action-group">
                                 <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg></button>

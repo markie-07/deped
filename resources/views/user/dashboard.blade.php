@@ -30,7 +30,7 @@
                             </svg>
                             User Dashboard
                         </div>
-                        <h1 class="hero-title">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->username ?? 'User' }}</h1>
+                        <h1 class="hero-title">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->name ?? 'User' }}</h1>
                         <p class="hero-desc">Your personal overview and activity at a glance. Manage your forms and view system history.</p>
                         <div class="hero-meta">
                             <div class="hero-meta-item">
@@ -183,11 +183,11 @@
                    @if(auth()->user() && auth()->user()->profile_image)
                        <img src="/storage/{{ auth()->user()->profile_image }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                    @else
-                       {{ auth()->user() ? strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'U', 0, 1)) : 'U' }}
+                       {{ auth()->user() ? strtoupper(substr(auth()->user()->first_name ?? auth()->user()->name ?? 'U', 0, 1)) : 'U' }}
                    @endif
                 </div>
                 <h2 class="panel-name">Activity History</h2>
-                <p class="panel-role">{{ auth()->user()->first_name ?? auth()->user()->username }}</p>
+                <p class="panel-role">{{ auth()->user()->first_name ?? auth()->user()->name }}</p>
                 <div class="panel-stat-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px; color:#6366f1;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

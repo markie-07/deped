@@ -161,8 +161,8 @@ Route::get('/profile', function () {
 // Employee Account Management API
 Route::get('/api/user-accounts', function () {
     return response()->json(User::orderBy('created_at', 'desc')->get([
-        'id', 'name', 'username', 'last_name', 'first_name', 'middle_name',
-        'suffix', 'position', 'profile_image', 'email', 'is_active', 'is_approved', 'role', 'created_at'
+        'id', 'name', 'last_name', 'first_name', 'middle_name',
+        'suffix', 'position', 'profile_image', 'email', 'is_active', 'is_approved', 'role', 'assigned', 'created_at'
     ]));
 });
 
@@ -172,7 +172,6 @@ Route::post('/api/user-accounts', function (Request $request) {
     }
     
     $request->validate([
-        'username' => 'required|string|max:255|unique:users,username',
         'last_name' => 'required|string|max:255',
         'first_name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
@@ -184,7 +183,6 @@ Route::post('/api/user-accounts', function (Request $request) {
 
     $data = [
         'name' => $fullName,
-        'username' => $request->username,
         'last_name' => $request->last_name,
         'first_name' => $request->first_name,
         'middle_name' => $request->middle_name,
@@ -193,6 +191,7 @@ Route::post('/api/user-accounts', function (Request $request) {
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role ?? 'user',
+        'assigned' => $request->assigned ?? 'national',
         'is_active' => $request->has('is_active') ? ($request->is_active == '1') : true,
         'is_approved' => $request->has('is_approved') ? ($request->is_approved == '1') : true,
     ];
@@ -210,7 +209,6 @@ Route::post('/api/user-accounts', function (Request $request) {
 // Self-Registration API
 Route::post('/api/register', function (Request $request) {
     $request->validate([
-        'username' => 'required|string|max:255|unique:users,username',
         'last_name' => 'required|string|max:255',
         'first_name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
@@ -223,15 +221,15 @@ Route::post('/api/register', function (Request $request) {
 
     $data = [
         'name' => $fullName,
-        'username' => $request->username,
         'last_name' => $request->last_name,
         'first_name' => $request->first_name,
         'middle_name' => $request->middle_name,
         'suffix' => $request->suffix,
         'position' => $request->position,
-        'email' => $request->email,
+        'email' => trim($request->email),
         'password' => Hash::make($request->password),
         'role' => $request->role,
+        'assigned' => $request->assigned ?? 'national',
         'face_descriptor' => $request->face_descriptor,
         'is_active' => true,
         'is_approved' => false, // Requires admin approval
@@ -264,8 +262,9 @@ Route::put('/api/user-accounts/{id}/approve', function ($id) {
     }
     $user = User::findOrFail($id);
     $user->is_approved = true;
+    $user->is_active = true;
     $user->save();
-    AuditLog::logAction('Approved user account', $user);
+    AuditLog::logAction('Approved user account (Activated)', $user);
     return response()->json(['success' => true, 'message' => 'Account approved.', 'user' => $user]);
 });
 
@@ -291,7 +290,6 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
     }
     $user = User::findOrFail($id);
     $request->validate([
-        'username' => 'required|string|max:255|unique:users,username,' . $id,
         'last_name' => 'required|string|max:255',
         'first_name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $id,
@@ -301,7 +299,6 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
     $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
 
     $user->name = $fullName;
-    $user->username = $request->username;
     $user->last_name = $request->last_name;
     $user->first_name = $request->first_name;
     $user->middle_name = $request->middle_name;
@@ -309,6 +306,7 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
     $user->position = $request->position;
     $user->email = $request->email;
     $user->role = $request->role ?? 'user';
+    $user->assigned = $request->assigned ?? $user->assigned;
     $user->is_active = $request->has('is_active') ? ($request->is_active == '1') : $user->is_active;
     $user->is_approved = $request->has('is_approved') ? ($request->is_approved == '1') : $user->is_approved;
 
@@ -339,7 +337,6 @@ Route::post('/api/profile/update', function (Request $request) {
     
     try {
         $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . $id,
             'last_name' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
@@ -365,13 +362,13 @@ Route::post('/api/profile/update', function (Request $request) {
     $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
 
     $user->name = $fullName;
-    $user->username = $request->username;
     $user->last_name = $request->last_name;
     $user->first_name = $request->first_name;
     $user->middle_name = $request->middle_name;
     $user->suffix = $request->suffix;
     $user->position = $request->position;
-    $user->email = $request->email;
+    $user->email = trim($request->email);
+    $user->assigned = $request->assigned ?? $user->assigned;
 
     if ($request->filled('password')) {
         if (!Hash::check($request->current_password, $user->password)) {
@@ -470,193 +467,148 @@ Route::post('/api/face/login', function (Request $request) {
         return response()->json(['success' => false, 'message' => 'Invalid face data.'], 400);
     }
 
-    $users = User::whereNotNull('face_descriptor')->where('is_active', true)->where('is_approved', true)->get();
-    $candidates = [];
-    $submittedLen = count($submitted);
-    $bestDistanceOverall = null;
-
-    if ($users->isEmpty()) {
-        // No users have registered face data at all
-        FaceRecognitionLog::create([
-            'user_id' => null,
-            'distance' => 0,
-            'confidence' => 0,
-            'status' => 'no_registered_faces',
-            'metadata' => ['error' => 'No registered face data in system'],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-        return response()->json([
-            'success' => false,
-            'message' => 'No registered faces found in the system. Please register your face first or sign in with email and password.',
-        ]);
+    // Get the user who already authenticated with email/password from the session
+    $userId = session('otp_user_id');
+    if (!$userId) {
+        return response()->json(['success' => false, 'message' => 'Session expired. Please login again.'], 400);
     }
 
-    foreach ($users as $u) {
-        $stored = json_decode($u->face_descriptor, true);
-        if (!is_array($stored)) continue;
-
-        $storedLen = count($stored);
-        if ($storedLen !== $submittedLen) continue;
-
-        $sum = 0;
-        for ($i = 0; $i < $submittedLen; $i++) {
-            $diff = $submitted[$i] - $stored[$i];
-            $sum += $diff * $diff;
-        }
-        $distance = sqrt($sum);
-
-        // Track the best distance regardless of threshold
-        if ($bestDistanceOverall === null || $distance < $bestDistanceOverall) {
-            $bestDistanceOverall = $distance;
-        }
-
-        if ($distance < 0.5) { // Match threshold — 0.5 for reliable identity matching
-            $candidates[] = [
-                'id' => $u->id,
-                'name' => $u->name,
-                'username' => $u->username,
-                'role' => $u->role,
-                'distance' => round($distance, 4),
-                'avatar' => $u->profile_image ? url('/storage/' . $u->profile_image) : null,
-                'initial' => strtoupper(substr($u->username ?? $u->name, 0, 1)),
-            ];
-        }
+    $user = User::find($userId);
+    if (!$user || !$user->is_active || !$user->is_approved) {
+        return response()->json(['success' => false, 'message' => 'Account not found or inactive.'], 403);
     }
 
-    // Sort candidates by distance (closest first)
-    usort($candidates, fn($a, $b) => $a['distance'] <=> $b['distance']);
-
-    if (count($candidates) === 0) {
-        // Log the failed attempt
-        FaceRecognitionLog::create([
-            'user_id' => null,
-            'distance' => $bestDistanceOverall ? round($bestDistanceOverall, 4) : 0,
-            'confidence' => $bestDistanceOverall ? max(0, round((1 - $bestDistanceOverall / 1.5) * 100, 1)) : 0,
-            'status' => 'no_match',
-            'metadata' => [
-                'registered_users' => $users->count(),
-                'best_distance' => $bestDistanceOverall ? round($bestDistanceOverall, 4) : 0,
-                'threshold' => 0.5,
-            ],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+    // Check if face recognition is locked (24-hour database-persisted lockout)
+    if ($user->face_locked_until && now()->lessThan($user->face_locked_until)) {
+        $hoursLeft = now()->diffInHours($user->face_locked_until, false);
+        $minutesLeft = now()->diffInMinutes($user->face_locked_until, false) % 60;
+        $timeMsg = $hoursLeft > 0 
+            ? "{$hoursLeft}h {$minutesLeft}m" 
+            : "{$minutesLeft} minute(s)";
 
         return response()->json([
             'success' => false,
-            'message' => 'Face not recognized. Your face does not match any registered account. Please sign in with your email and password, or register your face from your profile.',
+            'locked' => true,
+            'attempts_left' => 0,
+            'locked_until' => $user->face_locked_until->toIso8601String(),
+            'message' => "Face recognition is locked for this account. Try again in {$timeMsg}, or use Email OTP.",
+        ], 429);
+    }
+
+    // If lockout has expired, reset the attempts
+    if ($user->face_locked_until && now()->greaterThanOrEqualTo($user->face_locked_until)) {
+        $user->face_attempts = 0;
+        $user->face_locked_until = null;
+        $user->save();
+    }
+
+    $maxAttempts = 3;
+
+    // Verify face ONLY against the specific user's registered face
+    $status = 'no_match';
+    $distance = null;
+
+    if (empty($user->face_descriptor)) {
+        $status = 'no_registered_faces';
+    } else {
+        $stored = json_decode($user->face_descriptor, true);
+        if (is_array($stored) && count($stored) === count($submitted)) {
+            $sum = 0;
+            $submittedLen = count($submitted);
+            for ($i = 0; $i < $submittedLen; $i++) {
+                $diff = $submitted[$i] - $stored[$i];
+                $sum += $diff * $diff;
+            }
+            $distance = sqrt($sum);
+
+            if ($distance < 0.5) {
+                $status = 'match';
+            }
+        }
+    }
+
+    // Capture snapshot for security auditing (only for failed attempts)
+    $auditSnapshotUrl = null;
+    $isSecurityThreat = in_array($status, ['no_match', 'no_registered_faces']);
+
+    if ($isSecurityThreat && $request->has('snapshot')) {
+        $snapshotData = $request->input('snapshot');
+        if (str_contains($snapshotData, 'base64,')) {
+            $base64Image = explode('base64,', $snapshotData)[1];
+            $binaryImage = base64_decode($base64Image);
+            
+            $imageName = 'audit_' . time() . '_' . bin2hex(random_bytes(4)) . '.png';
+            $imagePath = 'face_logs/' . $imageName;
+            
+            if (\Illuminate\Support\Facades\Storage::disk('public')->put($imagePath, $binaryImage)) {
+                $auditSnapshotUrl = asset('storage/' . $imagePath);
+            }
+        }
+    }
+
+    if ($status === 'match') {
+        $confidence = max(0, round((1 - $distance / 1.5) * 100, 1));
+
+        // Reset attempt counter on success
+        $user->face_attempts = 0;
+        $user->face_locked_until = null;
+        $user->save();
+
+        Auth::login($user);
+        session(['authenticated' => true, 'user_id' => $user->id]);
+
+        return response()->json([
+            'success' => true,
+            'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
+            'user_name' => $user->name,
         ]);
     }
 
-    $bestMatch = $candidates[0];
-    $distance = $bestMatch['distance'];
-    $confidence = max(0, round((1 - $distance / 1.5) * 100, 1));
+    // Increment failed attempt counter in database
+    $user->face_attempts = ($user->face_attempts ?? 0) + 1;
+    $attemptsLeft = $maxAttempts - $user->face_attempts;
 
+    // If 3rd attempt just failed, lock for 24 hours
+    if ($attemptsLeft <= 0) {
+        $user->face_locked_until = now()->addHours(24);
+    }
+    $user->save();
+
+    // Process non-match / security audit log
     FaceRecognitionLog::create([
-        'user_id' => $bestMatch['id'],
-        'distance' => $distance,
-        'confidence' => $confidence,
-        'status' => 'match',
-        'metadata' => ['candidates_count' => count($candidates)],
+        'user_id' => $userId,
+        'distance' => $distance ? round($distance, 4) : 0,
+        'confidence' => $distance ? max(0, round((1 - $distance / 1.5) * 100, 1)) : 0,
+        'status' => $status,
+        'attempt_image' => $auditSnapshotUrl,
+        'metadata' => [
+            'error' => $status === 'no_registered_faces' 
+                ? 'No face registered for this account' 
+                : 'Face does not match the registered face for this account',
+            'attempt_number' => $user->face_attempts,
+        ],
         'ip_address' => $request->ip(),
         'user_agent' => $request->userAgent(),
     ]);
 
-    if (count($candidates) > 1) {
-        $first = $candidates[0];
-        $second = $candidates[1];
-        $gap = $second['distance'] - $first['distance'];
-
-        // AMBIGUOUS REJECTION:
-        // If ALL candidates have weak match distances (> 0.42) and they're all 
-        // close to each other (gap < 0.06), this is likely a false positive from 
-        // an unregistered face that weakly matches multiple people.
-        // But if the best distance is strong (< 0.42), at least one account 
-        // genuinely has this face registered — show the selector.
-        if ($first['distance'] > 0.42 && $gap < 0.06) {
-            FaceRecognitionLog::create([
-                'user_id' => null,
-                'distance' => round($first['distance'], 4),
-                'confidence' => max(0, round((1 - $first['distance'] / 1.5) * 100, 1)),
-                'status' => 'ambiguous_reject',
-                'metadata' => [
-                    'candidates' => count($candidates),
-                    'best_distance' => $first['distance'],
-                    'gap' => round($gap, 4),
-                ],
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Face not recognized. No confident match found. Please sign in with your email and password.',
-            ]);
-        }
-
-        // SMART AUTOSELECT:
-        // If the best match is very strong (< 0.3) AND clearly better than the 
-        // runner-up (gap > 0.12), auto-login without showing the selector.
-        if ($first['distance'] < 0.3 && $gap > 0.12) {
-            $user = User::findOrFail($first['id']);
-            Auth::login($user);
-            session(['authenticated' => true, 'user_id' => $user->id]);
-            AuditLog::logAction('Logged in via face recognition (Smart Autoselect)', $user);
-            
-            return response()->json([
-                'success' => true,
-                'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
-                'user_name' => $user->name,
-            ]);
-        }
-
-        // MULTIPLE MATCHES — show account selector
-        // This happens when the same face is registered on multiple accounts  
-        // (both have strong matches with similar distances)
-        session(['face_login_candidates' => array_column($candidates, 'id')]);
+    // If locked, return locked response
+    if ($attemptsLeft <= 0) {
         return response()->json([
-            'success' => true,
-            'needs_selection' => true,
-            'candidates' => $candidates
+            'success' => false,
+            'locked' => true,
+            'attempts_left' => 0,
+            'locked_until' => $user->face_locked_until->toIso8601String(),
+            'message' => 'Face recognition locked for 24 hours after 3 failed attempts. Please use Email OTP.',
         ]);
     }
 
-    // Auto-login single match
-    $user = User::findOrFail($bestMatch['id']);
-    Auth::login($user);
-    session(['authenticated' => true, 'user_id' => $user->id]);
-    AuditLog::logAction('Logged in via face recognition', $user);
-
     return response()->json([
-        'success' => true,
-        'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
-        'user_name' => $user->name,
-    ]);
-});
-
-Route::post('/api/face/confirm-login', function (Request $request) {
-    if (!session()->has('face_login_candidates')) {
-        return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
-    }
-
-    $userId = $request->input('user_id');
-    $allowedIds = session('face_login_candidates');
-
-    if (!in_array($userId, $allowedIds)) {
-        return response()->json(['success' => false, 'message' => 'Security mismatch.'], 403);
-    }
-
-    $user = User::findOrFail($userId);
-    Auth::login($user);
-    session()->forget('face_login_candidates');
-    session(['authenticated' => true, 'user_id' => $user->id]);
-    AuditLog::logAction('Logged in via face recognition (selected)', $user);
-
-    return response()->json([
-        'success' => true,
-        'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard',
-        'user_name' => $user->name,
+        'success' => false,
+        'locked' => false,
+        'attempts_left' => $attemptsLeft,
+        'message' => $status === 'no_registered_faces' 
+            ? 'No face registered for this account. Please use Email OTP instead.' 
+            : "Face does not match. You have {$attemptsLeft} attempt(s) remaining.",
     ]);
 });
 
@@ -669,9 +621,12 @@ Route::post('/logout', function (Request $request) {
 
 Route::post('/login', function (Request $request) {
     try {
-        $email = $request->input('email');
+        $email = trim($request->input('email'));
         $password = $request->input('password');
-        $user = User::where('email', $email)->first();
+        
+        // Use Blind Index (Email Hash) to find user with encrypted email
+        $user = User::where('email_hash', hash('sha256', strtolower($email)))->first();
+
         if (!$user || !Hash::check($password, $user->password)) {
             return response()->json(['success' => false, 'message' => 'Invalid email or password.'], 401);
         }
@@ -682,27 +637,62 @@ Route::post('/login', function (Request $request) {
         if (!$user->is_approved) {
             return response()->json(['success' => false, 'message' => 'Your account is pending approval. Please contact an administrator.'], 403);
         }
-        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        // Store user info in session for the chooser — OTP is NOT sent yet
         session([
-            'otp_code' => $otp,
             'otp_email' => $email,
             'otp_user_id' => $user->id,
             'otp_user_name' => $user->name,
-            'otp_expires' => now()->addMinutes(5),
         ]);
-        $emailSent = false;
-        try {
-            Mail::send('emails.otp', ['otp' => $otp, 'userName' => $user->name], function ($message) use ($email) {
-                $message->to($email)->subject('Login OTP - DepEd Manager');
-            });
-            $emailSent = true;
-        } catch (\Exception $e) {
-            Log::warning('OTP email failed: ' . $e->getMessage());
+        // Check if face recognition is currently locked (database-persisted)
+        $faceLocked = false;
+        $faceLockedUntil = null;
+        if ($user->face_locked_until && now()->lessThan($user->face_locked_until)) {
+            $faceLocked = true;
+            $faceLockedUntil = $user->face_locked_until->toIso8601String();
         }
-        return response()->json(['success' => true, 'otp_code' => $otp, 'user_name' => $user->name]);
+        
+        return response()->json([
+            'success' => true,
+            'user_name' => $user->name,
+            'has_face' => !empty($user->face_descriptor),
+            'face_locked' => $faceLocked,
+            'face_locked_until' => $faceLockedUntil,
+        ]);
     } catch (\Throwable $e) {
         return response()->json(['success' => false, 'message' => 'Server error.'], 500);
     }
+});
+
+Route::post('/send-otp', function (Request $request) {
+    $email = session('otp_email');
+    $userId = session('otp_user_id');
+    if (!$email || !$userId) {
+        return response()->json(['success' => false, 'message' => 'Session expired. Please login again.'], 400);
+    }
+    
+    $user = User::find($userId);
+    if (!$user) {
+        return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+    }
+    
+    $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    session([
+        'otp_code' => $otp,
+        'otp_expires' => now()->addMinutes(5),
+    ]);
+    
+    $emailSent = false;
+    try {
+        Mail::send('emails.otp', ['otp' => $otp, 'userName' => $user->name], function ($message) use ($email) {
+            $message->to($email)->subject('Login OTP - DepEd Manager');
+        });
+        $emailSent = true;
+    } catch (\Exception $e) {
+        Log::warning('OTP email failed: ' . $e->getMessage());
+    }
+    
+    return response()->json(['success' => true, 'otp_code' => $otp, 'email_sent' => $emailSent]);
 });
 
 Route::post('/verify-otp', function (Request $request) {
@@ -721,9 +711,6 @@ Route::post('/verify-otp', function (Request $request) {
     session(['authenticated' => true, 'user_id' => $user->id]);
     session()->forget(['otp_code', 'otp_expires', 'otp_user_id']);
     
-    // Log login action
-    AuditLog::logAction('Logged in', $user);
-
     return response()->json(['success' => true, 'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/user/dashboard']);
 });
 
@@ -745,8 +732,8 @@ Route::post('/resend-otp', function (Request $request) {
 });
 
 Route::post('/forgot-password', function (Request $request) {
-    $email = $request->input('email');
-    $user = User::where('email', $email)->first();
+    $email = trim($request->input('email'));
+    $user = User::where('email_hash', hash('sha256', strtolower($email)))->first();
     if (!$user) return response()->json(['success' => true, 'message' => 'Email sent if exists.']);
     
     $token = Str::random(64);
@@ -774,7 +761,8 @@ Route::get('/reset-password/{token}', function (string $token, Request $request)
 });
 
 Route::post('/reset-password', function (Request $request) {
-    $user = User::where('email', $request->email)->first();
+    $email = trim($request->email);
+    $user = User::where('email_hash', hash('sha256', strtolower($email)))->first();
     if (!$user) return response()->json(['success' => false], 400);
     $user->password = Hash::make($request->password);
     $user->save();

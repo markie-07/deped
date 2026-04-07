@@ -60,6 +60,17 @@
                                 </svg>
                             </button>
                         </div>
+                        <div class="hero-filter">
+                            <div class="filter-select-wrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                </svg>
+                                <select id="assignedFilter" onchange="fetchRemarks()">
+                                    <option value="national">National</option>
+                                    <option value="city">City</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="hsc-toggles">
                             <button class="view-btn active" id="viewGrid" onclick="setView('grid')" title="Grid">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
@@ -205,7 +216,14 @@
     .hsc-toggles { display: flex; gap: 4px; margin-top: 10px; background: #fef3c7; border-radius: 10px; padding: 3px; }
     .view-btn { background: transparent; border: none; flex: 1; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #92400e; transition: all 0.2s; }
     .view-btn svg { width: 16px; height: 16px; }
-    .view-btn.active { background: #fff; color: #d97706; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .view-btn.active { background: #fff; color: #0d9488; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
+    .hero-filter { margin-top: 10px; }
+    .filter-select-wrap { position: relative; display: flex; align-items: center; background: #fff; border-radius: 14px; border: 1.5px solid #fde68a; padding: 0 14px; box-shadow: 0 4px 16px rgba(245,158,11,0.08); transition: all 0.2s; }
+    .filter-select-wrap:focus-within { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+    .filter-select-wrap svg { position: absolute; left: 14px; width: 14px; height: 14px; color: #fbbf24; pointer-events: none; }
+    .filter-select-wrap:focus-within svg { color: #f59e0b; }
+    .filter-select-wrap select { flex: 1; border: none; outline: none; padding: 11px 0 11px 26px; font-size: 0.78rem; font-weight: 700; font-family: inherit; color: #1e293b; background: transparent; cursor: pointer; }
 
     /* ── Page Header (kept for legacy CSS) ── */
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
@@ -563,6 +581,10 @@
     body.dark-mode .hsc-toggles { background: rgba(0,0,0,0.3); }
     body.dark-mode .view-btn { color: #94a3b8; }
     body.dark-mode .view-btn.active { background: #334155; color: #fbbf24; }
+    body.dark-mode .filter-select-wrap { background: #0f172a; border-color: #334155; }
+    body.dark-mode .filter-select-wrap select { color: #f1f5f9; }
+    body.dark-mode .filter-select-wrap select option { background: #1e293b; color: #f1f5f9; }
+    body.dark-mode .filter-select-wrap svg { color: #fbbf24; }
     
     body.dark-mode .remark-card { background: #1e293b; border-color: #334155; }
     body.dark-mode .card-name { color: #f1f5f9; }
@@ -829,13 +851,14 @@
 </style>
 
 <script>
+const USER_ASSIGNED = "{{ auth()->user()->assigned ?? '' }}";
 const AUTH_USER_ID = "{{ auth()->id() }}";
 const AUTH_USERNAME = "{{ auth()->user()->username ?? '' }}";
 const AUTH_NAME = "{{ auth()->user()->name ?? '' }}";
 const AUTH_ROLE = "{{ auth()->user()->role ?? 'user' }}";
 
 document.addEventListener('DOMContentLoaded', function() {
-    let allRemarks = [];
+    let allRemarksData = [];
     let currentRemarkForModal = '';
 
     const remarksGrid = document.getElementById('remarksGrid');
@@ -846,15 +869,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('remarkModal');
     const loadingSkeleton = document.getElementById('loadingSkeleton');
 
-    fetch('{{ url("/leave-records/remarks-list") }}').then(res => res.json()).then(data => {
-        allRemarks = data;
-        loadingSkeleton.style.display = 'none';
-        renderRemarks();
-    }).catch(err => {
-        console.error('Error fetching remarks:', err);
-        loadingSkeleton.style.display = 'none';
-        remarksGrid.innerHTML = '<p style="text-align:center; color:#ef4444; padding: 40px;">Error loading remarks</p>';
-    });
+    // Initialize Assigned Filter
+    const assignedFilter = document.getElementById('assignedFilter');
+    if (assignedFilter && USER_ASSIGNED) {
+        assignedFilter.value = USER_ASSIGNED.toLowerCase();
+    }
+
+    function fetchRemarks() {
+        const assigned = document.getElementById('assignedFilter').value;
+        const apiPath = assigned === 'all' ? '{{ url("/leave-records/remarks-list") }}' : `{{ url("/leave-records/remarks-list") }}?assigned=${assigned}`;
+        
+        fetch(apiPath)
+            .then(res => res.json())
+            .then(data => {
+                allRemarksData = data;
+                loadingSkeleton.style.display = 'none';
+                renderRemarks(searchInput.value);
+            })
+            .catch(err => {
+                console.error('Error fetching remarks:', err);
+                loadingSkeleton.style.display = 'none';
+                remarksGrid.innerHTML = '<p style="text-align:center; color:#ef4444; padding: 40px;">Error loading remarks.</p>';
+            });
+    }
+
+    fetchRemarks();
 
     const getInitials = (name) => {
         if (!name) return '??';
@@ -902,7 +941,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderRemarks(filter = '') {
-        const filtered = allRemarks.filter(r => r.remarks.toLowerCase().includes(filter.toLowerCase()));
+        const filtered = allRemarksData.filter(r => r.remarks.toLowerCase().includes(filter.toLowerCase()));
         countEl.textContent = filtered.length;
         searchClear.style.display = filter ? 'flex' : 'none';
 
@@ -976,21 +1015,23 @@ document.addEventListener('DOMContentLoaded', function() {
         avatarEl.style.background = colours.avatar;
         document.getElementById('modalSearch').value = '';
         
-        // Clear the date filter to show all records by default
-        // Set the date filter to today's date by default
         document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
         
         fetchRemarkRecords();
     };
 
     window.fetchRemarkRecords = function() {
-        const remark = currentRemarkForModal;
-        const date = document.getElementById('modalFilterDate').value;
-        
-        const url = `{{ url("/leave-records/by-remark") }}?remark=${encodeURIComponent(remark)}&date=${encodeURIComponent(date)}`;
         const tbody = document.getElementById('remarkTableBody');
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">Loading...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 40px; color: #94a3b8;">Loading...</td></tr>';
         document.getElementById('modalRemarkRecordCount').textContent = '...';
+
+        const date = document.getElementById('modalFilterDate').value;
+        const assigned = document.getElementById('assignedFilter').value;
+        
+        let url = `{{ url("/leave-records/by-remark") }}?remark=${encodeURIComponent(currentRemarkForModal)}&date=${encodeURIComponent(date)}`;
+        if (assigned !== 'all') {
+            url += `&assigned=${assigned}`;
+        }
 
         fetch(url).then(res => res.json()).then(data => {
             document.getElementById('modalRemarkRecordCount').textContent = data.length;
@@ -1021,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${remarkBadge}</td>
                     <td class="cell-meta" style="font-family:monospace; font-size:0.75rem;">${formatDate(r.date_of_action)}</td>
                     <td class="cell-subtext" style="font-size:0.8rem;">${r.deduction_remarks || '-'}</td>
-                    <td class="cell-incharge" style="font-weight:500;">${r.incharge || '-'}</td>
+                    <td class="cell-incharge" style="font-weight:500;">${r.first_name || r.incharge || '-'}</td>
                     <td>
                         <div class="btn-action-group">
                             ${canEdit ? `

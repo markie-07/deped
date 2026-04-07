@@ -77,11 +77,11 @@
                 <img src="/storage/{{ auth()->user()->profile_image }}" class="navbar-user-avatar" style="object-fit: cover;">
             @else
                 <div class="navbar-user-avatar">
-                    {{ auth()->user() ? strtoupper(substr(auth()->user()->username ?? auth()->user()->name ?? 'G', 0, 1)) : 'G' }}
+                    {{ auth()->user() ? strtoupper(substr(auth()->user()->first_name ?? auth()->user()->name ?? 'G', 0, 1)) : 'G' }}
                 </div>
             @endif
             <div class="navbar-user-info">
-                <span class="navbar-user-name">{{ auth()->user() ? (auth()->user()->username ?? auth()->user()->name) : 'Guest' }}</span>
+                <span class="navbar-user-name">{{ auth()->user() ? (auth()->user()->first_name ?? auth()->user()->name) : 'Guest' }}</span>
                 <span class="navbar-user-role">{{ auth()->user() ? (auth()->user()->position ?? 'User') : 'Guest' }}</span>
             </div>
             <svg class="navbar-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
