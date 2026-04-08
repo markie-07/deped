@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,7 +19,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'last_name',
         'first_name',
         'middle_name',
@@ -55,6 +55,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['name'];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -69,12 +76,10 @@ class User extends Authenticatable
             'is_approved' => 'boolean',
             'face_descriptor' => 'encrypted:json',
             'face_locked_until' => 'datetime',
-            'profile_image' => 'encrypted',
-            'cover_image' => 'encrypted',
         ];
     }
     /**
-     * Boot the model to handle automatic email hashing.
+     * Boot the model to handle automatic email hashing and external sync.
      */
     protected static function booted()
     {
@@ -84,6 +89,38 @@ class User extends Authenticatable
                 $user->email_hash = hash('sha256', strtolower($user->email));
             }
         });
+
+        static::created(function ($user) {
+            \App\Services\SyncService::syncUser($user, 'created');
+        });
+
+        static::updated(function ($user) {
+            \App\Services\SyncService::syncUser($user, 'updated');
+        });
+
+        static::deleted(function ($user) {
+            \App\Services\SyncService::syncUser($user, 'deleted');
+        });
+    }
+
+    /**
+     * Get the user's full name.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $parts = [
+                    $this->first_name,
+                    $this->middle_name,
+                    $this->last_name,
+                    $this->suffix
+                ];
+                
+                // Filter out empty parts and join them with spaces
+                return implode(' ', array_filter(array_map('trim', $parts)));
+            }
+        );
     }
 
 }

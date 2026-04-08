@@ -12,6 +12,7 @@ use App\Models\Employee;
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LeaveRecordController extends Controller
 {
@@ -45,7 +46,7 @@ class LeaveRecordController extends Controller
 
         if ($request->has('incharge') && $request->incharge && $request->incharge !== 'all') {
             $inchargeName = $request->incharge;
-            $targetUser = User::where('name', $inchargeName)->first();
+            $targetUser = User::whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$inchargeName])->first();
             
             $query->where(function($q) use ($inchargeName, $targetUser) {
                 // Direct column match
@@ -340,7 +341,7 @@ class LeaveRecordController extends Controller
             });
 
         // For incharges, show both users in the system and anyone who has handled a record
-        $userNames = User::pluck('name')->values();
+        $userNames = User::all()->pluck('name')->values();
         $recordIncharges = LeaveRecord::whereNotNull('incharge')->distinct()->pluck('incharge')->filter()->values();
         $incharges = $userNames->merge($recordIncharges)->unique()->values();
 
@@ -365,7 +366,7 @@ class LeaveRecordController extends Controller
         $assigned = $request->query('assigned');
         $query = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
-                     ->orOn('leave_records.incharge', '=', 'users.name');
+                     ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
             })
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.school', $school);
@@ -460,7 +461,7 @@ class LeaveRecordController extends Controller
         $assigned = $request->query('assigned');
         $query = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
-                     ->orOn('leave_records.incharge', '=', 'users.name');
+                     ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
             })
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.position', $position);
@@ -525,7 +526,7 @@ class LeaveRecordController extends Controller
         $regex = '(^|,)[[:space:]]*' . preg_quote($type) . '[[:space:]]*([,]|$)';
         $query = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
-                     ->orOn('leave_records.incharge', '=', 'users.name');
+                     ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
             })
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.type_of_leave', 'LIKE', '%' . $type . '%');
@@ -602,7 +603,7 @@ class LeaveRecordController extends Controller
         $assigned = $request->query('assigned');
         $query = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
-                     ->orOn('leave_records.incharge', '=', 'users.name');
+                     ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
             })
             ->select('leave_records.*', 'users.first_name');
             
@@ -759,7 +760,7 @@ class LeaveRecordController extends Controller
         $incharge = $request->input('incharge');
         
         // Find the user to get their name for a thorough search
-        $user = User::where('name', $incharge)->first();
+        $user = User::whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$incharge])->first();
         
         $query = LeaveRecord::leftJoin('users', 'leave_records.user_id', '=', 'users.id')
             ->select('leave_records.*', 'users.first_name')

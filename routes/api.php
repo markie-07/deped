@@ -15,8 +15,13 @@ use App\Http\Controllers\EmployeeController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// ─── User Synchronization API ───
+Route::middleware(\App\Http\Middleware\ApiTokenMiddleware::class)->group(function () {
+    Route::get('/users', [App\Http\Controllers\Api\UserApiController::class, 'index']);
+    Route::post('/users', [App\Http\Controllers\Api\UserApiController::class, 'store']);
+    Route::get('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'show']);
+    Route::put('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'update']);
+    Route::delete('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'destroy']);
 });
 
 

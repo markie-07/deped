@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
             ['email_hash' => $emailHash],
             [
                 'email' => $email,
-                'name' => 'Mark James Gabriel Pisngot',
                 'first_name' => 'Mark James',
                 'last_name' => 'Pisngot',
                 'middle_name' => 'Gabriel',

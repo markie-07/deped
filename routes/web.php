@@ -161,7 +161,7 @@ Route::get('/profile', function () {
 // Employee Account Management API
 Route::get('/api/user-accounts', function () {
     return response()->json(User::orderBy('created_at', 'desc')->get([
-        'id', 'name', 'last_name', 'first_name', 'middle_name',
+        'id', 'last_name', 'first_name', 'middle_name',
         'suffix', 'position', 'profile_image', 'email', 'is_active', 'is_approved', 'role', 'assigned', 'created_at'
     ]));
 });
@@ -182,7 +182,6 @@ Route::post('/api/user-accounts', function (Request $request) {
     $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
 
     $data = [
-        'name' => $fullName,
         'last_name' => $request->last_name,
         'first_name' => $request->first_name,
         'middle_name' => $request->middle_name,
@@ -220,7 +219,6 @@ Route::post('/api/register', function (Request $request) {
     $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
 
     $data = [
-        'name' => $fullName,
         'last_name' => $request->last_name,
         'first_name' => $request->first_name,
         'middle_name' => $request->middle_name,
@@ -296,15 +294,14 @@ Route::post('/api/user-accounts/{id}/update', function (Request $request, $id) {
         'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
     ]);
 
-    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
-
-    $user->name = $fullName;
     $user->last_name = $request->last_name;
     $user->first_name = $request->first_name;
     $user->middle_name = $request->middle_name;
     $user->suffix = $request->suffix;
     $user->position = $request->position;
-    $user->email = $request->email;
+    /** @var string $email */
+    $email = trim($request->email);
+    $user->email = $email;
     $user->role = $request->role ?? 'user';
     $user->assigned = $request->assigned ?? $user->assigned;
     $user->is_active = $request->has('is_active') ? ($request->is_active == '1') : $user->is_active;
@@ -359,15 +356,12 @@ Route::post('/api/profile/update', function (Request $request) {
         ], 422);
     }
 
-    $fullName = trim($request->first_name . ' ' . ($request->middle_name ? $request->middle_name . ' ' : '') . $request->last_name . ($request->suffix ? ' ' . $request->suffix : ''));
-
-    $user->name = $fullName;
     $user->last_name = $request->last_name;
     $user->first_name = $request->first_name;
     $user->middle_name = $request->middle_name;
     $user->suffix = $request->suffix;
     $user->position = $request->position;
-    $user->email = trim($request->email);
+    $user->setAttribute('email', trim($request->email));
     $user->assigned = $request->assigned ?? $user->assigned;
 
     if ($request->filled('password')) {
@@ -394,7 +388,7 @@ Route::post('/api/profile/update', function (Request $request) {
             Storage::disk('public')->delete($user->profile_image);
         }
         $path = $request->file('profile_image')->store('profile-images', 'public');
-        $user->profile_image = $path;
+        $user->setAttribute('profile_image', $path ?: null);
     }
 
     if ($request->hasFile('cover_image')) {
@@ -402,7 +396,7 @@ Route::post('/api/profile/update', function (Request $request) {
             Storage::disk('public')->delete($user->cover_image);
         }
         $path = $request->file('cover_image')->store('cover-images', 'public');
-        $user->cover_image = $path;
+        $user->setAttribute('cover_image', $path ?: null);
     }
 
     $user->save();
@@ -540,7 +534,7 @@ Route::post('/api/face/login', function (Request $request) {
             $imageName = 'audit_' . time() . '_' . bin2hex(random_bytes(4)) . '.png';
             $imagePath = 'face_logs/' . $imageName;
             
-            if (\Illuminate\Support\Facades\Storage::disk('public')->put($imagePath, $binaryImage)) {
+            if (Storage::disk('public')->put($imagePath, $binaryImage)) {
                 $auditSnapshotUrl = asset('storage/' . $imagePath);
             }
         }

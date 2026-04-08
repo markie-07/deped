@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         // Change attempt_image to TEXT to store the clickable URL of the person's face
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE face_recognition_logs MODIFY COLUMN attempt_image TEXT NULL");
+        DB::statement("ALTER TABLE face_recognition_logs MODIFY COLUMN attempt_image TEXT NULL");
     }
 
     /**
@@ -18,6 +18,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE face_recognition_logs MODIFY COLUMN attempt_image LONGBLOB NULL");
+        DB::statement("ALTER TABLE face_recognition_logs MODIFY COLUMN attempt_image LONGBLOB NULL");
     }
 };

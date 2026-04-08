@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\LeaveRecord;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -47,7 +48,7 @@ class EmployeeController extends Controller
         $assigned = $request->query('assigned');
         $records = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
-                     ->orOn('leave_records.incharge', '=', 'users.name');
+                     ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
             })
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.name', $name);
