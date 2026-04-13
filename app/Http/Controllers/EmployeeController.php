@@ -27,8 +27,7 @@ class EmployeeController extends Controller
         $query = LeaveRecord::whereNotNull('name')->where('name', '!=', '');
 
         if ($assigned && $assigned !== 'all') {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $query->whereIn('user_id', $userIds);
+            $query->where('assigned', $assigned);
         }
         
         $employees = $query->select('name')
@@ -54,8 +53,7 @@ class EmployeeController extends Controller
             ->where('leave_records.name', $name);
 
         if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $records->whereIn('leave_records.user_id', $userIds);
+            $records->where('leave_records.assigned', $assigned);
         }
 
         if ($request->has('date') && $request->date) {

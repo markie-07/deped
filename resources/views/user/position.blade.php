@@ -1140,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         avatarEl.style.background = colours.avatar;
         document.getElementById('modalSearch').value = '';
         
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchPositionRecords();
     };

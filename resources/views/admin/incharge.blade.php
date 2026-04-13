@@ -1322,7 +1322,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const roleLabel = i.role ? (i.role.charAt(0).toUpperCase() + i.role.slice(1)) : 'User';
             
             return `
-            <div class="incharge-card" onclick="openInchargeModal('${safeName}')" style="animation-delay:${Math.min(idx*0.04,0.5)}s; --card-color: ${col.color}">
+            <div class="incharge-card" onclick="openInchargeModal('${safeName}', '${i.id || ''}')" style="animation-delay:${Math.min(idx*0.04,0.5)}s; --card-color: ${col.color}">
                 <div class="card-banner" style="${coverBg}"></div>
                 <div class="card-avatar-container">
                     <div class="card-avatar" style="${avatarBg}">${avatarContent}</div>
@@ -1389,9 +1389,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── Modal ──
     const modal = document.getElementById('inchargeModal');
     let currentIncharge = '';
-
-    window.openInchargeModal = function(name) {
+    let currentInchargeId = '';
+    
+    window.openInchargeModal = function(name, id = '') {
         currentIncharge = name;
+        currentInchargeId = id;
         const ci = getColorIdx(name);
         const panelAvatar = document.getElementById('panelAvatar');
         // Find matching incharge data for profile image
@@ -1439,7 +1441,8 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.innerHTML = '<tr><td colspan="10" class="table-loading">Loading records…</td></tr>';
 
         const date = document.getElementById('modalFilterDate').value;
-        fetch(`{{ url("/leave-records/by-incharge") }}?incharge=${encodeURIComponent(currentIncharge)}&date=${encodeURIComponent(date)}`)
+        const assigned = document.getElementById('assignedFilter').value;
+        fetch(`{{ url("/leave-records/by-incharge") }}?incharge=${encodeURIComponent(currentIncharge)}&user_id=${currentInchargeId}&date=${encodeURIComponent(date)}&assigned=${assigned}`)
             .then(r => r.json())
             .then(data => {
                 document.getElementById('panelRecordCount').textContent = data.length;

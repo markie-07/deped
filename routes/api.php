@@ -22,6 +22,9 @@ Route::middleware(\App\Http\Middleware\ApiTokenMiddleware::class)->group(functio
     Route::get('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'show']);
     Route::put('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'update']);
     Route::delete('/users/{id}', [App\Http\Controllers\Api\UserApiController::class, 'destroy']);
+    
+    // ─── Leave Records API ───
+    Route::post('/leave-records', [App\Http\Controllers\Api\LeaveRecordApiController::class, 'store']);
 });
 
 

@@ -1230,7 +1230,7 @@
     .record-table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed;
+        table-layout: auto;
     }
     .record-table th {
         background: #f8fafc;
@@ -1258,19 +1258,11 @@
         line-height: 1.4;
     }
 
-    /* Column widths for Registry Modal */
-    .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 3%; }  /* Selection */
-    .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 3%; }  /* # */
-    .record-table th:nth-child(3), .record-table td:nth-child(3) { width: 11%; } /* Name */
-    .record-table th:nth-child(4), .record-table td:nth-child(4) { width: 9%; }  /* Position */
-    .record-table th:nth-child(5), .record-table td:nth-child(5) { width: 9%; }  /* School */
-    .record-table th:nth-child(6), .record-table td:nth-child(6) { width: 6%; }  /* Leave Type */
-    .record-table th:nth-child(7), .record-table td:nth-child(7) { width: 10%; } /* Inclusive Dates */
-    .record-table th:nth-child(8), .record-table td:nth-child(8) { width: 8%; }  /* Remarks */
-    .record-table th:nth-child(9), .record-table td:nth-child(9) { width: 8%; }  /* Action Date */
-    .record-table th:nth-child(10), .record-table td:nth-child(10) { width: 13%; } /* Deduction Remark */
-    .record-table th:nth-child(11), .record-table td:nth-child(11) { width: 10%; } /* Incharge */
-    .record-table th:nth-child(12), .record-table td:nth-child(12) { width: 10%; } /* Actions */
+    /* Column specific adjustments for Registry Modal */
+    .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 40px; } /* Selection */
+    .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 40px; } /* # */
+    .record-table th:nth-child(3), .record-table td:nth-child(3) { min-width: 180px; } /* Name - give it more space */
+    .record-table th:nth-child(12), .record-table td:nth-child(12) { width: 100px; text-align: center; } /* Actions */
     .record-table tbody tr.record-row {
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
@@ -1379,6 +1371,8 @@
     .badge-yellow { background: #fffbeb; color: #d97706; border: 1px solid rgba(217,119,6,0.1); }
     .badge-violet { background: #f5f3ff; color: #7c3aed; border: 1px solid rgba(124,58,237,0.1); }
     .badge-gray { background: #f1f5f9; color: #64748b; border: 1px solid rgba(100,116,139,0.1); }
+    .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid rgba(29,78,216,0.1); }
+    .badge-orange { background: #fff7ed; color: #c2410c; border: 1px solid rgba(194,65,12,0.1); }
     .nowrap { white-space: nowrap; }
 
     /* ── Action Buttons (Table) ── */
@@ -2659,7 +2653,7 @@
             <div class="panel-divider"></div>
 
             <div class="panel-filters-group">
-                <div class="filter-item">
+                <div class="filter-item" style="display: none;">
                     <label class="fi-label">Forwarded</label>
                     <div class="fi-select-wrap">
                         <select id="filterForwarded" class="fi-select" onchange="filterModalRecords()">
@@ -2735,11 +2729,12 @@
                             <th>Action Date</th>
                             <th>Deduction Remark</th>
                             <th>Incharge</th>
+                            <th style="display: none;">Assigned</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="recordsTableBody">
-                        <tr><td colspan="12" class="empty-registry-message">Loading registry records...</td></tr>
+                        <tr><td colspan="13" class="empty-registry-message">Loading registry records...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -2821,10 +2816,10 @@
             if (!existingNoResults) {
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.id = 'noResultsRow';
-                noResultsRow.innerHTML = `<td colspan="12" class="empty-registry-message">${noResultsMsg}</td>`;
+                noResultsRow.innerHTML = `<td colspan="13" class="empty-registry-message">${noResultsMsg}</td>`;
                 tbody.appendChild(noResultsRow);
             } else {
-                existingNoResults.innerHTML = `<td colspan="12" class="empty-registry-message">${noResultsMsg}</td>`;
+                existingNoResults.innerHTML = `<td colspan="13" class="empty-registry-message">${noResultsMsg}</td>`;
                 existingNoResults.style.display = '';
             }
         } else if (existingNoResults) {
@@ -2904,7 +2899,7 @@
                 if (totalEl) totalEl.textContent = data.length;
                 const tbody = document.getElementById('recordsTableBody');
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" class="empty-registry-message">No records found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="13" class="empty-registry-message">No records found.</td></tr>';
                     return;
                 }
 
@@ -2945,57 +2940,32 @@
                 let html = '';
                 data.forEach((r, index) => {
                     const batchId = r.batch_id || 1;
-                    const incharge = r.incharge || 'System';
-                    const forwarded = r.forwarded || 'No Forwarded';
+                    const incharge = (r.first_name || r.incharge || 'System');
+                    const forwarded = r.forwarded || ''; 
                     const isProcessed = r.is_processed == 1 || r.is_processed === true;
 
-                    // Add batch separator when batch OR incharge changes
-                    if (batchId !== lastBatchId || incharge.toLowerCase().trim() !== (lastInchargeName || '').toLowerCase().trim()) {
-                        const isFirstBatch = lastBatchId === null;
-                        lastDept = null; 
-                        html += `
-                            <tr class="batch-header-row" data-batch="${batchId}">
-                                <td colspan="12" style="vertical-align: middle; padding: ${isFirstBatch ? '0' : '20px 40px'} !important; border:none;" class="batch-header-cell">
-                                    ${!isFirstBatch ? `
-                                    <div style="display: flex; align-items: center; gap: 20px;">
-                                        <div style="flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #6366f1); border-radius: 4px;"></div>
-                                        <div style="display: flex; gap: 6px;">
-                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
-                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc;"></div>
-                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
-                                        </div>
-                                        <div style="flex: 1; height: 2px; background: linear-gradient(90deg, #6366f1, transparent); border-radius: 4px;"></div>
-                                    </div>
-                                    ` : ''}
-                                </td>
-                            </tr>
-                        `;
-                        lastBatchId = batchId;
-                        lastInchargeName = incharge;
-                    }
-
+                    // Add forwarded header ONLY if it's not empty and it changed
                     if (forwarded !== lastDept) {
-                        const prepDate = r.created_at ? formatDate(r.created_at) : '-';
-                        html += `
-                            <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}">
-                                <td colspan="12" class="forwarded-header">
-                                    <div class="forwarded-header-content">
-                                        <div class="custom-checkbox forwarded-select-all" data-forwarded="${forwarded}" onclick="toggleForwardedSelection('${forwarded.replace(/'/g, "\\'")}', this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                        if (forwarded !== '') {
+                            const prepDate = r.created_at ? formatDate(r.created_at) : '-';
+                            html += `
+                                <tr class="forwarded-header-row" data-forwarded="${forwarded}" data-batch="${batchId}">
+                                    <td colspan="13" class="forwarded-header">
+                                        <div class="forwarded-header-content">
+                                            <div class="custom-checkbox forwarded-select-all" data-forwarded="${forwarded}" onclick="toggleForwardedSelection('${forwarded.replace(/'/g, "\\'")}', this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                            </div>
+                                            <div class="forwarded-badge">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                                </svg>
+                                                <span>${forwarded}</span>
+                                            </div>
                                         </div>
-                                        <div class="forwarded-badge">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px; height:16px;">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                                            </svg>
-                                            <span>${forwarded}</span>
-                                        </div>
-                                        <div class="header-date-badge" style="display: none;">
-                                            ${prepDate}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
+                                    </td>
+                                </tr>
+                            `;
+                        }
                         lastDept = forwarded;
                     }
 
@@ -3008,6 +2978,15 @@
                     
                     const remarkBadge = r.remarks ? `<span class="badge ${remarkClass}">${r.remarks}</span>` : '<span style="color:#cbd5e1">-</span>';
 
+                    // Formatting for display as requested
+                    const typeMap = {
+                        'Sick Leave': 'SL', 'Vacation Leave': 'VL', 'Mandatory/Forced Leave': 'FL', 'Special Privilege Leave': 'SPL',
+                        'Maternity Leave': 'ML', 'Paternity Leave': 'PL', 'Study Leave': 'STL', 'CTO': 'CTO'
+                    };
+                    const displayType = typeMap[r.type_of_leave] || r.type_of_leave;
+                    const displayIncharge = (r.first_name || r.incharge || '-');
+                    const displayDeduction = (r.deduction_remarks && r.deduction_remarks.includes('Bulk Approved')) ? '-' : (r.deduction_remarks || '-');
+
                     html += `
                         <tr data-forwarded="${forwarded}" data-id="${r.id}" data-remarks="${(r.remarks || '').toLowerCase()}" class="record-row">
                             <td class="selection-col">
@@ -3019,12 +2998,13 @@
                             <td class="cell-name" style="font-weight: 700;">${r.name}</td>
                             <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
                             <td class="cell-school">${r.school || '-'}</td>
-                            <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                            <td><span class="badge-leave">${displayType}</span></td>
                             <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
                             <td>${remarkBadge}</td>
                             <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
-                            <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.first_name || r.incharge || '-'}</td>
+                            <td class="cell-deduction">${displayDeduction}</td>
+                            <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${displayIncharge}</td>
+                            <td class="cell-assigned" style="display: none;"><span class="badge ${r.assigned === 'national' ? 'badge-blue' : 'badge-orange'}">${r.assigned || '-'}</span></td>
                             <td>
                                 <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                     <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -3049,7 +3029,7 @@
                 filterModalRecords();
             })
             .catch(() => {
-                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
+                document.getElementById('recordsTableBody').innerHTML = '<tr><td colspan="13" style="text-align:center; padding: 30px; color: #ef4444;">Error loading records.</td></tr>';
             });
     }
 
@@ -3406,7 +3386,7 @@
             if (data.success) {
                 setTimeout(() => {
                     if (ids.length >= tbody.querySelectorAll('.record-row').length) {
-                        tbody.innerHTML = '<tr><td colspan="12" class="empty-registry-message">All records processed and removed from registry.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="13" class="empty-registry-message">All records processed and removed from registry.</td></tr>';
                     } else {
                         // Re-fetch if partial export was done
                         fetchRecordsList();

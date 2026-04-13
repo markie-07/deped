@@ -20,5 +20,6 @@ class LeaveRecord extends Model
         'is_processed',
         'batch_id',
         'user_id',
+        'assigned',
     ];
 }

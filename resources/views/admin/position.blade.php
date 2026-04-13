@@ -1086,7 +1086,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear the date filter to show all records by default
         // Set the date filter to today's date by default
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchPositionRecords();
     };
@@ -1094,7 +1094,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.fetchPositionRecords = function() {
         const posName = currentPosForModal;
         const date = document.getElementById('modalFilterDate').value;
-        const url = `{{ url("/leave-records/by-position") }}?position=${encodeURIComponent(posName)}&date=${encodeURIComponent(date)}`;
+        const assigned = document.getElementById('assignedFilter').value;
+        const url = `{{ url("/leave-records/by-position") }}?position=${encodeURIComponent(posName)}&date=${encodeURIComponent(date)}&assigned=${assigned}`;
         
         const tbody = document.getElementById('positionTableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 40px; color: #94a3b8;">Loading...</td></tr>';

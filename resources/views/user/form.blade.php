@@ -1227,7 +1227,7 @@
     .record-table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed;
+        table-layout: auto;
     }
 
     .record-table th {
@@ -1273,19 +1273,11 @@
         line-height:1.4;
     }
 
-    /* Column widths for Registry Modal */
-    .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 3%; }  /* Selection */
-    .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 3%; }  /* # */
-    .record-table th:nth-child(3), .record-table td:nth-child(3) { width: 11%; } /* Name */
-    .record-table th:nth-child(4), .record-table td:nth-child(4) { width: 9%; }  /* Position */
-    .record-table th:nth-child(5), .record-table td:nth-child(5) { width: 9%; }  /* School */
-    .record-table th:nth-child(6), .record-table td:nth-child(6) { width: 6%; }  /* Leave Type */
-    .record-table th:nth-child(7), .record-table td:nth-child(7) { width: 10%; } /* Inclusive Dates */
-    .record-table th:nth-child(8), .record-table td:nth-child(8) { width: 8%; }  /* Remarks */
-    .record-table th:nth-child(9), .record-table td:nth-child(9) { width: 8%; }  /* Action Date */
-    .record-table th:nth-child(10), .record-table td:nth-child(10) { width: 13%; } /* Deduction Remark */
-    .record-table th:nth-child(11), .record-table td:nth-child(11) { width: 10%; } /* Incharge */
-    .record-table th:nth-child(12), .record-table td:nth-child(12) { width: 10%; } /* Actions */
+    /* Column specific adjustments for Registry Modal */
+    .record-table th:nth-child(1), .record-table td:nth-child(1) { width: 40px; } /* Selection */
+    .record-table th:nth-child(2), .record-table td:nth-child(2) { width: 40px; } /* # */
+    .record-table th:nth-child(3), .record-table td:nth-child(3) { min-width: 180px; } /* Name - give it more space */
+    .record-table th:nth-child(12), .record-table td:nth-child(12) { width: 100px; text-align: center; } /* Actions */
 
     .record-row:hover td {
         background: #f8fbff;
@@ -1458,6 +1450,8 @@
     .badge-yellow { background: #fffbeb; color: #d97706; border: 1px solid rgba(217,119,6,0.1); }
     .badge-violet { background: #f5f3ff; color: #7c3aed; border: 1px solid rgba(124,58,237,0.1); }
     .badge-gray { background: #f1f5f9; color: #64748b; border: 1px solid rgba(100,116,139,0.1); }
+    .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid rgba(29,78,216,0.1); }
+    .badge-orange { background: #fff7ed; color: #c2410c; border: 1px solid rgba(194,65,12,0.1); }
 
     /* ── Action Buttons (Table) ── */
     .btn-action {
@@ -3007,8 +3001,8 @@
                 let lastDept = null;
 
                 data.forEach((r, index) => {
-                    const forwarded = r.forwarded || 'No Forwarded';
-                if (forwarded !== lastDept) {
+                    const forwarded = r.forwarded || '';
+                if (forwarded && forwarded !== lastDept) {
                     html += `
                         <tr class="forwarded-header-row" data-forwarded="${forwarded}">
                             <td colspan="12" class="forwarded-header">

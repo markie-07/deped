@@ -25,57 +25,83 @@ class UserApiController extends Controller
      */
     public function store(Request $request)
     {
-        // Map external field names to internal ones
-        if ($request->has('avatar')) {
-            $request->merge(['profile_image' => $request->avatar]);
+        // ─── Mapping Incoming Standardized JSON to Internal Model ───
+        // Determine role mapping
+        $incomingRole = $request->role;
+        $mappedRole = $incomingRole;
+        if ($incomingRole === 'system_admin') {
+            $mappedRole = 'admin';
+        } elseif (in_array($incomingRole, ['coordinator', 'ojt'])) {
+            $mappedRole = 'user';
         }
-        if ($request->has('assign')) {
-            $request->merge(['assigned' => $request->assign]);
+
+        // Handle Profile Image Sync
+        $profileImagePath = $request->profile_image;
+        if ($request->filled('profile_image_base64')) {
+            $base64String = $request->profile_image_base64;
+            
+            // Remove base64 prefix if present (e.g., data:image/jpeg;base64,)
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $type)) {
+                $base64String = substr($base64String, strpos($base64String, ',') + 1);
+            }
+            
+            $imageData = base64_decode($base64String);
+            if ($imageData) {
+                // Ensure the relative path is used. If not provided, generate one.
+                $fileName = $request->profile_image ?: ('profile-images/' . uniqid() . '.jpg');
+                
+                // Make sure the filename is clean
+                $fileName = ltrim($fileName, '/');
+                
+                \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $imageData);
+                $profileImagePath = $fileName;
+                \Illuminate\Support\Facades\Log::info("DepEd: Profile image synced: {$fileName}");
+            }
         }
-        if ($request->has('email_searchable')) {
-            $request->merge(['email_hash' => $request->email_searchable]);
+
+        $mappedData = [
+            'last_name'         => $request->lastname,
+            'first_name'        => $request->first_name,
+            'middle_name'       => $request->middle_name,
+            'suffix'            => $request->suffix,
+            'email'             => $request->email,
+            'email_hash'        => $request->email_hash,
+            'profile_image'     => $profileImagePath,
+            'role'              => $mappedRole,
+            'assigned'          => $request->assigned,
+            'is_active'         => $request->has('is_active') ? (bool)$request->is_active : true,
+            'email_verified_at' => $request->email_verified_at,
+        ];
+
+        if ($request->filled('password')) {
+            $mappedData['password'] = $request->password;
         }
 
         // --- DEBUG LOG ---
-        \Illuminate\Support\Facades\Log::info('Incoming Data Payload:', $request->all());
+        \Illuminate\Support\Facades\Log::info('DepEd Incoming Sync Data:', $request->all());
 
-        $validator = Validator::make($request->all(), [
-            'id' => 'nullable|integer',
+        if ($request->action === 'deleted') {
+            return $this->destroy($request->id);
+        }
+
+        $validator = Validator::make($mappedData, [
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'suffix' => 'nullable|string|max:20',
-            'email' => 'required|email',
-            'password' => 'nullable|string|min:8',
-            'role' => 'nullable|string',
-            'assigned' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
-            'profile_image' => 'nullable|string',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email',
         ]);
 
         if ($validator->fails()) {
-            \Illuminate\Support\Facades\Log::error('Validation Failed:', $validator->errors()->toArray());
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only([
-            'first_name', 'last_name', 'middle_name', 'suffix', 
-            'email', 'role', 'assigned', 'is_active', 'profile_image', 'email_hash'
-        ]);
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        // Check if user exists by ID or Email
+        // Check if user exists by ID or Email Hash
         $user = null;
         if ($request->has('id')) {
             $user = User::find($request->id);
         }
         
         if (!$user) {
-            // Find by email hash (since email is encrypted, we use the blind index)
-            $emailHash = hash('sha256', strtolower($request->email));
+            $emailHash = $mappedData['email_hash'] ?? hash('sha256', strtolower($mappedData['email']));
             $user = User::where('email_hash', $emailHash)->first();
         }
 
@@ -85,23 +111,17 @@ class UserApiController extends Controller
             SyncService::$isSyncing = true;
 
             if ($user) {
-                // Update existing
-                $user->update($data);
+                $user->update($mappedData);
                 $status = 'updated';
             } else {
-                // Create new
                 if ($request->has('id')) {
-                    $data['id'] = $request->id;
+                    $mappedData['id'] = $request->id;
                 }
-                // Default values if not provided
-                $data['is_active'] = $data['is_active'] ?? true;
-                $data['role'] = $data['role'] ?? 'user';
-                
-                if (!isset($data['password'])) {
-                    $data['password'] = Hash::make('password123'); // Default password
+                $mappedData['is_approved'] = true;
+                if (!isset($mappedData['password'])) {
+                    $mappedData['password'] = Hash::make('password123');
                 }
-
-                $user = User::create($data);
+                $user = User::create($mappedData);
                 $status = 'created';
             }
 
@@ -109,14 +129,18 @@ class UserApiController extends Controller
             SyncService::$isSyncing = false;
 
             return response()->json([
-                'message' => "User successfully {$status}",
+                'message' => "User successfully {$status} in DepEd",
                 'user' => $user
             ], $status === 'created' ? 201 : 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
             SyncService::$isSyncing = false;
-            return response()->json(['error' => 'Failed to save user: ' . $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('Failed to save user in DepEd: ' . $e->getMessage(), [
+                'exception' => $e,
+                'data' => $mappedData
+            ]);
+            return response()->json(['error' => 'Failed to save user in DepEd: ' . $e->getMessage()], 500);
         }
     }
 

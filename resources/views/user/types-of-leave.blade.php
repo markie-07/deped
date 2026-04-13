@@ -1022,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear the date filter to show all records by default
         // Set the date filter to today's date by default
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchTypeRecords();
     };

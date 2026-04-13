@@ -1020,7 +1020,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear the date filter to show all records by default
         // Set the date filter to today's date by default
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchTypeRecords();
     };
@@ -1028,8 +1028,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.fetchTypeRecords = function() {
         const typeName = currentTypeForModal;
         const date = document.getElementById('modalFilterDate').value;
-
-        const url = `{{ url("/leave-records/by-type") }}?type=${encodeURIComponent(typeName)}&date=${encodeURIComponent(date)}`;
+        const assigned = getAssignedFilter();
+        const url = `{{ url("/leave-records/by-type") }}?type=${encodeURIComponent(typeName)}&date=${encodeURIComponent(date)}&assigned=${assigned}`;
         const tbody = document.getElementById('typeTableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 40px; color: #94a3b8;">Loading...</td></tr>';
         document.getElementById('modalTypeRecordCount').textContent = '...';

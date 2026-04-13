@@ -33,43 +33,61 @@ class SyncService
         }
 
         try {
-            $data = [
-                'action' => $action,
-                'user' => [
-                    'id' => $user->id,
-                    'last_name' => $user->last_name,
-                    'first_name' => $user->first_name,
-                    'middle_name' => $user->middle_name,
-                    'suffix' => $user->suffix,
-                    'avatar' => $user->profile_image, // Mapped from profile_image
-                    'email' => $user->email,
-                    'email_searchable' => $user->email_hash, // Mapped from email_hash
-                    'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null,
-                    'is_active' => $user->is_active,
-                    'role' => $user->role,
-                    'assign' => $user->assigned, // Mapped from assigned
-                ]
-            ];
+            $profileImageBase64 = null;
+            if ($user->profile_image) {
+                $path = storage_path('app/public/' . $user->profile_image);
+                Log::info('SyncService: Checking profile image at ' . $path);
+                if (file_exists($path)) {
+                    $profileImageBase64 = base64_encode(file_get_contents($path));
+                    Log::info('SyncService: Profile image encoded. Length: ' . strlen($profileImageBase64));
+                } else {
+                    Log::warning('SyncService: Profile image file not found at ' . $path);
+                }
+            }
 
-            // If deleted, we might only need the ID
+            $data = [
+                'id' => $user->id,
+                'lastname' => $user->last_name,
+                'middle_name' => $user->middle_name,
+                'first_name' => $user->first_name,
+                'suffix' => $user->suffix,
+                'email' => $user->email,
+                'email_hash' => $user->email_hash, // maps to email_searchable on the other side
+                'profile_image' => $user->profile_image, // relative path
+                'profile_image_base64' => $profileImageBase64,
+                'password' => $user->password,
+                'role' => $user->role,
+                'assigned' => $user->assigned, // maps to assign on the other side
+                'is_active' => $user->is_active ? 1 : 0,
+                'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null,
+                'action' => $action,
+            ];
+            
+            Log::info('SyncService: Sending payload for User ID: ' . $user->id . ' has_image: ' . ($profileImageBase64 ? 'Yes' : 'No'));
+
+            // If deleted, we might only need the ID and email_hash for identification
             if ($action === 'deleted') {
-                $data['user'] = ['id' => $user->id];
+                $data = [
+                    'id' => $user->id,
+                    'email_hash' => $user->email_hash,
+                    'action' => 'deleted'
+                ];
             }
 
             $response = Http::withHeaders([
-                'X-Sync-Source' => 'deped-system',
+                'X-Sync-Source' => 'deped',
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
             ])->post($url, $data);
 
             if (!$response->successful()) {
-                Log::error('External Sync Failed. Status: ' . $response->status() . ' Body: ' . $response->body());
+                Log::error('External Sync Failed from deped to ' . $url . '. Status: ' . $response->status() . ' Body: ' . $response->body());
             } else {
-                Log::info('External Sync Success for User ID: ' . $user->id);
+                Log::info('External Sync Success for User ID: ' . $user->id . ' Action: ' . $action);
             }
 
         } catch (\Exception $e) {
-            Log::error('External Sync Connection Error: ' . $e->getMessage());
+            Log::error('External Sync Connection Error in deped: ' . $e->getMessage());
         }
     }
 }

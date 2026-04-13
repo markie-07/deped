@@ -15,11 +15,17 @@ class ApiTokenMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = env('INTERNAL_API_TOKEN');
         $providedToken = $request->bearerToken();
+        $isRecordPath = $request->is('api/leave-records*');
         
+        $token = $isRecordPath 
+            ? env('INTERNAL_RECORD_TOKEN', env('INTERNAL_API_TOKEN'))
+            : env('INTERNAL_USER_TOKEN', env('INTERNAL_API_TOKEN'));
+
         \Illuminate\Support\Facades\Log::info('Incoming Sync Request', [
             'url' => $request->fullUrl(),
+            'path' => $request->path(),
+            'type' => $isRecordPath ? 'Record' : 'User',
             'token_match' => ($providedToken === $token)
         ]);
 
@@ -29,7 +35,7 @@ class ApiTokenMiddleware
 
         if ($providedToken !== $token) {
             return response()->json([
-                'message' => 'Unauthorized. Invalid API Token.'
+                'message' => 'Unauthorized. Invalid API Token for ' . ($isRecordPath ? 'Records' : 'Users') . '.'
             ], 401);
         }
 

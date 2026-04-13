@@ -1318,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modalEmployeeAvatar').style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
         document.getElementById('modalSearch').value = '';
         // Set the date filter to today's date by default
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchEmployeeRecords();
     };

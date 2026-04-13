@@ -118,7 +118,7 @@ class User extends Authenticatable
                 ];
                 
                 // Filter out empty parts and join them with spaces
-                return implode(' ', array_filter(array_map('trim', $parts)));
+                return implode(' ', array_filter(array_map(fn($val) => trim($val ?? ''), $parts)));
             }
         );
     }

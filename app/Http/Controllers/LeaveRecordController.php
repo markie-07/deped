@@ -64,9 +64,7 @@ class LeaveRecordController extends Controller
 
         if ($request->has('assigned') && $request->assigned && $request->assigned !== 'all') {
             $assigned = $request->assigned;
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            // Check both the creator (user_id) and the assigned scope of the record itself if we add that later
-            $query->whereIn('leave_records.user_id', $userIds);
+            $query->where('leave_records.assigned', $assigned);
         }
 
         $records = $query->get();
@@ -167,9 +165,10 @@ class LeaveRecordController extends Controller
             $validated['batch_id'] = $currentBatch;
         }
         
-        // Tag the record with the current user's ID
+        // Tag the record with the current user's ID and region
         if (auth()->check()) {
             $validated['user_id'] = auth()->id();
+            $validated['assigned'] = auth()->user()->assigned ?? 'national';
         }
         
         // If from leave-records page, mark as already processed
@@ -179,7 +178,7 @@ class LeaveRecordController extends Controller
     }
 
         // Automatically set incharge to the current user's name
-        $validated['incharge'] = auth()->user()->name ?? auth()->user()->email ?? '-';
+        $validated['incharge'] = auth()->user()->name;
 
         $record = LeaveRecord::create($validated);
 
@@ -226,6 +225,7 @@ class LeaveRecordController extends Controller
                     'remarks' => $record->remarks,
                     'date_of_action' => $record->date_of_action,
                     'deduction_remarks' => $record->deduction_remarks,
+                    'assigned' => $record->assigned,
                 ]
             );
         }
@@ -242,6 +242,7 @@ class LeaveRecordController extends Controller
                     'remarks' => $record->remarks,
                     'date_of_action' => $record->date_of_action,
                     'deduction_remarks' => $record->deduction_remarks,
+                    'assigned' => $record->assigned,
                 ]
             );
         }
@@ -260,12 +261,13 @@ class LeaveRecordController extends Controller
                         'remarks' => $record->remarks,
                         'date_of_action' => $record->date_of_action,
                         'deduction_remarks' => $record->deduction_remarks,
+                        'assigned' => $record->assigned,
                     ]
                 );
             }
         }
 
-        // Sync Remarks
+        // Sync Remark
         if ($record->remarks) {
             Remark::updateOrCreate(
                 ['name' => $record->remarks],
@@ -277,6 +279,7 @@ class LeaveRecordController extends Controller
                     'inclusive_dates' => $record->inclusive_dates,
                     'date_of_action' => $record->date_of_action,
                     'deduction_remarks' => $record->deduction_remarks,
+                    'assigned' => $record->assigned,
                 ]
             );
         }
@@ -372,8 +375,7 @@ class LeaveRecordController extends Controller
             ->where('leave_records.school', $school);
 
         if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $query->whereIn('user_id', $userIds);
+            $query->where('leave_records.assigned', $assigned);
         }
 
         if ($request->has('date') && $request->date) {
@@ -390,23 +392,15 @@ class LeaveRecordController extends Controller
     public function getSchools(Request $request) 
     {
         $assigned = $request->query('assigned');
+        $query = LeaveRecord::select('school', DB::raw('count(*) as leave_count'))
+                  ->whereNotNull('school')
+                  ->where('school', '!=', '');
         
-        // Get all schools from directory and filter out those with 0 records
-        $schools = School::orderBy('name')->get()->map(function($s) use ($assigned) {
-            $query = LeaveRecord::where('school', $s->name);
-            if ($assigned) {
-                $userIds = User::where('assigned', $assigned)->pluck('id');
-                $query->whereIn('user_id', $userIds);
-            }
-            return [
-                'school' => $s->name,
-                'type' => $s->type,
-                'leave_count' => $query->count()
-            ];
-        })->filter(function($s) {
-            return $s['leave_count'] > 0;
-        })->values();
-            
+        if ($assigned && $assigned !== 'all') {
+            $query->where('assigned', $assigned);
+        }
+        
+        $schools = $query->groupBy('school')->orderBy('school')->get();
         return response()->json($schools);
     }
 
@@ -433,22 +427,15 @@ class LeaveRecordController extends Controller
     public function getPositions(Request $request)
     {
         $assigned = $request->query('assigned');
+        $query = LeaveRecord::select('position', DB::raw('count(*) as leave_count'))
+                  ->whereNotNull('position')
+                  ->where('position', '!=', '');
+                  
+        if ($assigned && $assigned !== 'all') {
+            $query->where('assigned', $assigned);
+        }
         
-        // Get all positions from directory and filter out those with 0 records
-        $positions = Position::orderBy('name')->get()->map(function($p) use ($assigned) {
-            $query = LeaveRecord::where('position', $p->name);
-            if ($assigned) {
-                $userIds = User::where('assigned', $assigned)->pluck('id');
-                $query->whereIn('user_id', $userIds);
-            }
-            return [
-                'position' => $p->name,
-                'leave_count' => $query->count()
-            ];
-        })->filter(function($p) {
-            return $p['leave_count'] > 0;
-        })->values();
-            
+        $positions = $query->groupBy('position')->orderBy('position')->get();
         return response()->json($positions);
     }
 
@@ -467,8 +454,7 @@ class LeaveRecordController extends Controller
             ->where('leave_records.position', $position);
 
         if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $query->whereIn('user_id', $userIds);
+            $query->where('leave_records.assigned', $assigned);
         }
 
         if ($request->has('date') && $request->date) {
@@ -485,34 +471,16 @@ class LeaveRecordController extends Controller
     public function getLeaveTypes(Request $request)
     {
         $assigned = $request->query('assigned');
+        $query = LeaveRecord::select('type_of_leave', DB::raw('count(*) as leave_count'))
+                  ->whereNotNull('type_of_leave')
+                  ->where('type_of_leave', '!=', '');
         
-        // Get all leave types from directory
-        $types = LeaveType::orderBy('name')->get();
-        
-        $userIds = null;
-        if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
+        if ($assigned && $assigned !== 'all') {
+            $query->where('assigned', $assigned);
         }
         
-        $results = $types->map(function($t) use ($assigned, $userIds) {
-            // Optimized regex: allow optional spaces after/before commas
-            // This ensures 'Wellness, LC' matches the 'LC' card
-            $regex = '(^|,)[[:space:]]*' . preg_quote($t->name) . '[[:space:]]*([,]|$)';
-            $query = LeaveRecord::where('type_of_leave', 'REGEXP', $regex);
-            if ($userIds !== null) {
-                $query->whereIn('user_id', $userIds);
-            }
-            $count = $query->count();
-            
-            return [
-                'type_of_leave' => $t->name,
-                'leave_count' => $count
-            ];
-        })->filter(function($t) {
-            return $t['leave_count'] > 0;
-        })->values();
-            
-        return response()->json($results);
+        $types = $query->groupBy('type_of_leave')->orderBy('type_of_leave')->get();
+        return response()->json($types);
     }
 
     /**
@@ -532,8 +500,7 @@ class LeaveRecordController extends Controller
             ->where('leave_records.type_of_leave', 'LIKE', '%' . $type . '%');
 
         if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $query->whereIn('user_id', $userIds);
+            $query->where('leave_records.assigned', $assigned);
         }
 
         if ($request->has('date') && $request->date) {
@@ -550,31 +517,27 @@ class LeaveRecordController extends Controller
     public function getRemarksList(Request $request)
     {
         $assigned = $request->query('assigned');
+        $query = LeaveRecord::select('remarks', DB::raw('count(*) as leave_count'))
+                  ->whereNotNull('remarks')
+                  ->where('remarks', '!=', '');
         
-        // Get all remarks from directory
-        $remarks = Remark::orderBy('name')->get();
-
-        $userIds = null;
-        if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
+        if ($assigned && $assigned !== 'all') {
+            $query->where('assigned', $assigned);
         }
-
-        $resultsGrouped = [];
         
-        foreach ($remarks as $r) {
-            $name = $r->name;
+        $rawRecords = $query->groupBy('remarks')->get();
+        
+        $resultsGrouped = [];
+        foreach ($rawRecords as $r) {
+            $name = $r->remarks;
             $key = $name;
+            $count = $r->leave_count;
             
-            // Normalize W/O to Without Pay for grouping
-            if (strtolower($name) === 'w/o') {
+            // Normalize common variations of "Without Pay"
+            $lower = strtolower($name);
+            if ($lower === 'w/o' || $lower === 'without pay' || $lower === 'w/o pay') {
                 $key = 'Without Pay';
             }
-            
-            $query = LeaveRecord::where('remarks', $name);
-            if ($userIds !== null) {
-                $query->whereIn('user_id', $userIds);
-            }
-            $count = $query->count();
             
             if (isset($resultsGrouped[$key])) {
                 $resultsGrouped[$key]['leave_count'] += $count;
@@ -586,9 +549,7 @@ class LeaveRecordController extends Controller
             }
         }
         
-        $final = array_values(array_filter($resultsGrouped, function ($r) {
-            return $r['leave_count'] > 0;
-        }));
+        $final = array_values($resultsGrouped);
         usort($final, function($a, $b) { return strcmp($a['remarks'], $b['remarks']); });
         
         return response()->json($final);
@@ -614,8 +575,7 @@ class LeaveRecordController extends Controller
         }
 
         if ($assigned) {
-            $userIds = User::where('assigned', $assigned)->pluck('id');
-            $query->whereIn('user_id', $userIds);
+            $query->where('leave_records.assigned', $assigned);
         }
 
         if ($request->has('date') && $request->date) {
@@ -711,45 +671,65 @@ class LeaveRecordController extends Controller
         $users = $usersQuery->get();
         
         $result = $users->map(function ($user) {
-            $name = $user->name;
+            $name = trim($user->name);
             $leave_count = LeaveRecord::where('user_id', $user->id)->count();
 
             return (object)[
                 'id' => $user->id,
                 'incharge' => $name,
-                'first_name' => $user->first_name,
+                'first_name' => trim($user->first_name),
                 'leave_count' => $leave_count,
                 'profile_image' => $user->profile_image,
                 'cover_image' => $user->cover_image,
                 'position' => $user->position,
                 'assigned' => $user->assigned,
             ];
-        })->values();
+        });
 
         // 2. Add legacy incharges who might not be in the users table
-        // (but only if they have records in the current assignment scope)
         $legacyQuery = LeaveRecord::whereNotNull('incharge')->where('incharge', '!=', '');
         if ($assignment && $assignment !== 'all') {
-            $userIds = User::where('assigned', $assignment)->pluck('id');
-            $legacyQuery->whereIn('user_id', $userIds);
+            $legacyQuery->where('assigned', $assignment);
         }
         
         $legacyNames = $legacyQuery->distinct()->pluck('incharge');
-        $existingNames = $result->pluck('incharge')->toArray();
+        $existingNames = $result->pluck('incharge')->map(fn($n) => strtolower(trim($n)))->toArray();
+        $existingFirstNames = $result->pluck('first_name')->map(fn($n) => strtolower(trim($n)))->toArray();
         
         foreach ($legacyNames as $lName) {
-            if (!in_array($lName, $existingNames)) {
+            $trimmedLName = trim($lName);
+            $lowerLName = strtolower($trimmedLName);
+            
+            // Avoid duplicates if the legacy name matches either a user's full name or first name
+            if (!in_array($lowerLName, $existingNames) && !in_array($lowerLName, $existingFirstNames)) {
                 $result->push((object)[
-                    'incharge' => $lName,
-                    'first_name' => $lName,
+                    'id' => null,
+                    'incharge' => $trimmedLName,
+                    'first_name' => $trimmedLName,
                     'leave_count' => LeaveRecord::where('incharge', $lName)->count(),
                     'profile_image' => null,
                     'assigned' => $assignment
                 ]);
+                
+                // Add to existing names to prevent further duplicates from legacy names
+                $existingNames[] = $lowerLName;
+                $existingFirstNames[] = $lowerLName;
+            }
+        }
+        
+        // Final de-duplication based on first_name (what actually displays in the UI)
+        $uniqueResult = [];
+        $seenDisplays = [];
+        
+        foreach ($result as $item) {
+            $display = strtolower(trim($item->first_name ?: $item->incharge));
+            if (!in_array($display, $seenDisplays)) {
+                $seenDisplays[] = $display;
+                $uniqueResult[] = $item;
             }
         }
 
-        return response()->json($result);
+        return response()->json($uniqueResult);
     }
 
     /**
@@ -758,24 +738,42 @@ class LeaveRecordController extends Controller
     public function getByIncharge(Request $request)
     {
         $incharge = $request->input('incharge');
+        $assigned = $request->query('assigned');
         
-        // Find the user to get their name for a thorough search
-        $user = User::whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$incharge])->first();
+        // Find the user to get their name and ID for a thorough search
+        $userId = $request->input('user_id');
+        $user = null;
+        
+        if ($userId && $userId !== 'undefined' && $userId !== '') {
+            $user = User::find($userId);
+        }
+        
+        if (!$user) {
+            $user = User::whereRaw("CONCAT(first_name, ' ', last_name) = ?", [$incharge])
+                      ->orWhere('first_name', $incharge)
+                      ->first();
+        }
         
         $query = LeaveRecord::leftJoin('users', 'leave_records.user_id', '=', 'users.id')
             ->select('leave_records.*', 'users.first_name')
             ->where(function($q) use ($incharge, $user) {
-            $q->where('leave_records.incharge', $incharge);
-            if ($user) {
-                $q->orWhere('leave_records.incharge', $user->name);
-            }
-        });
+                $q->where('leave_records.incharge', $incharge);
+                if ($user) {
+                    $q->orWhere('leave_records.incharge', $user->name);
+                    $q->orWhere('leave_records.incharge', $user->first_name);
+                    $q->orWhere('leave_records.user_id', $user->id);
+                }
+            });
 
-        if ($request->has('date') && $request->date) {
-            $query->whereDate('date_of_action', $request->date);
+        if ($assigned && $assigned !== 'all') {
+            $query->where('leave_records.assigned', $assigned);
         }
 
-        $records = $query->orderBy('created_at', 'asc')->get();
+        if ($request->has('date') && $request->date) {
+            $query->whereDate('leave_records.date_of_action', $request->date);
+        }
+
+        $records = $query->orderBy('leave_records.created_at', 'asc')->get();
         return response()->json($records);
     }
 

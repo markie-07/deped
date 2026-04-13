@@ -1539,7 +1539,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear the date filter to show all records by default
         // Set the date filter to today's date by default
-        document.getElementById('modalFilterDate').value = "{{ date('Y-m-d') }}";
+        document.getElementById('modalFilterDate').value = "";
         
         fetchSchoolRecords();
     };
@@ -1547,8 +1547,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.fetchSchoolRecords = function() {
         const schoolName = currentSchoolForModal;
         const date = document.getElementById('modalFilterDate').value;
-
-        const url = `{{ url("/leave-records/by-school") }}?school=${encodeURIComponent(schoolName)}&date=${encodeURIComponent(date)}`;
+        const assigned = document.getElementById('assignedFilter').value;
+        const url = `{{ url("/leave-records/by-school") }}?school=${encodeURIComponent(schoolName)}&date=${encodeURIComponent(date)}&assigned=${assigned}`;
         const tbody = document.getElementById('schoolTableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 40px; color: #94a3b8;">Loading...</td></tr>';
         document.getElementById('modalSchoolRecordCount').textContent = '...';

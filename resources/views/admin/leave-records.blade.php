@@ -1399,6 +1399,15 @@ function fetchMasterRecords(exportModeOverride = null) {
 
                 const remarkBadge = `<span class="remark-badge ${remarkClass}">${r.remarks || '-'}</span>`;
 
+                // Formatting for display as requested
+                const typeMap = {
+                    'Sick Leave': 'SL', 'Vacation Leave': 'VL', 'Mandatory/Forced Leave': 'FL', 'Special Privilege Leave': 'SPL',
+                    'Maternity Leave': 'ML', 'Paternity Leave': 'PL', 'Study Leave': 'STL', 'CTO': 'CTO'
+                };
+                const displayType = typeMap[r.type_of_leave] || r.type_of_leave;
+                const displayIncharge = (r.first_name || r.incharge || '-');
+                const displayDeduction = (r.deduction_remarks && r.deduction_remarks.includes('Bulk Approved')) ? '-' : (r.deduction_remarks || '-');
+
                 html += `
                     <tr data-forwarded="${forwarded}" data-batch="${batchId}" data-remarks="${rem}" data-incharge="${r.incharge || ''}" data-user-id="${r.user_id || ''}" data-first-name="${(r.first_name || '').toLowerCase()}">
                         <td class="col-checkbox" style="display: ${isExportMode ? '' : 'none'};">
@@ -1408,12 +1417,12 @@ function fetchMasterRecords(exportModeOverride = null) {
                         <td class="cell-name" style="font-weight: 700;">${r.name}</td>
                         <td class="cell-position" style="font-weight: 600;">${r.position || '-'}</td>
                         <td class="cell-school">${r.school || '-'}</td>
-                        <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                        <td><span class="badge-leave">${displayType}</span></td>
                         <td class="cell-dates" style="font-family:monospace; letter-spacing: -0.01em;">${r.inclusive_dates || '-'}</td>
                         <td>${remarkBadge}</td>
-<td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
-                        <td class="cell-deduction">${r.deduction_remarks || '-'}</td>
-                        <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${r.first_name || r.incharge || '-'}</td>
+                        <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${isProcessed ? formatDate(r.date_of_action) : '-'}</td>
+                        <td class="cell-deduction">${displayDeduction}</td>
+                        <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${displayIncharge}</td>
                         <td>
                             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                 <button onclick="editRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -1739,18 +1748,27 @@ function renderPreview() {
         else if (rem.includes('disapproved') || rem.includes('without pay')) remarkType = 'red';
         else if (rem.includes('pending')) remarkType = 'yellow';
         
+        // Formatting for display as requested
+        const typeMap = {
+            'Sick Leave': 'SL', 'Vacation Leave': 'VL', 'Mandatory/Forced Leave': 'FL', 'Special Privilege Leave': 'SPL',
+            'Maternity Leave': 'ML', 'Paternity Leave': 'PL', 'Study Leave': 'STL', 'CTO': 'CTO'
+        };
+        const displayType = typeMap[r.type_of_leave] || r.type_of_leave;
+        const displayIncharge = (r.incharge || '-');
+        const displayDeduction = (r.deduction_remarks && r.deduction_remarks.includes('Bulk Approved')) ? '-' : (r.deduction_remarks || '-');
+
         html += `
             <tr>
                 <td class="cell-index">${rowIndex}</td>
                 <td class="cell-name">${r.name}</td>
                 <td>${r.position}</td>
                 <td>${r.school}</td>
-                <td><span class="badge-leave">${r.type_of_leave}</span></td>
+                <td><span class="badge-leave">${displayType}</span></td>
                 <td class="cell-dates">${r.inclusive_dates}</td>
                 <td><span class="remark-badge-preview ${remarkType}">${r.remarks}</span></td>
                 <td>${r.date_of_action}</td>
-                <td>${r.deduction_remarks}</td>
-                <td>${r.incharge}</td>
+                <td>${displayDeduction}</td>
+                <td>${displayIncharge}</td>
             </tr>
         `;
     });
