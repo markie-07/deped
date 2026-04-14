@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeaveRecord;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -15,21 +16,31 @@ class LeaveRecordApiController extends Controller
             Log::info('Received Leave Record: ', $request->all());
 
             $userId = null;
-            if ($request->encoder_id) {
-                // Try matching by ID first
-                $user = \App\Models\User::find($request->encoder_id);
-                if ($user) {
-                    $userId = $user->id;
-                }
+            $applicantUser = null;
+            $encoderUser = null;
+
+            // 1. Look up the Applicant
+            if ($request->applicant_email) {
+                $emailHash = hash('sha256', strtolower($request->applicant_email));
+                $applicantUser = User::where('email_hash', $emailHash)->first();
             }
 
-            if (!$userId && $request->encoder_email) {
-                // Fallback to email_hash if ID doesn't match or is missing
+            // 2. Look up the Encoder/Approver
+            if ($request->encoder_email) {
                 $emailHash = hash('sha256', strtolower($request->encoder_email));
-                $user = \App\Models\User::where('email_hash', $emailHash)->first();
-                if ($user) {
-                    $userId = $user->id;
-                }
+                $encoderUser = User::where('email_hash', $emailHash)->first();
+            }
+
+            // DECISION LOGIC:
+            // - If Applicant is a Staff (OJT/Coordinator), they see it.
+            // - If Applicant is an Admin, they DON'T see it (falls to Encoder).
+            if ($applicantUser && $applicantUser->role !== 'admin') {
+                $userId = $applicantUser->id;
+            } elseif ($encoderUser) {
+                $userId = $encoderUser->id;
+            } elseif ($applicantUser) {
+                // Last resort fallback
+                $userId = $applicantUser->id;
             }
 
             // Determine Forwarded and Assigned
@@ -37,8 +48,9 @@ class LeaveRecordApiController extends Controller
             $forwarded = null; // Should be empty as requested
 
             // Automatic Batching
-            $currentBatch = \App\Models\LeaveRecord::where('is_processed', false)->max('batch_id') 
-                ?? (\App\Models\LeaveRecord::max('batch_id') ?? 0) + 1;
+            $currentBatch = LeaveRecord::where('is_processed', false)->max('batch_id') 
+                ?? (LeaveRecord::max('batch_id') ?? 0) + 1;
+
 
             // Check for duplicate to prevent "domodoble" (duplication)
             $existing = LeaveRecord::where('name', $request->full_name)
@@ -56,8 +68,12 @@ class LeaveRecordApiController extends Controller
                 ], 200);
             }
 
+            // Automatic Batching
+            $currentBatch = LeaveRecord::where('is_processed', false)->max('batch_id') 
+                ?? (LeaveRecord::max('batch_id') ?? 0) + 1;
+
             $record = LeaveRecord::create([
-                'name'              => $request->full_name,
+                'name'              => $request->full_name ?? $request->name ?? 'Unknown Employee',
                 'forwarded'         => $forwarded,
                 'position'          => $request->position,
                 'school'            => $request->school,
@@ -66,8 +82,8 @@ class LeaveRecordApiController extends Controller
                 'remarks'           => $request->remarks,
                 'date_of_action'    => $request->action_date,
                 'deduction_remarks' => $request->deduction_remark,
-                'incharge'          => $request->incharge,
-                'assigned'          => $assigned,
+                'incharge'          => $request->incharge ?: 'System',
+                'assigned'          => $assigned ?: 'national',
                 'is_processed'      => false,
                 'batch_id'          => $currentBatch,
                 'user_id'           => $userId,

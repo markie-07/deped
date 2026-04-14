@@ -2729,7 +2729,7 @@
                             <th>Action Date</th>
                             <th>Deduction Remark</th>
                             <th>Incharge</th>
-                            <th style="display: none;">Assigned</th>
+                            <th>Assigned</th>
                             <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
@@ -3004,7 +3004,7 @@
                             <td class="cell-action-date" style="font-family:monospace; font-weight:700;">${formatDate(r.date_of_action)}</td>
                             <td class="cell-deduction">${displayDeduction}</td>
                             <td class="cell-incharge" style="font-style: italic; font-weight: 500;">${displayIncharge}</td>
-                            <td class="cell-assigned" style="display: none;"><span class="badge ${r.assigned === 'national' ? 'badge-blue' : 'badge-orange'}">${r.assigned || '-'}</span></td>
+                             <td class="cell-assigned"><span class="badge ${r.assigned === 'national' ? 'badge-blue' : 'badge-orange'}" style="text-transform: capitalize;">${r.assigned || '-'}</span></td>
                             <td>
                                 <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;">
                                     <button onclick="editModalRecord(${r.id})" class="btn-action btn-edit" title="Edit">
@@ -3242,11 +3242,11 @@
                             <th>Name</th>
                             <th>Position</th>
                             <th>School</th>
-                            <th>Type of Leave</th>
+                            <th>Leave Type</th>
                             <th>Inclusive Dates</th>
                             <th>Remarks</th>
-                            <th>Date of Action</th>
-                            <th>Deduction Remarks</th>
+                            <th>Action Date</th>
+                            <th>Deduction Remark</th>
                             <th>Incharge</th>
                         </tr>
                     </thead>

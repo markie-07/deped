@@ -82,6 +82,7 @@
                                 <label>Assignment</label>
                                 <div class="filter-select-wrap">
                                     <select id="assignedFilter" onchange="handleAssignmentChange()">
+                                        <option value="all">All Regions</option>
                                         <option value="national">National</option>
                                         <option value="city">City</option>
                                     </select>

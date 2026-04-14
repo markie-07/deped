@@ -31,13 +31,21 @@ class LeaveRecordController extends Controller
         // 1. The "Registry" modal (on the Form page) is personal work - only see your own records.
         // 2. The "History" page (on leave-records page) shows everyone's work, but grouped separately.
         if ($request->has('view') && $request->view === 'registry') {
-            $query->where('is_processed', false);
+            $query->where('leave_records.is_processed', false);
             if (auth()->check()) {
-                $query->where('user_id', auth()->id());
+                $user = auth()->user();
+                $userAssigned = strtolower($user->assigned ?? 'national');
+                $query->where(function($q) use ($user, $userAssigned) {
+                    $q->where('leave_records.user_id', $user->id)
+                      ->orWhere(function($sq) use ($userAssigned) {
+                          $sq->whereNull('leave_records.user_id')
+                             ->where('leave_records.assigned', $userAssigned);
+                      });
+                });
             }
         } else {
             // History pages should only show processed records
-            $query->where('is_processed', true);
+            $query->where('leave_records.is_processed', true);
         }
 
         if ($request->has('date') && $request->date) {
@@ -62,9 +70,21 @@ class LeaveRecordController extends Controller
             });
         }
 
-        if ($request->has('assigned') && $request->assigned && $request->assigned !== 'all') {
+        $user = auth()->user();
+        if ($request->has('assigned') && $request->assigned) {
             $assigned = $request->assigned;
-            $query->where('leave_records.assigned', $assigned);
+            
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            // Default to user's assignment if no parameter provided
+            $query->where('leave_records.assigned', strtolower($user->assigned) ?: 'national');
         }
 
         $records = $query->get();
@@ -374,8 +394,18 @@ class LeaveRecordController extends Controller
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.school', $school);
 
+        $user = auth()->user();
         if ($assigned) {
-            $query->where('leave_records.assigned', $assigned);
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('leave_records.assigned', strtolower($user->assigned) ?: 'national');
         }
 
         if ($request->has('date') && $request->date) {
@@ -396,8 +426,18 @@ class LeaveRecordController extends Controller
                   ->whereNotNull('school')
                   ->where('school', '!=', '');
         
-        if ($assigned && $assigned !== 'all') {
-            $query->where('assigned', $assigned);
+        $user = auth()->user();
+        if ($assigned) {
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('assigned', strtolower($user->assigned) ?: 'national');
         }
         
         $schools = $query->groupBy('school')->orderBy('school')->get();
@@ -431,8 +471,18 @@ class LeaveRecordController extends Controller
                   ->whereNotNull('position')
                   ->where('position', '!=', '');
                   
-        if ($assigned && $assigned !== 'all') {
-            $query->where('assigned', $assigned);
+        $user = auth()->user();
+        if ($assigned) {
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('assigned', strtolower($user->assigned) ?: 'national');
         }
         
         $positions = $query->groupBy('position')->orderBy('position')->get();
@@ -453,8 +503,18 @@ class LeaveRecordController extends Controller
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.position', $position);
 
+        $user = auth()->user();
         if ($assigned) {
-            $query->where('leave_records.assigned', $assigned);
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('leave_records.assigned', strtolower($user->assigned) ?: 'national');
         }
 
         if ($request->has('date') && $request->date) {
@@ -475,8 +535,18 @@ class LeaveRecordController extends Controller
                   ->whereNotNull('type_of_leave')
                   ->where('type_of_leave', '!=', '');
         
-        if ($assigned && $assigned !== 'all') {
-            $query->where('assigned', $assigned);
+        $user = auth()->user();
+        if ($assigned) {
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('assigned', strtolower($user->assigned) ?: 'national');
         }
         
         $types = $query->groupBy('type_of_leave')->orderBy('type_of_leave')->get();
@@ -499,8 +569,18 @@ class LeaveRecordController extends Controller
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.type_of_leave', 'LIKE', '%' . $type . '%');
 
+        $user = auth()->user();
         if ($assigned) {
-            $query->where('leave_records.assigned', $assigned);
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('leave_records.assigned', strtolower($user->assigned) ?: 'national');
         }
 
         if ($request->has('date') && $request->date) {
@@ -521,8 +601,18 @@ class LeaveRecordController extends Controller
                   ->whereNotNull('remarks')
                   ->where('remarks', '!=', '');
         
-        if ($assigned && $assigned !== 'all') {
-            $query->where('assigned', $assigned);
+        $user = auth()->user();
+        if ($assigned) {
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('assigned', strtolower($user->assigned) ?: 'national');
         }
         
         $rawRecords = $query->groupBy('remarks')->get();
@@ -574,8 +664,18 @@ class LeaveRecordController extends Controller
             $query->where('leave_records.remarks', $remark);
         }
 
+        $user = auth()->user();
         if ($assigned) {
-            $query->where('leave_records.assigned', $assigned);
+            // Regular users cannot see 'all'
+            if ($user->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user->role !== 'admin') {
+            $query->where('leave_records.assigned', strtolower($user->assigned) ?: 'national');
         }
 
         if ($request->has('date') && $request->date) {
@@ -664,9 +764,19 @@ class LeaveRecordController extends Controller
         $assignment = $request->query('assigned');
         
         // 1. Get all users as potential incharges
+        $user_auth = auth()->user();
         $usersQuery = User::query();
-        if ($assignment && $assignment !== 'all') {
-            $usersQuery->where('assigned', $assignment);
+        if ($assignment) {
+            // Regular users cannot see 'all'
+            if ($user_auth->role !== 'admin' && $assignment === 'all') {
+                $assignment = strtolower($user_auth->assigned) ?: 'national';
+            }
+            
+            if ($assignment !== 'all') {
+                $usersQuery->where('assigned', $assignment);
+            }
+        } elseif ($user_auth->role !== 'admin') {
+            $usersQuery->where('assigned', strtolower($user_auth->assigned) ?: 'national');
         }
         $users = $usersQuery->get();
         
@@ -765,8 +875,18 @@ class LeaveRecordController extends Controller
                 }
             });
 
-        if ($assigned && $assigned !== 'all') {
-            $query->where('leave_records.assigned', $assigned);
+        $user_auth = auth()->user();
+        if ($assigned) {
+            // Regular users cannot see 'all'
+            if ($user_auth->role !== 'admin' && $assigned === 'all') {
+                $assigned = strtolower($user_auth->assigned) ?: 'national';
+            }
+            
+            if ($assigned !== 'all') {
+                $query->where('leave_records.assigned', $assigned);
+            }
+        } elseif ($user_auth->role !== 'admin') {
+            $query->where('leave_records.assigned', strtolower($user_auth->assigned) ?: 'national');
         }
 
         if ($request->has('date') && $request->date) {

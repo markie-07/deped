@@ -21,8 +21,17 @@ class EmployeeController extends Controller
 
     public function getEmployees(Request $request)
     {
+        $user = auth()->user();
         $assigned = $request->query('assigned');
         
+        // Admin can see everything if they choose 'all'
+        // Regular users must choose one (national or city)
+        if ($user->role !== 'admin') {
+            if (!$assigned || $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+        }
+
         // Get employees with at least one leave record, filtering by creator's assignment
         $query = LeaveRecord::whereNotNull('name')->where('name', '!=', '');
 
@@ -43,8 +52,16 @@ class EmployeeController extends Controller
 
     public function getRecordsByEmployee(Request $request)
     {
+        $user = auth()->user();
         $name = $request->input('name');
         $assigned = $request->query('assigned');
+
+        if ($user->role !== 'admin') {
+            if (!$assigned || $assigned === 'all') {
+                $assigned = strtolower($user->assigned) ?: 'national';
+            }
+        }
+
         $records = LeaveRecord::leftJoin('users', function($join) {
                 $join->on('leave_records.user_id', '=', 'users.id')
                      ->orOn('leave_records.incharge', '=', DB::raw("CONCAT(users.first_name, ' ', users.last_name)"));
@@ -52,7 +69,7 @@ class EmployeeController extends Controller
             ->select('leave_records.*', 'users.first_name')
             ->where('leave_records.name', $name);
 
-        if ($assigned) {
+        if ($assigned && $assigned !== 'all') {
             $records->where('leave_records.assigned', $assigned);
         }
 

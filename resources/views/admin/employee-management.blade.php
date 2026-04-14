@@ -269,7 +269,7 @@
                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                    </svg><select id="inputRole"
+                                    </svg><select id="inputRole" onchange="toggleAssignField()"
                                         style="flex:1;border:none;outline:none;background:transparent;padding:11px 0;font-size:0.82rem;font-family:inherit;color:#1e293b;">
                                         <option value="user">User</option>
                                         <option value="admin">Administrator</option>
@@ -303,7 +303,7 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-field"><label class="form-label">Assign <span class="req">*</span></label>
+                            <div class="form-field" id="assignFieldArea"><label class="form-label">Assign <span class="req">*</span></label>
                                 <div class="form-input-wrap"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -1928,6 +1928,16 @@
             }
         };
 
+        window.toggleAssignField = function () {
+            const role = document.getElementById('inputRole').value;
+            const assignArea = document.getElementById('assignFieldArea');
+            if (role === 'admin') {
+                assignArea.style.display = 'none';
+            } else {
+                assignArea.style.display = '';
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             const PALETTES = [
                 ['#6366f1', '#4f46e5'], ['#818cf8', '#6366f1'], ['#ec4899', '#db2777'],
@@ -2078,6 +2088,7 @@
                 document.getElementById('approvalFieldArea').style.display = 'none';
                 document.getElementById('inputStatus').value = '1';
                 document.getElementById('inputApproved').value = '1';
+                toggleAssignField();
                 document.getElementById('accountModal').classList.add('open');
             };
 
@@ -2124,6 +2135,7 @@
                 document.getElementById('passwordHint').textContent = 'Leave blank to keep current password.';
                 document.getElementById('statusFieldArea').style.display = 'block';
                 document.getElementById('approvalFieldArea').style.display = 'block';
+                toggleAssignField();
                 document.getElementById('accountModal').classList.add('open');
             };
 
