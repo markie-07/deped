@@ -24,3 +24,4 @@ class Forwarded extends Model
         return $this->hasMany(LeaveRecord::class, 'forwarded', 'name');
     }
 }
+

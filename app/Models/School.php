@@ -23,3 +23,4 @@ class School extends Model
         return $this->hasMany(LeaveRecord::class, 'school', 'name');
     }
 }
+

@@ -22,3 +22,4 @@ class Remark extends Model
         return $this->hasMany(LeaveRecord::class, 'remarks', 'name');
     }
 }
+

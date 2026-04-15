@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LeaveRecord;
-use App\Models\School;
-use App\Models\Position;
-use App\Models\LeaveType;
-use App\Models\Remark;
-use App\Models\Forwarded;
-use App\Models\Employee;
 use App\Models\AuditLog;
+use App\Models\Employee;
+use App\Models\Forwarded;
+use App\Models\LeaveRecord;
+use App\Models\LeaveType;
+use App\Models\Position;
+use App\Models\Remark;
+use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
